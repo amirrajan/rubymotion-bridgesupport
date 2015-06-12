@@ -1,0 +1,33 @@
+diff --git a/src/projects/compiler-rt/make/platform/clang_darwin.mk b/src/projects/compiler-rt/make/platform/clang_darwin.mk
+index d664547..19deba5 100644
+--- a/src/projects/compiler-rt/make/platform/clang_darwin.mk
++++ b/src/projects/compiler-rt/make/platform/clang_darwin.mk
+@@ -15,14 +15,8 @@ UniversalArchs :=
+ Configs += 10.4
+ UniversalArchs.10.4 := i386 x86_64
+ 
+-# Configuration for targetting armv6. We need a few additional functions which
+-# must be in the same linkage unit.
+-Configs += armv6
+-UniversalArchs.armv6 := armv6
+-
+-# Configuration for use with kernel/kexts.
+ Configs += cc_kext
+-UniversalArchs.cc_kext := armv6 i386 x86_64
++UniversalArchs.cc_kext := i386 x86_64
+ 
+ # FIXME: Don't build an armv7 slice currently, they have the same functions.
+ #
+diff --git a/src/tools/clang/runtime/Makefile b/src/tools/clang/runtime/Makefile
+index 0e8b359..ef74f72 100644
+--- a/src/tools/clang/runtime/Makefile
++++ b/src/tools/clang/runtime/Makefile
+@@ -39,7 +39,7 @@ ifeq ($(shell test -d $(COMPILERRT_SRC_ROOT) && echo OK),OK)
+ RuntimeDirs :=
+ ifeq ($(OS),Darwin)
+ RuntimeDirs += darwin
+-RuntimeLibrary.darwin.Configs = 10.4 armv6 cc_kext
++RuntimeLibrary.darwin.Configs = 10.4 cc_kext
+ endif
+ 
+ # Rule to build the compiler-rt libraries we need.

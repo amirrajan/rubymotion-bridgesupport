@@ -88,6 +88,8 @@ SWIG_DIR = $(OBJROOT)/swig
 CLANG_DIR_MADE = $(CLANG_DIR)/$(MADEFILE)
 $(CLANG_DIR_MADE): $(OBJROOT_MADE)
 	$(TAR) -xjof $(SRCROOT)/$(CLANG_TARBALL) -C $(OBJROOT)
+	cd $(OBJROOT)/$(CLANG_VERS) && patch -p1 < ../../clang.patch
+	cd $(SRCROOT)
 	$(TOUCH) $@
 
 SWIG_DIR_MADE = $(SWIG_DIR)/$(MADEFILE)
