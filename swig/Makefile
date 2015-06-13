@@ -4,7 +4,7 @@ SHELL = /bin/sh
 
 #### Start of system configuration section. ####
 
- ifeq ("$(wildcard $(/System/Library/Frameworks/Ruby.framework/Versions/2.0))","")
+ifneq ("$(wildcard /System/Library/Frameworks/Ruby.framework/Versions/2.0)","")
 	ruby_version     = 2.0
 	ruby_abi_version = 2.0.0
 	topdir  = $(shell echo /System/Library/Frameworks/Ruby.framework/Versions/$(ruby_version)/usr/lib/ruby/$(ruby_abi_version)/universal-darwin*)
