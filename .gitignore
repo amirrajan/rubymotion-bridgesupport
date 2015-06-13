@@ -3,6 +3,8 @@
 # Specific files #
 ##################
 /OBJROOT
+/DSTROOT
+/SYMROOT
 
 # Xcode #
 #########
