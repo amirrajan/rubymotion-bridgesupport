@@ -1,4 +1,3 @@
-require 'iconv'
 require 'pathname'
 require 'rexml/document'
 require 'set'
@@ -324,15 +323,24 @@ module Bridgesupportparser
 
     class StringInfo < ValueInfo
 	@element_name = 'string_constant'
-	@@iconv = Iconv.new('UTF-8', 'MACROMAN')
 
 	def initialize(parser, name, value, nsstring = false)
 	    # make sure the string is UTF-8.  If not, assume it is MacRoman
 	    # and convert to UTF-8
-	    begin
-		value.unpack('U*') # throws exception if not UTF-8
-	    rescue
-		value = @@iconv.iconv(value)
+	    if RUBY_VERSION < "1.9"
+		require 'iconv'
+		@@iconv ||= Iconv.new('UTF-8', 'MACROMAN')
+		begin
+		    value.unpack('U*') # throws exception if not UTF-8
+		rescue
+		    value = @@iconv.iconv(value)
+		end
+	    else
+		begin
+		    value.encode!('UTF-8')
+		rescue
+		    value.encode!('UTF-8', 'MACROMAN')
+		end
 	    end
 	    super(parser, name, value)
 	    self[:nsstring] = true if nsstring
