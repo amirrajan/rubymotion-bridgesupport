@@ -38,7 +38,7 @@ datadir = $(datarootdir)
 localstatedir = $(prefix)/var
 sitelibdir = $(sitedir)/$(ruby_version)
 
-CC = g++
+CC = g++-4.2
 CXX = $(CC)
 LIBRUBY = $(LIBRUBY_SO)
 LIBRUBY_A = lib$(RUBY_SO_NAME)-static.a

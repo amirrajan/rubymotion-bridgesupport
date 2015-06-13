@@ -24,6 +24,8 @@ RC_CFLAGS = $(foreach arch,$(RC_ARCHS),-arch $(arch)) -pipe
 
 RSYNC = /usr/bin/rsync -rlpt
 RUBY = /usr/bin/ruby
+CC = gcc-4.2
+CXX = g++-4.2
 
 # Use files to represent whether a directory exist, avoiding problems with
 # the modification date of a directory changing.  To avoid cluttering up
@@ -116,7 +118,7 @@ $(CLANGROOT_MADE): $(CLANG_DIR_MADE)
 	    $(MKDIR) $(CLANG_DIR)/src/darwin-$$arch && \
 	    (cd $(CLANG_DIR)/src/darwin-$$arch && \
 	    $(MKDIR) ROOT && \
-	    ../configure --prefix=$(CLANG_PREFIX) --enable-debug-runtime --enable-debug-symbols --enable-optimized --disable-timestamps --disable-assertions --with-optimize-option='-Os' --without-llvmgcc --without-llvmgxx --disable-bindings --disable-doxygen --with-extra-options='-DDISABLE_SMART_POINTERS' CC="gcc -arch $$arch" CXX="g++ -arch $$arch" && \
+	    ../configure --prefix=$(CLANG_PREFIX) --enable-debug-runtime --enable-debug-symbols --enable-optimized --disable-timestamps --disable-assertions --with-optimize-option='-Os' --without-llvmgcc --without-llvmgxx --disable-bindings --disable-doxygen --with-extra-options='-DDISABLE_SMART_POINTERS' CC="$(CC) -arch $$arch" CXX="$(CXX) -arch $$arch" && \
 	    make -j$(shell sysctl -n hw.ncpu) && \
 	    $(MKDIR) $(CLANG_DIR)/src/darwin-$$arch/ROOT && \
 	    make install DESTDIR=$(CLANG_DIR)/src/darwin-$$arch/ROOT && \
