@@ -4,12 +4,24 @@ SHELL = /bin/sh
 
 #### Start of system configuration section. ####
 
+ ifeq ("$(wildcard $(/System/Library/Frameworks/Ruby.framework/Versions/2.0))","")
+	ruby_version     = 2.0
+	ruby_abi_version = 2.0.0
+	topdir  = $(shell echo /System/Library/Frameworks/Ruby.framework/Versions/$(ruby_version)/usr/lib/ruby/$(ruby_abi_version)/universal-darwin*)
+	hdrdir  = $(shell echo /System/Library/Frameworks/Ruby.framework/Versions/$(ruby_version)/usr/include/ruby-$(ruby_abi_version))
+	confdir = $(shell echo /System/Library/Frameworks/Ruby.framework/Versions/$(ruby_version)/usr/include/ruby-$(ruby_abi_version)/universal-darwin*)
+else
+	ruby_version     = 1.8
+	ruby_abi_version = 1.8
+	topdir = $(shell echo /System/Library/Frameworks/Ruby.framework/Versions/$(ruby_version)/usr/lib/ruby/$(ruby_abi_version)/universal-darwin*)
+	hdrdir = $(topdir)
+	confdir = .
+endif
+
 srcdir = .
-topdir = $(shell echo /System/Library/Frameworks/Ruby.framework/Versions/1.8/usr/lib/ruby/1.8/universal-darwin*)
-hdrdir = $(topdir)
 VPATH = $(srcdir):$(topdir):$(hdrdir)
 exec_prefix = $(prefix)
-prefix = $(DESTDIR)/System/Library/Frameworks/Ruby.framework/Versions/1.8/usr
+prefix = $(DESTDIR)/System/Library/Frameworks/Ruby.framework/Versions/$(ruby_version)/usr
 sharedstatedir = $(prefix)/com
 mandir = $(DESTDIR)/usr/share/man
 psdir = $(docdir)
@@ -22,11 +34,11 @@ htmldir = $(docdir)
 vendorarchdir = $(vendorlibdir)/$(sitearch)
 includedir = $(prefix)/include
 infodir = $(DESTDIR)/usr/share/info
-vendorlibdir = $(vendordir)/$(ruby_version)
+vendorlibdir = $(vendordir)/$(ruby_abi_version)
 sysconfdir = $(prefix)/etc
 libdir = $(exec_prefix)/lib
 sbindir = $(exec_prefix)/sbin
-rubylibdir = $(libdir)/ruby/$(ruby_version)
+rubylibdir = $(libdir)/ruby/$(ruby_abi_version)
 docdir = $(datarootdir)/doc/$(PACKAGE)
 dvidir = $(docdir)
 vendordir = $(libdir)/ruby/vendor_ruby
@@ -36,7 +48,7 @@ archdir = $(rubylibdir)/$(arch)
 sitearchdir = $(sitelibdir)/$(sitearch)
 datadir = $(datarootdir)
 localstatedir = $(prefix)/var
-sitelibdir = $(sitedir)/$(ruby_version)
+sitelibdir = $(sitedir)/$(ruby_abi_version)
 
 CC = g++-4.2
 CXX = $(CC)
@@ -49,7 +61,7 @@ RUBY_EXTCONF_H =
 LLVM-CONFIG = llvm-config
 CFLAGS   =  $(RC_CFLAGS) $(shell $(LLVM-CONFIG) --cxxflags | sed -e 's/ *-arch [^ ]*//g' -e 's/ *-D[^ ]*//g')
  
-INCFLAGS = -I. -I$(topdir) -I$(hdrdir) -I$(srcdir)
+INCFLAGS = -I. -I$(topdir) -I$(hdrdir) -I$(confdir) -I$(srcdir)
 DEFS     = 
 CPPFLAGS =  $(shell $(LLVM-CONFIG) --cppflags | sed 's/ *-arch [^ ]*//g')
 
@@ -67,8 +79,8 @@ RUBY_INSTALL_NAME = ruby
 RUBY_SO_NAME = ruby
 arch = $(shell $(RUBY) -e 'puts RUBY_PLATFORM')
 sitearch = $(arch)
-ruby_version = 1.8
-ruby = /System/Library/Frameworks/Ruby.framework/Versions/1.8/usr/bin/ruby
+
+ruby = /System/Library/Frameworks/Ruby.framework/Versions/$(ruby_version)/usr/bin/ruby
 RUBY = $(ruby)
 RM = rm -f
 MAKEDIRS = mkdir -p
@@ -162,7 +174,7 @@ ifneq ($(findstring -g,$(CXXFLAGS)),)
 endif
 
 
-$(OBJS): ruby.h defines.h
+$(OBJS): ruby.h
 
 BSP_HEADERS = classes.h bridgesupportparser.h __xattr__.h
 $(OBJS): $(BSP_HEADERS)
