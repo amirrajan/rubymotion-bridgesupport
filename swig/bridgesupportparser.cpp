@@ -947,15 +947,15 @@ rubyarr2c(VALUE arr)
 {
     Check_Type(arr, T_ARRAY);
     /* Get the length of the array */
-    int size = RARRAY(arr)->len; 
+    int size = RARRAY_LEN(arr); 
     const char **carr = (const char **) malloc((size+1)*sizeof(const char *));
     if(!carr) rb_raise(rb_eRuntimeError, "Out of memory");
     /* Get the first element in memory */
-    VALUE *ptr = RARRAY(arr)->ptr; 
+    VALUE *ptr = RARRAY_PTR(arr); 
     const char **p;
     for (p = carr; size > 0; size--, ptr++)
     /* Convert Ruby Object String to char* */
-	*p++ = STR2CSTR(*ptr); 
+	*p++ = StringValuePtr(*ptr); 
     *p = NULL; /* End of list */
     return carr;
 }
