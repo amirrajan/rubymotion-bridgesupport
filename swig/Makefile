@@ -59,14 +59,14 @@ LIBRUBYARG_STATIC = -l$(RUBY_SO_NAME)
 
 RUBY_EXTCONF_H = 
 LLVM-CONFIG = llvm-config
-CFLAGS   =  $(RC_CFLAGS) $(shell $(LLVM-CONFIG) --cxxflags | sed -e 's/ *-arch [^ ]*//g' -e 's/ *-D[^ ]*//g')
+CFLAGS   =  $(RC_CFLAGS) -mmacosx-version-min=10.7 $(shell $(LLVM-CONFIG) --cxxflags | sed -e 's/ *-arch [^ ]*//g' -e 's/ *-D[^ ]*//g')
  
 INCFLAGS = -I. -I$(topdir) -I$(hdrdir) -I$(confdir) -I$(srcdir)
 DEFS     = 
 CPPFLAGS =  $(shell $(LLVM-CONFIG) --cppflags | sed 's/ *-arch [^ ]*//g')
 
 CXXFLAGS = $(CFLAGS) 
-ldflags  = $(RC_CFLAGS) $(shell $(LLVM-CONFIG) --ldflags | sed 's/ *-arch [^ ]*//g')
+ldflags  = $(RC_CFLAGS) -mmacosx-version-min=10.7 $(shell $(LLVM-CONFIG) --ldflags | sed 's/ *-arch [^ ]*//g')
 
 dldflags = 
 archflag = 
