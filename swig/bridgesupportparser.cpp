@@ -212,8 +212,9 @@ declAttributes(const Decl *D, VALUE rhash = Qnil)
 {
     if(!D->hasAttrs()) return rhash;
     std::map<std::string,std::string> m;
-    const Attr *attr = D->getAttrs();
-    do {
+    const AttrVec Attrs = D->getAttrs();
+    for (AttrVec::const_iterator i = Attrs.begin(), e = Attrs.end(); i != e; ++i){
+	const Attr *attr = *i;
 	switch(attr->getKind()) {
 	  case attr::Annotate: {
 	    llvm::StringRef str((static_cast<const AnnotateAttr *>(attr))->getAnnotation());
@@ -269,11 +270,11 @@ declAttributes(const Decl *D, VALUE rhash = Qnil)
 	  }
 	  case attr::NonNull: {
 	    const NonNullAttr *n = static_cast<const NonNullAttr *>(attr);
-	    if(n->size() > 0) {
+	    if(n->args_size() > 0) {
 		std::string s;
 		const char *sep = "";
 		char buf[16];
-		for(NonNullAttr::iterator i = n->begin(), e = n->end(); i != e; i++) {
+		for(NonNullAttr::args_iterator i = n->args_begin(), e = n->args_end(); i != e; i++) {
 		    s.append(sep);
 		    sprintf(buf, "%u", *i);
 		    s.append(buf);
@@ -291,7 +292,7 @@ declAttributes(const Decl *D, VALUE rhash = Qnil)
 	    break;
 	  }
 	}
-    } while((attr = attr->getNext()));
+    }
     if(m.empty()) return rhash;
     m["_override"] = "true";
     if(rhash == Qnil) rhash = rb_hash_new();
@@ -304,10 +305,10 @@ declAttributes(const Decl *D, VALUE rhash = Qnil)
 static bool
 isDeclUnavailable(const Decl *decl)
 {
-    const Attr *attr = decl->getAttrs();
-    while(attr) {
+    const AttrVec Attrs = decl->getAttrs();
+    for (AttrVec::const_iterator i = Attrs.begin(), e = Attrs.end(); i != e; ++i){
+	const Attr *attr = *i;
 	if(attr->getKind() == attr::Unavailable) return true;
-	attr = attr->getNext();
     }
     return false;
 }
@@ -380,9 +381,9 @@ public:
     }
 #endif
 
-    virtual OwningStmtResult ActOnExprStmt(FullExprArg expr) {
+    StmtResult ActOnExprStmt(FullExprArg expr) {
 	if(!customActOn) return Sema::ActOnExprStmt(expr);
-	Expr *E = expr->takeAs<Expr>();
+	Expr *E = expr.get();
 	CallExpr *C;
 	QualType rettype;
 	if(E) {
@@ -483,7 +484,7 @@ doCFSTR:
 			//llvm::errs() << ">>CallExpr:StringLiteral: " << str << "\n";
 			/* possible CFSTR(...) */
 			customActOn->kind = ExprCallCFSTR;
-			customActOn->str.append(S->getStrData(), S->getByteLength());
+			customActOn->str.append(S->getString().str());
 		    }
 		    break;
 		}
@@ -500,13 +501,13 @@ doCFSTR:
 doObjCString:
 		    ObjCStringLiteral *O = static_cast<ObjCStringLiteral *>(E);
 		    StringLiteral *S = O->getString();
-		    customActOn->str.append(S->getStrData(), S->getByteLength());
+		    customActOn->str.append(S->getString().str());
 		    customActOn->kind = ExprObjCString;
 		    break;
 		}
 		case Stmt::StringLiteralClass: {
 		    StringLiteral *S = static_cast<StringLiteral *>(E);
-		    customActOn->str.append(S->getStrData(), S->getByteLength());
+		    customActOn->str.append(S->getString().str());
 		    customActOn->kind = ExprString;
 		    break;
 		}
@@ -809,19 +810,19 @@ BridgeSupportParser::BridgeSupportParser(const char **headers, const std::string
 	  diags(&diagClient),
 	  targOpts(triple),
 	  target(TargetInfo::CreateTargetInfo(diags, targOpts)),
-	  hs(fm),
-	  sm(diags),
+	  hs(fm, fso),
+	  sm(diags, fm, fso),
 	  pp(diags, opts, *target, sm, hs),
 	  astctxt(opts, sm, *target, pp.getIdentifierTable(), pp.getSelectorTable(), pp.getBuiltinInfo(), 0),
 	  verbose(verbose)
 {
     diags.setSuppressSystemWarnings(true);
     diags.setDiagnosticMapping(diag::ext_multichar_character_literal, diag::MAP_IGNORE);
-    pp.getBuiltinInfo().InitializeBuiltins(pp.getIdentifierTable());
+    pp.getBuiltinInfo().InitializeBuiltins(pp.getIdentifierTable(), pp.getLangOptions());
 
     // Add header search directories
     HeaderSearchOptions hso(sysroot);
-    hso.AddPath(*defaultIncludePath, frontend::After, false, false);
+    hso.AddPath(*defaultIncludePath, frontend::After, false, false, false);
 
     /*
      * Add include directories and frameworks:
@@ -848,7 +849,7 @@ BridgeSupportParser::BridgeSupportParser(const char **headers, const std::string
 	    }
 	    u = ((*d)[1] == 'T');
 	    f = ((*d)[2] == 'T');
-	    hso.AddPath(*d + 3, g, u, f);
+	    hso.AddPath(*d + 3, g, u, f, false);
 	}
     }
 
@@ -868,8 +869,9 @@ BridgeSupportParser::BridgeSupportParser(const char **headers, const std::string
 	for(const char **d = defines; *d; d++)
 	    ppo.addMacroDef(*d);
     }
+    FileSystemOptions fso;
     FrontendOptions feo;
-    InitializePreprocessor(pp, ppo, hso, feo);
+    InitializePreprocessor(pp, fso, ppo, hso, feo);
 
     // create a dummy FieldDecl for getObjCEncodingForType()
     dummyFD = FieldDecl::Create(astctxt, NULL, SourceLocation(), NULL, QualType(), NULL, NULL, false);
@@ -1219,14 +1221,14 @@ void
 AnEnum::each_value()
 {
     for(EnumDecl::enumerator_iterator E = ED->enumerator_begin(), EE = ED->enumerator_end(); E != EE; E++) {
-	rb_yield(arrayOf2Strings((*E)->getNameAsCString(), (*E)->getInitVal().toString(10).c_str()));
+	rb_yield(arrayOf2Strings((*E)->getName().data(), (*E)->getInitVal().toString(10).c_str()));
     }
 }
 
 VALUE
 AnEnum::info()
 {
-    return rb_str_new2(ED->getNameAsCString());
+    return rb_str_new2(ED->getName().data());
 }
 
 void
@@ -1246,7 +1248,7 @@ AFunctionDecl::each_argument()
 	if((*P)->getType()->isFunctionPointerType() || (*P)->getType()->isBlockPointerType()) {
 	    AFunctionType f(BSP, Path, (*P)->getType()->getPointeeType()->getAs<FunctionType>());
 	    rb_yield(arrayOf3Strings2VALUEs(
-		(*P)->getNameAsCString(),
+		(*P)->getName().data(),
 		(*P)->getType().getAsString().c_str(),
 		enc.c_str(),
 		typedefAttributes(
@@ -1257,7 +1259,7 @@ AFunctionDecl::each_argument()
 	    ));
 	} else {
 	    rb_yield(arrayOf3Strings2VALUEs(
-		(*P)->getNameAsCString(),
+		(*P)->getName().data(),
 		(*P)->getType().getAsString().c_str(),
 		enc.c_str(),
 		typedefAttributes(
@@ -1280,7 +1282,7 @@ AFunctionDecl::info()
     if(rettype->isFunctionPointerType() || rettype->isBlockPointerType()) {
 	AFunctionType *f = new AFunctionType(BSP, Path, rettype->getPointeeType()->getAs<FunctionType>());
 	return arrayOf3Strings3VALUEs2Bools(
-	    FD->getNameAsCString(),
+	    FD->getName().data(),
 	    FD->getResultType().getAsString().c_str(),
 	    retenc.c_str(),
 	    typedefAttributes(rettype.getTypePtr()),
@@ -1291,7 +1293,7 @@ AFunctionDecl::info()
 	);
     } else {
 	return arrayOf3Strings3VALUEs2Bools(
-	    FD->getNameAsCString(),
+	    FD->getName().data(),
 	    FD->getResultType().getAsString().c_str(),
 	    retenc.c_str(),
 	    typedefAttributes(rettype.getTypePtr()),
@@ -1421,20 +1423,20 @@ void
 AnObjCMethodProtocolIter::each_protocol()
 {
     for(ObjCInterfaceDecl::protocol_iterator P = this->protocol_begin(), PE = this->protocol_end(); P != PE; P++) {
-	rb_yield(rb_str_new2((*P)->getNameAsCString()));
+	rb_yield(rb_str_new2((*P)->getName().data()));
     }
 }
 
 VALUE
 AnObjCCategory::info()
 {
-    return arrayOf2Strings(CD->getClassInterface()->getNameAsCString(), CD->getNameAsCString());
+    return arrayOf2Strings(CD->getClassInterface()->getName().data(), CD->getName().data());
 }
 
 VALUE
 AnObjCInterface::info()
 {
-    return rb_str_new2(ID->getNameAsCString());
+    return rb_str_new2(ID->getName().data());
 }
 
 void
@@ -1474,7 +1476,7 @@ AnObjCMethod::each_argument()
 	if((*P)->getType()->isFunctionPointerType() || (*P)->getType()->isBlockPointerType()) {
 	    AFunctionType f(BSP, Path, (*P)->getType()->getPointeeType()->getAs<FunctionType>());
 	    rb_yield(arrayOf4Strings2VALUEs(
-		(*P)->getNameAsCString(),
+		(*P)->getName().data(),
 		type.c_str(),
 		enc.c_str(),
 		type_modifier,
@@ -1486,7 +1488,7 @@ AnObjCMethod::each_argument()
 	    ));
 	} else {
 	    rb_yield(arrayOf4Strings2VALUEs(
-		(*P)->getNameAsCString(),
+		(*P)->getName().data(),
 		type.c_str(),
 		enc.c_str(),
 		type_modifier,
@@ -1539,7 +1541,7 @@ AnObjCMethod::info()
 VALUE
 AnObjCProtocol::info()
 {
-    return rb_str_new2(PD->getNameAsCString());
+    return rb_str_new2(PD->getName().data());
 }
 
 void
@@ -1553,7 +1555,7 @@ AStruct::each_field()
 	if(type->isFunctionPointerType() || type->isBlockPointerType()) {
 	    AFunctionType f(BSP, Path, type->getPointeeType()->getAs<FunctionType>());
 	    rb_yield(arrayOf3Strings2VALUEs(
-		(*F)->getNameAsCString(),
+		(*F)->getName().data(),
 		type.getAsString().c_str(),
 		enc.c_str(),
 		typedefAttributes(
@@ -1564,7 +1566,7 @@ AStruct::each_field()
 	    ));
 	} else {
 	    rb_yield(arrayOf3Strings2VALUEs(
-		(*F)->getNameAsCString(),
+		(*F)->getName().data(),
 		type.getAsString().c_str(),
 		enc.c_str(),
 		typedefAttributes(
@@ -1582,7 +1584,7 @@ AStruct::info()
 {
     std::string enc;
     BSP->getObjCEncodingForType(RD->getTypeForDecl()->getCanonicalTypeInternal(), enc, BSP->dummyFD);
-    return arrayOf2Strings(RD->getNameAsCString(), enc.c_str());
+    return arrayOf2Strings(RD->getName().data(), enc.c_str());
 }
 
 VALUE
@@ -1596,7 +1598,7 @@ ATypedef::encoding()
 VALUE
 ATypedef::info()
 {
-    return arrayOf2Strings1VALUE(TD->getNameAsCString(), TD->getUnderlyingType().getAsString().c_str(), declAttributes(TD));
+    return arrayOf2Strings1VALUE(TD->getName().data(), TD->getUnderlyingType().getAsString().c_str(), declAttributes(TD));
 }
 
 void
@@ -1629,7 +1631,7 @@ redo:
 	      case TypeLoc::Record: {
 		RecordTypeLoc *rl = static_cast<RecordTypeLoc *>(&tl);
 		RecordDecl *R = rl->getDecl();
-		name = R->getNameAsCString();
+		name = R->getName().data();
 		if(!R->isStruct()) {
 		    /*
 		     * No need to test for R->isEnum(), since there is a
@@ -1650,7 +1652,7 @@ redo:
 	      case TypeLoc::Typedef: {
 		TypedefTypeLoc *td = static_cast<TypedefTypeLoc *>(&tl);
 		TypedefDecl *T = td->getTypedefDecl();
-		rb_yield(arrayOf2Strings2VALUEs(T->getNameAsCString(), type, Qnil, declAttributes(T)));
+		rb_yield(arrayOf2Strings2VALUEs(T->getName().data(), type, Qnil, declAttributes(T)));
 		tsi = T->getTypeSourceInfo();
 		goto again;
 	      }
@@ -1670,7 +1672,7 @@ AVar::info()
     if(type->isFunctionPointerType() || type->isBlockPointerType()) {
 	AFunctionType *f = new AFunctionType(BSP, Path, type->getPointeeType()->getAs<FunctionType>());
 	return arrayOf3Strings2VALUEs(
-	    VD->getNameAsCString(),
+	    VD->getName().data(),
 	    type.getAsString().c_str(),
 	    enc.c_str(),
 	    typedefAttributes(
@@ -1681,7 +1683,7 @@ AVar::info()
 	);
     } else {
 	return arrayOf3Strings2VALUEs(
-	    VD->getNameAsCString(),
+	    VD->getName().data(),
 	    type.getAsString().c_str(),
 	    enc.c_str(),
 	    typedefAttributes(

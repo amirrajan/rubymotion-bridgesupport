@@ -24,6 +24,7 @@ private:
     MyTargetOptions targOpts;
     clang::TargetInfo* target;
     clang::FileManager fm;
+    clang::FileSystemOptions fso;
     clang::HeaderSearch hs;
     MyObjCLangOptions opts;
     clang::SourceManager sm;
