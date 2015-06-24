@@ -1,3 +1,17 @@
+diff --git a/src/include/llvm/ADT/OwningPtr.h b/src/include/llvm/ADT/OwningPtr.h
+index 6d9c305..34bc9d4 100644
+--- a/src/include/llvm/ADT/OwningPtr.h
++++ b/src/include/llvm/ADT/OwningPtr.h
+@@ -32,7 +32,8 @@ public:
+   explicit OwningPtr(T *P = 0) : Ptr(P) {}
+ 
+   ~OwningPtr() {
+-    delete Ptr;
++    // FIXME
++    // delete Ptr;
+   }
+ 
+   /// reset - Change the current pointee to the specified pointer.  Note that
 diff --git a/src/projects/compiler-rt/make/platform/clang_darwin.mk b/src/projects/compiler-rt/make/platform/clang_darwin.mk
 index a297939..f76efbc 100644
 --- a/src/projects/compiler-rt/make/platform/clang_darwin.mk
