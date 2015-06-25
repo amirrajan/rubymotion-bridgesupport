@@ -372,7 +372,7 @@ struct ExprData {
 
 class MySema : public Sema {
 public:
-    MySema(BridgeSupportParser *_BSP, ASTConsumer &consumer, bool CompleteTranslationUnit=true, CodeCompleteConsumer *CompletionConsumer=0) : Sema(_BSP->pp, _BSP->astctxt, consumer, CompleteTranslationUnit, CompletionConsumer), BSP(_BSP), customActOn(0) {}
+    MySema(BridgeSupportParser *_BSP, ASTConsumer &consumer, TranslationUnitKind TUKind=TU_Complete, CodeCompleteConsumer *CompletionConsumer=0) : Sema(_BSP->pp, _BSP->astctxt, consumer, TUKind, CompletionConsumer), BSP(_BSP), customActOn(0) {}
 
 #if 0
     virtual void ActOnEndOfTranslationUnit() {
@@ -389,7 +389,7 @@ public:
 	if(E) {
 	    E = E->IgnoreParens();
 	    Expr::EvalResult er;
-	    if(E->Evaluate(er, Context)) {
+	    if(E->EvaluateAsRValue(er, Context)) {
 		if(er.Val.isInt()) {
 		    customActOn->str.append(er.Val.getInt().toString(10));
 		    customActOn->kind = ExprInt;
@@ -614,7 +614,7 @@ public:
 	    switch(ND->getKind()) {
 	      case Decl::Enum: {
 		const EnumDecl *E = static_cast<const EnumDecl *>(ND);
-		if(E->isDefinition()) {
+		if(E->isCompleteDefinition()) {
 		    AnEnum e(BSP, path, E);
 		    rb_yield(Data_Wrap_Struct(klass_AnEnum, 0, 0, &e));
 		}
@@ -647,7 +647,7 @@ public:
 	      }
 	      case Decl::Record: {
 		const RecordDecl *R = static_cast<const RecordDecl *>(ND);
-		if(R->isDefinition() && R->isStruct()) {
+		if(R->isCompleteDefinition() && R->isStruct()) {
 		    AStruct s(BSP, path, R);
 		    rb_yield(Data_Wrap_Struct(klass_AStruct, 0, 0, &s));
 		}
@@ -814,8 +814,9 @@ BridgeSupportParser::BridgeSupportParser(const char **headers, const std::string
 	  fm(FileSystemOptions()),
 	  hs(fm),
 	  sm(diags, fm),
-	  pp(diags, opts, *target, sm, hs),
-	  astctxt(opts, sm, *target, pp.getIdentifierTable(), pp.getSelectorTable(), pp.getBuiltinInfo(), 0),
+	  ModLoader(),
+	  pp(diags, opts, target, sm, hs, ModLoader),
+	  astctxt(opts, sm, target, pp.getIdentifierTable(), pp.getSelectorTable(), pp.getBuiltinInfo(), 0),
 	  verbose(verbose)
 {
     diags.setSuppressSystemWarnings(true);
@@ -886,7 +887,7 @@ BridgeSupportParser::~BridgeSupportParser()
 void
 BridgeSupportParser::addFile(const char *file) {
     const DirectoryLookup *CurDir;
-    const FileEntry *fe = pp.getHeaderSearchInfo().LookupFile(file, false, NULL, CurDir, NULL, NULL, NULL);
+    const FileEntry *fe = pp.getHeaderSearchInfo().LookupFile(file, false, NULL, CurDir, NULL, NULL, NULL, NULL);
     if(!fe)
 	rb_raise(rb_eRuntimeError, "addFile: Couldn't lookup file: %s", file);
     char path[PATH_MAX];
@@ -1445,7 +1446,7 @@ AnObjCMethod::each_argument()
 {
     std::string type, enc;
     const char *type_modifier;
-    for(ObjCMethodDecl::param_iterator P = MD->param_begin(), PE = MD->param_end(); P != PE; P++) {
+    for(ObjCMethodDecl::param_const_iterator P = MD->param_begin(), PE = MD->param_end(); P != PE; P++) {
 	type = "";
 	type_modifier = NULL;
 	switch((*P)->getObjCDeclQualifier()) {
@@ -1643,7 +1644,7 @@ redo:
 		    break; /* do default code at bottom */
 		}
 		type = "Struct";
-		if(R->isDefinition()) {
+		if(R->isCompleteDefinition()) {
 		    AStruct s(BSP, Path, R);
 		    rb_yield(arrayOf2Strings2VALUEs(name, type, Data_Wrap_Struct(klass_AStruct, 0, 0, &s), declAttributes(R)));
 		    continue;

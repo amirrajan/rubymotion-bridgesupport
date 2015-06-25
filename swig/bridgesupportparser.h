@@ -21,13 +21,14 @@ private:
     MyDiagnosticOptions diagOpts;
     llvm::IntrusiveRefCntPtr<clang::DiagnosticIDs> diagID;
     clang::TextDiagnosticPrinter diagClient;
-    clang::Diagnostic diags;
+    clang::DiagnosticsEngine diags;
     MyTargetOptions targOpts;
     clang::TargetInfo* target;
     clang::FileManager fm;
     clang::HeaderSearch hs;
     MyObjCLangOptions opts;
     clang::SourceManager sm;
+    MyModuleLoader ModLoader;
     clang::Preprocessor pp;
     clang::ASTContext astctxt;
     bool verbose;

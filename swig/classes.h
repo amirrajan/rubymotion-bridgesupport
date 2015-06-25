@@ -53,6 +53,7 @@ class VarDecl;
 #include "clang/Lex/HeaderSearch.h"
 #include "clang/Lex/LexDiagnostic.h"
 #include "clang/Lex/MacroInfo.h"
+#include "clang/Lex/ModuleLoader.h"
 #include "clang/Lex/Preprocessor.h"
 #include "clang/Lex/Token.h"
 #include "clang/Driver/Action.h"
@@ -101,10 +102,19 @@ class MyPass2Consumer;
 
 class MyTargetOptions: public clang::TargetOptions {
 public:
-    MyTargetOptions(const std::string& triple = LLVM_HOSTTRIPLE)
+    MyTargetOptions(const std::string& triple = LLVM_DEFAULT_TARGET_TRIPLE)
     {
 	Triple = triple;
 	CPU = "core2";
+    }
+};
+
+class MyModuleLoader : public clang::ModuleLoader {
+    virtual clang::ModuleKey loadModule(clang::SourceLocation ImportLoc,
+					    clang::IdentifierInfo &ModuleName,
+					    clang::SourceLocation ModuleNameLoc)
+    {
+	return 0;
     }
 };
 #endif /* SWIG */

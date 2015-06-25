@@ -82,7 +82,7 @@ $(SYMROOT_MADE): $(OBJROOT_MADE)
 	$(TOUCH) $@
 
 # Subdirectories
-CLANG_VERS = clang-211.10.1
+CLANG_VERS = clang-318.0.45
 CLANG_TARBALL = $(CLANG_VERS).tar.gz
 CLANG_DIR = $(OBJROOT)/$(CLANG_VERS)
 SWIG_DIR = $(OBJROOT)/swig
@@ -90,7 +90,6 @@ SWIG_DIR = $(OBJROOT)/swig
 CLANG_DIR_MADE = $(CLANG_DIR)/$(MADEFILE)
 $(CLANG_DIR_MADE): $(OBJROOT_MADE)
 	$(TAR) -xjof $(SRCROOT)/$(CLANG_TARBALL) -C $(OBJROOT)
-	cd $(OBJROOT)/$(CLANG_VERS) && patch -p1 < ../../clang.patch
 	cd $(SRCROOT)
 	$(TOUCH) $@
 
@@ -123,8 +122,8 @@ $(CLANGROOT_MADE): $(CLANG_DIR_MADE)
 	    ../configure --prefix=$(CLANG_PREFIX) MACOSX_DEPLOYMENT_TARGET=10.7 --enable-debug-runtime --enable-debug-symbols --enable-optimized --disable-timestamps --disable-assertions --with-optimize-option='-Os' --without-llvmgcc --without-llvmgxx --disable-bindings --disable-doxygen --with-extra-options='-DDISABLE_SMART_POINTERS' CC="$(CC) -arch $$arch" CXX="$(CXX) -arch $$arch" && \
 	    make -j$(shell sysctl -n hw.ncpu) && \
 	    $(MKDIR) $(CLANG_DIR)/src/darwin-$$arch/ROOT && \
-	    make install DESTDIR=$(CLANG_DIR)/src/darwin-$$arch/ROOT && \
-	    cp -f ../tools/clang/lib/Sema/*.h $(CLANG_DIR)/src/darwin-$$arch/ROOT$(CLANG_PREFIX)/include/clang/Sema) || exit 1; \
+	    sudo make install DESTDIR=$(CLANG_DIR)/src/darwin-$$arch/ROOT && \
+	    sudo cp -f ../tools/clang/lib/Sema/*.h $(CLANG_DIR)/src/darwin-$$arch/ROOT$(CLANG_PREFIX)/include/clang/Sema) || exit 1; \
 	done
 ifneq ($(words $(RC_ARCHS)),1)
 	$(MKDIR) $(CLANGROOT)$(CLANG_PREFIX)
