@@ -875,7 +875,7 @@ BridgeSupportParser::BridgeSupportParser(const char **headers, const std::string
     InitializePreprocessor(pp, ppo, hso, feo);
 
     // create a dummy FieldDecl for getObjCEncodingForType()
-    dummyFD = FieldDecl::Create(astctxt, NULL, SourceLocation(), SourceLocation(), NULL, QualType(), NULL, NULL, false);
+    dummyFD = FieldDecl::Create(astctxt, NULL, SourceLocation(), SourceLocation(), NULL, QualType(), NULL, NULL, false, false);
 }
 
 BridgeSupportParser::~BridgeSupportParser()
