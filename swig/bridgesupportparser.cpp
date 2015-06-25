@@ -807,17 +807,19 @@ private:
 
 BridgeSupportParser::BridgeSupportParser(const char **headers, const std::string& triple, const char **defines, const char **incdirs, const std::string& sysroot, bool verbose)
 	: diagClient(verbose ? llvm::errs() : llvm::nulls(), diagOpts),
-	  diags(&diagClient),
+	  diagID(new DiagnosticIDs()),
+	  diags(diagID, &diagClient, false),
 	  targOpts(triple),
 	  target(TargetInfo::CreateTargetInfo(diags, targOpts)),
-	  hs(fm, fso),
-	  sm(diags, fm, fso),
+	  fm(FileSystemOptions()),
+	  hs(fm),
+	  sm(diags, fm),
 	  pp(diags, opts, *target, sm, hs),
 	  astctxt(opts, sm, *target, pp.getIdentifierTable(), pp.getSelectorTable(), pp.getBuiltinInfo(), 0),
 	  verbose(verbose)
 {
     diags.setSuppressSystemWarnings(true);
-    diags.setDiagnosticMapping(diag::ext_multichar_character_literal, diag::MAP_IGNORE);
+    diags.setDiagnosticMapping(diag::ext_multichar_character_literal, diag::MAP_IGNORE, SourceLocation());
     pp.getBuiltinInfo().InitializeBuiltins(pp.getIdentifierTable(), pp.getLangOptions());
 
     // Add header search directories
@@ -869,12 +871,11 @@ BridgeSupportParser::BridgeSupportParser(const char **headers, const std::string
 	for(const char **d = defines; *d; d++)
 	    ppo.addMacroDef(*d);
     }
-    FileSystemOptions fso;
     FrontendOptions feo;
-    InitializePreprocessor(pp, fso, ppo, hso, feo);
+    InitializePreprocessor(pp, ppo, hso, feo);
 
     // create a dummy FieldDecl for getObjCEncodingForType()
-    dummyFD = FieldDecl::Create(astctxt, NULL, SourceLocation(), NULL, QualType(), NULL, NULL, false);
+    dummyFD = FieldDecl::Create(astctxt, NULL, SourceLocation(), SourceLocation(), NULL, QualType(), NULL, NULL, false);
 }
 
 BridgeSupportParser::~BridgeSupportParser()
@@ -885,7 +886,7 @@ BridgeSupportParser::~BridgeSupportParser()
 void
 BridgeSupportParser::addFile(const char *file) {
     const DirectoryLookup *CurDir;
-    const FileEntry *fe = pp.getHeaderSearchInfo().LookupFile(file, false, NULL, CurDir, NULL);
+    const FileEntry *fe = pp.getHeaderSearchInfo().LookupFile(file, false, NULL, CurDir, NULL, NULL, NULL);
     if(!fe)
 	rb_raise(rb_eRuntimeError, "addFile: Couldn't lookup file: %s", file);
     char path[PATH_MAX];
@@ -1651,8 +1652,9 @@ redo:
 	      }
 	      case TypeLoc::Typedef: {
 		TypedefTypeLoc *td = static_cast<TypedefTypeLoc *>(&tl);
-		TypedefDecl *T = td->getTypedefDecl();
-		rb_yield(arrayOf2Strings2VALUEs(T->getName().data(), type, Qnil, declAttributes(T)));
+		TypedefNameDecl *T = td->getTypedefNameDecl();
+		NamedDecl *ND = static_cast<NamedDecl *>(T);
+		rb_yield(arrayOf2Strings2VALUEs(ND->getName().data(), type, Qnil, declAttributes(ND)));
 		tsi = T->getTypeSourceInfo();
 		goto again;
 	      }
