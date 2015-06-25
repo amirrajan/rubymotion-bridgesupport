@@ -1,7 +1,7 @@
 #! /bin/sh -x
 
 ARCHS='i386 x86_64'
-PROJECT=clang-163.7.1
+PROJECT=clang-211.10.1
 CLANGHOME=/Volumes/XDisk/build/Roots/$PROJECT.roots/$PROJECT~obj
 INCDIR=x86_64/tools/clang/include
 LIBS='LLVMARMAsmParser LLVMARMAsmPrinter LLVMARMCodeGen LLVMARMInfo LLVMAnalysis LLVMArchive LLVMAsmParser LLVMAsmPrinter LLVMBitReader LLVMBitWriter LLVMCodeGen LLVMCore LLVMExecutionEngine LLVMInstCombine LLVMInstrumentation LLVMInterpreter LLVMJIT LLVMLinker LLVMMC LLVMScalarOpts LLVMSelectionDAG LLVMSupport LLVMSystem LLVMTarget LLVMTransformUtils LLVMX86AsmParser LLVMX86AsmPrinter LLVMX86CodeGen LLVMX86Disassembler LLVMX86Info LLVMipa LLVMipo clangAST clangAnalysis clangBasic clangCodeGen clangDriver clangFrontend clangIndex clangLex clangParse clangRewrite clangSema'
