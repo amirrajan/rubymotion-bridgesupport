@@ -808,7 +808,7 @@ private:
 BridgeSupportParser::BridgeSupportParser(const char **headers, const std::string& triple, const char **defines, const char **incdirs, const std::string& sysroot, bool verbose)
 	: diagClient(verbose ? llvm::errs() : llvm::nulls(), diagOpts),
 	  diagID(new DiagnosticIDs()),
-	  diags(diagID, &diagClient),
+	  diags(diagID, &diagClient, false),
 	  targOpts(triple),
 	  target(TargetInfo::CreateTargetInfo(diags, targOpts)),
 	  fm(FileSystemOptions()),
