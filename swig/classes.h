@@ -94,7 +94,7 @@ public:
     MyObjCLangOptions()
     {
 	BCPLComment = Blocks = Bool = C99 = GNUMode = HexFloats = 1;
-	ObjC1 = ObjC2 = ObjCNonFragileABI = 1;
+	ObjC1 = ObjC2 = ObjCAutoRefCount = ObjCARCWeak = 1;
     }
 };
 
@@ -110,9 +110,9 @@ public:
 };
 
 class MyModuleLoader : public clang::ModuleLoader {
-    virtual clang::ModuleKey loadModule(clang::SourceLocation ImportLoc,
-					    clang::IdentifierInfo &ModuleName,
-					    clang::SourceLocation ModuleNameLoc)
+    virtual clang::Module *loadModule(clang::SourceLocation ImportLoc, clang::ModuleIdPath Path,
+			       clang::Module::NameVisibilityKind Visibility,
+			       bool IsInclusionDirective)
     {
 	return 0;
     }
