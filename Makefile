@@ -88,7 +88,7 @@ $(SYMROOT_MADE): $(OBJROOT_MADE)
 	$(TOUCH) $@
 
 # Subdirectories
-CLANG_VERS = clang-425.0.24
+CLANG_VERS = clang-500.2.76
 CLANG_TARBALL = $(CLANG_VERS).tar.gz
 CLANG_DIR = $(OBJROOT)/$(CLANG_VERS)
 SWIG_DIR = $(OBJROOT)/swig
@@ -96,6 +96,7 @@ SWIG_DIR = $(OBJROOT)/swig
 CLANG_DIR_MADE = $(CLANG_DIR)/$(MADEFILE)
 $(CLANG_DIR_MADE): $(OBJROOT_MADE)
 	$(TAR) -xjof $(SRCROOT)/$(CLANG_TARBALL) -C $(OBJROOT)
+	cd $(OBJROOT)/$(CLANG_VERS) && patch -p1 < ../../clang.patch
 	cd $(SRCROOT)
 	$(TOUCH) $@
 
