@@ -50,7 +50,11 @@ datadir = $(datarootdir)
 localstatedir = $(prefix)/var
 sitelibdir = $(sitedir)/$(ruby_abi_version)
 
-CC = g++-4.2
+ifneq ("$(wildcard /usr/local/bin/gcc-4.2)","")
+	CC = g++-4.2
+else
+	CC = c++
+endif
 CXX = $(CC)
 LIBRUBY = $(LIBRUBY_SO)
 LIBRUBY_A = lib$(RUBY_SO_NAME)-static.a

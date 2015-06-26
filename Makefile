@@ -24,8 +24,14 @@ RC_CFLAGS = $(foreach arch,$(RC_ARCHS),-arch $(arch)) -pipe
 
 RSYNC = /usr/bin/rsync -rlpt
 RUBY = /usr/bin/ruby
-CC = gcc-4.2
-CXX = g++-4.2
+
+ifneq ("$(wildcard /usr/local/bin/gcc-4.2)","")
+	CC = gcc-4.2
+	CXX = g++-4.2
+else
+	CC = cc
+	CXX = c++
+endif
 
 # Use files to represent whether a directory exist, avoiding problems with
 # the modification date of a directory changing.  To avoid cluttering up
