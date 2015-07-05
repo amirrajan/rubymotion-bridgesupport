@@ -257,7 +257,7 @@ declAttributes(const Decl *D, VALUE rhash = Qnil)
 	  }
 	  case attr::Format: {
 	    const FormatAttr *f = static_cast<const FormatAttr *>(attr);
-	    std::string s(f->getType());
+	    std::string s(f->getType()->getName());
 	    s.push_back(',');
 	    char buf[16];
 	    sprintf(buf, "%d", f->getFormatIdx());
@@ -680,7 +680,7 @@ public:
 	sema->setCustomActOn(&expr);
 	while (!P.ParseTopLevelDecl(ADecl)) {
 	    if(ADecl) {
-		DeclGroupRef D = ADecl.getAsVal<DeclGroupRef>();
+		DeclGroupRef D = static_cast<DeclGroupRef>(ADecl.get());
 		for(DeclGroupRef::const_iterator I = D.begin(), E = D.end(); I != E; I++) {
 		    const NamedDecl *ND = dyn_cast<NamedDecl>(*I);
 		    if(!ND || isDeclUnavailable(ND)) continue;
@@ -812,8 +812,8 @@ BridgeSupportParser::BridgeSupportParser(const char **headers, const std::string
 	  targOpts(triple),
 	  target(TargetInfo::CreateTargetInfo(diags, &targOpts)),
 	  fm(FileSystemOptions()),
-	  hs(new HeaderSearchOptions(sysroot), fm, diags, opts, target),
 	  sm(diags, fm),
+	  hs(new HeaderSearchOptions(sysroot), sm, diags, opts, target),
 	  ModLoader(),
 	  pp(ppo, diags, opts, target, sm, hs, ModLoader),
 	  astctxt(opts, sm, target, pp.getIdentifierTable(), pp.getSelectorTable(), pp.getBuiltinInfo(), 0),
@@ -993,7 +993,7 @@ void MyParseAST(BridgeSupportParser *BSP, MyPass2Consumer *Consumer) {
 	// is due to a top-level semicolon, an action override, or a parse error
 	// skipping something.
 	if (!ADecl) continue;
-	DeclGroupRef D = ADecl.getAsVal<DeclGroupRef>();
+	DeclGroupRef D = static_cast<DeclGroupRef>(ADecl.get());
 	for(DeclGroupRef::const_iterator I = D.begin(), E = D.end(); I != E; I++) {
 	    if((*I)->getKind() == Decl::ObjCInterface) {
 		const ObjCInterfaceDecl *ID = static_cast<const ObjCInterfaceDecl *>(*I);
