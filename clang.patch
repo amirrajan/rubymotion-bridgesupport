@@ -1,25 +1,24 @@
 diff --git a/src/projects/compiler-rt/lib/Makefile.mk b/src/projects/compiler-rt/lib/Makefile.mk
-index 3bb40a9..5805a0e 100644
+index d5545f1..111d63a 100644
 --- a/src/projects/compiler-rt/lib/Makefile.mk
 +++ b/src/projects/compiler-rt/lib/Makefile.mk
-@@ -11,10 +11,10 @@ ModuleName := builtins
+@@ -11,10 +11,7 @@ ModuleName := builtins
  SubDirs :=
  
  # Add arch specific optimized implementations.
 -SubDirs += i386 ppc x86_64 arm
-+SubDirs += i386 x86_64
- 
- # Add ARM64 dir.
+-
+-# Add ARM64 dir.
 -SubDirs += arm64
-+# SubDirs += arm64
++SubDirs += i386 x86_64
  
  # Add other submodules.
  SubDirs += asan
 diff --git a/src/projects/compiler-rt/make/platform/clang_darwin.mk b/src/projects/compiler-rt/make/platform/clang_darwin.mk
-index ede7c59..f62f1db 100644
+index c48d9ba..44895d6 100644
 --- a/src/projects/compiler-rt/make/platform/clang_darwin.mk
 +++ b/src/projects/compiler-rt/make/platform/clang_darwin.mk
-@@ -44,30 +44,14 @@ UniversalArchs.eprintf := $(call CheckArches,i386,eprintf)
+@@ -55,11 +55,6 @@ UniversalArchs.eprintf := $(call CheckArches,i386,eprintf)
  Configs += 10.4
  UniversalArchs.10.4 := $(call CheckArches,i386 x86_64,10.4)
  
@@ -31,17 +30,18 @@ index ede7c59..f62f1db 100644
  # Configuration for targetting OSX. These functions may not be in libSystem
  # so we should provide our own.
  Configs += osx
- UniversalArchs.osx := $(call CheckArches,i386 x86_64,osx)
+@@ -67,18 +62,11 @@ UniversalArchs.osx := $(call CheckArches,i386 x86_64,osx)
  
--# Configuration for use with kernel/kexts.
--Configs += cc_kext
+ # Configuration for use with kernel/kexts.
+ Configs += cc_kext
 -UniversalArchs.cc_kext := $(call CheckArches,armv7 i386 x86_64,cc_kext)
 -
 -# Configuration for use with kernel/kexts for iOS 5.0 and earlier (which used 
 -# a different code generation strategy).
 -Configs += cc_kext_ios5
 -UniversalArchs.cc_kext_ios5 := $(call CheckArches,x86_64 armv7,cc_kext_ios5)
--
++UniversalArchs.cc_kext := $(call CheckArches,i386 x86_64,cc_kext)
+ 
  # Configurations which define the profiling support functions.
  Configs += profile_osx
  UniversalArchs.profile_osx := $(call CheckArches,i386 x86_64,profile_osx)
@@ -49,19 +49,19 @@ index ede7c59..f62f1db 100644
 -UniversalArchs.profile_ios := $(call CheckArches,i386 x86_64 armv7,profile_ios)
  
  # Configurations which define the ASAN support functions.
- # Apple Internal: Disable building asan libraries. <rdar://problem/12423266>
+ #Configs += asan_osx_dynamic
 diff --git a/src/tools/clang/runtime/compiler-rt/Makefile b/src/tools/clang/runtime/compiler-rt/Makefile
-index e32a9c3..a48867e 100644
+index 930a8c2..08bad7e 100644
 --- a/src/tools/clang/runtime/compiler-rt/Makefile
 +++ b/src/tools/clang/runtime/compiler-rt/Makefile
-@@ -74,8 +74,8 @@ RuntimeDirs :=
+@@ -80,8 +80,8 @@ RuntimeDirs :=
  ifeq ($(OS),Darwin)
  RuntimeDirs += darwin
  RuntimeLibrary.darwin.Configs := \
 -	eprintf.a 10.4.a osx.a ios.a cc_kext.a cc_kext_ios5.a \
 -	profile_osx.a profile_ios.a
-+	eprintf.a 10.4.a osx.a \
++	eprintf.a 10.4.a osx.a cc_kext.a \
 +	profile_osx.a
  #	Apple Internal: Disable building asan libraries. <rdar://12423266>
- #	asan_osx.a asan_osx_dynamic.dylib ubsan_osx.a
- endif
+ #	asan_osx_dynamic.dylib ubsan_osx.a
+ 
