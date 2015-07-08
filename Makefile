@@ -88,7 +88,7 @@ $(SYMROOT_MADE): $(OBJROOT_MADE)
 	$(TOUCH) $@
 
 # Subdirectories
-CLANG_VERS = clang-503.0.38
+CLANG_VERS = clang-600.0.51
 CLANG_TARBALL = $(CLANG_VERS).tar.gz
 CLANG_DIR = $(OBJROOT)/$(CLANG_VERS)
 SWIG_DIR = $(OBJROOT)/swig
@@ -96,7 +96,7 @@ SWIG_DIR = $(OBJROOT)/swig
 CLANG_DIR_MADE = $(CLANG_DIR)/$(MADEFILE)
 $(CLANG_DIR_MADE): $(OBJROOT_MADE)
 	$(TAR) -xjof $(SRCROOT)/$(CLANG_TARBALL) -C $(OBJROOT)
-	cd $(OBJROOT)/$(CLANG_VERS) && patch -p1 < ../../clang.patch
+	# cd $(OBJROOT)/$(CLANG_VERS) && patch -p1 < ../../clang.patch
 	cd $(SRCROOT)
 	$(TOUCH) $@
 
@@ -126,7 +126,7 @@ $(CLANGROOT_MADE): $(CLANG_DIR_MADE)
 	    $(MKDIR) ROOT && \
 	    chmod +x ../configure && \
 	    chmod +x ../autoconf/mkinstalldirs && \
-	    ../configure --prefix=$(CLANG_PREFIX) MACOSX_DEPLOYMENT_TARGET=10.7 --enable-debug-runtime --enable-debug-symbols --enable-optimized --disable-timestamps --disable-assertions --with-optimize-option='-Os' --without-llvmgcc --without-llvmgxx --disable-bindings --disable-doxygen --with-extra-options='-DDISABLE_SMART_POINTERS' CC="$(CC) -arch $$arch" CXX="$(CXX) -arch $$arch" && \
+	    ../configure --prefix=$(CLANG_PREFIX) MACOSX_DEPLOYMENT_TARGET=10.7 --enable-libcpp --enable-debug-runtime --enable-debug-symbols --enable-optimized --disable-timestamps --disable-assertions --with-optimize-option='-Os' --without-llvmgcc --without-llvmgxx --disable-bindings --disable-doxygen --with-extra-options='-DDISABLE_SMART_POINTERS' CC="$(CC) -arch $$arch" CXX="$(CXX) -arch $$arch" && \
 	    make -j$(shell sysctl -n hw.ncpu) && \
 	    $(MKDIR) $(CLANG_DIR)/src/darwin-$$arch/ROOT && \
 	    sudo make install DESTDIR=$(CLANG_DIR)/src/darwin-$$arch/ROOT && \
