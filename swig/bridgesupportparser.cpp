@@ -888,7 +888,7 @@ BridgeSupportParser::~BridgeSupportParser()
 void
 BridgeSupportParser::addFile(const char *file) {
     const DirectoryLookup *CurDir;
-    const FileEntry *fe = pp.getHeaderSearchInfo().LookupFile(file, false, NULL, CurDir, NULL, NULL, NULL, NULL);
+    const FileEntry *fe = pp.getHeaderSearchInfo().LookupFile(file, SourceLocation(), false, NULL, CurDir, NULL, NULL, NULL, NULL);
     if(!fe)
 	rb_raise(rb_eRuntimeError, "addFile: Couldn't lookup file: %s", file);
     char path[PATH_MAX];
@@ -1282,14 +1282,14 @@ VALUE
 AFunctionDecl::info()
 {
     std::string retenc;
-    QualType rettype = FD->getResultType();
+    QualType rettype = FD->getReturnType();
     BSP->getObjCEncodingForType(rettype, retenc);
     const FunctionProtoType *FP = FD->getType()->getAs<FunctionProtoType>();
     if(rettype->isFunctionPointerType() || rettype->isBlockPointerType()) {
 	AFunctionType *f = new AFunctionType(BSP, Path, rettype->getPointeeType()->getAs<FunctionType>());
 	return arrayOf3Strings3VALUEs2Bools(
 	    FD->getName().data(),
-	    FD->getResultType().getAsString().c_str(),
+	    FD->getReturnType().getAsString().c_str(),
 	    retenc.c_str(),
 	    typedefAttributes(rettype.getTypePtr()),
 	    Data_Wrap_Struct(klass_AFunctionType, 0, RB_FINALIZER(delete_AFunctionType), f),
@@ -1300,7 +1300,7 @@ AFunctionDecl::info()
     } else {
 	return arrayOf3Strings3VALUEs2Bools(
 	    FD->getName().data(),
-	    FD->getResultType().getAsString().c_str(),
+	    FD->getReturnType().getAsString().c_str(),
 	    retenc.c_str(),
 	    typedefAttributes(rettype.getTypePtr()),
 	    Qnil,
@@ -1339,7 +1339,7 @@ AFunctionType::each_argument()
     const FunctionProtoType *FPT = FT->getAs<FunctionProtoType>();
     if(!FPT) return;
     std::string enc;
-    for(FunctionProtoType::arg_type_iterator T = FPT->arg_type_begin(), TE = FPT->arg_type_end(); T != TE; T++) {
+    for(FunctionProtoType::param_type_iterator T = FPT->param_type_begin(), TE = FPT->param_type_end(); T != TE; T++) {
 	enc.clear();
 	BSP->getObjCEncodingForType(*T, enc);
 	if((*T)->isFunctionPointerType() || (*T)->isBlockPointerType()) {
@@ -1367,7 +1367,7 @@ VALUE
 AFunctionType::info()
 {
     std::string retenc;
-    QualType rettype = FT->getResultType();
+    QualType rettype = FT->getReturnType();
     BSP->getObjCEncodingForType(rettype, retenc);
     const FunctionProtoType *FP = rettype->getAs<FunctionProtoType>();
     if(rettype->isFunctionPointerType() || rettype->isBlockPointerType()) {
@@ -1514,7 +1514,7 @@ AnObjCMethod::info()
     //std::string type = MD->getResultType().isNull() ? "id" : MD->getResultType().getAsString();
     std::string menc, retenc;
     BSP->astctxt.getObjCEncodingForMethodDecl(MD, menc);
-    QualType rettype = MD->getResultType();
+    QualType rettype = MD->getReturnType();
     BSP->getObjCEncodingForType(rettype, retenc);
     if(rettype->isFunctionPointerType() || rettype->isBlockPointerType()) {
 	AFunctionType *f = new AFunctionType(BSP, Path, rettype->getPointeeType()->getAs<FunctionType>());
