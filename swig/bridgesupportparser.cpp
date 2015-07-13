@@ -819,6 +819,7 @@ BridgeSupportParser::BridgeSupportParser(const char **headers, const std::string
 	  astctxt(opts, sm, target, pp.getIdentifierTable(), pp.getSelectorTable(), pp.getBuiltinInfo(), 0),
 	  verbose(verbose)
 {
+    diagClient.BeginSourceFile(opts, &pp);
     diags.setSuppressSystemWarnings(true);
     diags.setDiagnosticMapping(diag::ext_multichar_character_literal, diag::MAP_IGNORE, SourceLocation());
     pp.getBuiltinInfo().InitializeBuiltins(pp.getIdentifierTable(), pp.getLangOpts());
