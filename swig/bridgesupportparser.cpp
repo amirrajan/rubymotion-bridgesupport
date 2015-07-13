@@ -382,7 +382,7 @@ public:
 #endif
 
     StmtResult ActOnExprStmt(FullExprArg expr) {
-	if(!customActOn) return Sema::ActOnExprStmt(expr);
+	if(!customActOn) return Sema::ActOnExprStmt(expr.release());
 	Expr *E = expr.get();
 	CallExpr *C;
 	QualType rettype;
@@ -550,7 +550,7 @@ public:
 
 	for (int i = 0; M != ME; M++) {
 	    const IdentifierInfo *I = M->first;
-	    const MacroInfo *V = M->second;
+	    const MacroInfo *V = M->second->getMacroInfo();
 	    if(!V->isEnabled() || V->isBuiltinMacro() || !BSP->inDir(BSP->sm.getFileID(V->getDefinitionLoc())) || V->isFunctionLike()) continue;
 	    if(ignoreMacro(V)) continue;
 	    //llvm::errs() << I->getName() << " "; BSP->pp.DumpMacro(*V); //DEBUG
@@ -806,16 +806,16 @@ private:
 };
 
 BridgeSupportParser::BridgeSupportParser(const char **headers, const std::string& triple, const char **defines, const char **incdirs, const std::string& sysroot, bool verbose)
-	: diagClient(verbose ? llvm::errs() : llvm::nulls(), diagOpts),
+	: diagClient(verbose ? llvm::errs() : llvm::nulls(), &diagOpts),
 	  diagID(new DiagnosticIDs()),
-	  diags(diagID, &diagClient, false),
+	  diags(diagID, &diagOpts, &diagClient, false),
 	  targOpts(triple),
-	  target(TargetInfo::CreateTargetInfo(diags, targOpts)),
+	  target(TargetInfo::CreateTargetInfo(diags, &targOpts)),
 	  fm(FileSystemOptions()),
-	  hs(fm, diags, opts, target),
+	  hs(new HeaderSearchOptions(sysroot), fm, diags, opts, target),
 	  sm(diags, fm),
 	  ModLoader(),
-	  pp(diags, opts, target, sm, hs, ModLoader),
+	  pp(ppo, diags, opts, target, sm, hs, ModLoader),
 	  astctxt(opts, sm, target, pp.getIdentifierTable(), pp.getSelectorTable(), pp.getBuiltinInfo(), 0),
 	  verbose(verbose)
 {
@@ -825,8 +825,8 @@ BridgeSupportParser::BridgeSupportParser(const char **headers, const std::string
     pp.getBuiltinInfo().InitializeBuiltins(pp.getIdentifierTable(), pp.getLangOpts());
 
     // Add header search directories
-    HeaderSearchOptions hso(sysroot);
-    hso.AddPath(*defaultIncludePath, frontend::After, false, false, false);
+    HeaderSearchOptions &hso = hs.getHeaderSearchOpts();
+    hso.AddPath(*defaultIncludePath, frontend::After, false, false);
 
     /*
      * Add include directories and frameworks:
@@ -853,7 +853,7 @@ BridgeSupportParser::BridgeSupportParser(const char **headers, const std::string
 	    }
 	    u = ((*d)[1] == 'T');
 	    f = ((*d)[2] == 'T');
-	    hso.AddPath(*d + 3, g, u, f, false);
+	    hso.AddPath(*d + 3, g, u, f);
 	}
     }
 
@@ -952,15 +952,15 @@ rubyarr2c(VALUE arr)
 {
     Check_Type(arr, T_ARRAY);
     /* Get the length of the array */
-    int size = RARRAY_LEN(arr); 
+    int size = RARRAY_LEN(arr);
     const char **carr = (const char **) malloc((size+1)*sizeof(const char *));
     if(!carr) rb_raise(rb_eRuntimeError, "Out of memory");
     /* Get the first element in memory */
-    VALUE *ptr = RARRAY_PTR(arr); 
+    VALUE *ptr = RARRAY_PTR(arr);
     const char **p;
     for (p = carr; size > 0; size--, ptr++)
     /* Convert Ruby Object String to char* */
-	*p++ = StringValuePtr(*ptr); 
+	*p++ = StringValuePtr(*ptr);
     *p = NULL; /* End of list */
     return carr;
 }

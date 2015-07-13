@@ -29,6 +29,7 @@ private:
     MyObjCLangOptions opts;
     clang::SourceManager sm;
     MyModuleLoader ModLoader;
+    llvm::IntrusiveRefCntPtr<clang::PreprocessorOptions> ppo;
     clang::Preprocessor pp;
     clang::ASTContext astctxt;
     bool verbose;
