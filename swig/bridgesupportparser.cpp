@@ -519,7 +519,7 @@ doObjCString:
 	} else {
 	    customActOn->str.append("NULL");
 	}
-	return Owned(static_cast<Stmt*>(E));
+	return static_cast<Stmt*>(E);
     }
 
     void setCustomActOn(ExprData *e) { customActOn = e; }
@@ -810,18 +810,18 @@ BridgeSupportParser::BridgeSupportParser(const char **headers, const std::string
 	  diagID(new DiagnosticIDs()),
 	  diags(diagID, &diagOpts, &diagClient, false),
 	  targOpts(triple),
-	  target(TargetInfo::CreateTargetInfo(diags, &targOpts)),
+	  target(TargetInfo::CreateTargetInfo(diags, std::make_shared<TargetOptions>(targOpts))),
 	  fm(FileSystemOptions()),
 	  sm(diags, fm),
 	  hs(new HeaderSearchOptions(sysroot), sm, diags, opts, target),
 	  ModLoader(),
-	  pp(ppo, diags, opts, target, sm, hs, ModLoader),
-	  astctxt(opts, sm, target, pp.getIdentifierTable(), pp.getSelectorTable(), pp.getBuiltinInfo(), 0),
+	  pp(ppo, diags, opts, sm, hs, ModLoader),
+	  astctxt(opts, sm, pp.getIdentifierTable(), pp.getSelectorTable(), pp.getBuiltinInfo()),
 	  verbose(verbose)
 {
     diagClient.BeginSourceFile(opts, &pp);
     diags.setSuppressSystemWarnings(true);
-    diags.setDiagnosticMapping(diag::ext_multichar_character_literal, diag::MAP_IGNORE, SourceLocation());
+    diags.setSeverity(diag::ext_multichar_character_literal, diag::Severity::Ignored, SourceLocation());
     pp.getBuiltinInfo().InitializeBuiltins(pp.getIdentifierTable(), pp.getLangOpts());
 
     // Add header search directories
@@ -874,7 +874,7 @@ BridgeSupportParser::BridgeSupportParser(const char **headers, const std::string
 	    ppo.addMacroDef(*d);
     }
     FrontendOptions feo;
-    InitializePreprocessor(pp, ppo, hso, feo);
+    InitializePreprocessor(pp, ppo, feo);
 
     // create a dummy FieldDecl for getObjCEncodingForType()
     dummyFD = FieldDecl::Create(astctxt, NULL, SourceLocation(), SourceLocation(), NULL, QualType(), NULL, NULL, false, ICIS_NoInit);
@@ -888,7 +888,8 @@ BridgeSupportParser::~BridgeSupportParser()
 void
 BridgeSupportParser::addFile(const char *file) {
     const DirectoryLookup *CurDir;
-    const FileEntry *fe = pp.getHeaderSearchInfo().LookupFile(file, SourceLocation(), false, NULL, CurDir, NULL, NULL, NULL, NULL);
+    SmallVector<std::pair<const FileEntry *, const DirectoryEntry *>, 0> Includers;
+    const FileEntry *fe = pp.getHeaderSearchInfo().LookupFile(file, SourceLocation(), false, NULL, CurDir, Includers, NULL, NULL, NULL);
     if(!fe)
 	rb_raise(rb_eRuntimeError, "addFile: Couldn't lookup file: %s", file);
     char path[PATH_MAX];
@@ -1099,7 +1100,7 @@ BridgeSupportParser::pass1(const char **headers, const std::string& triple, cons
 
     const char *empty = "";
     llvm::MemoryBuffer *membuf = llvm::MemoryBuffer::getMemBuffer(empty, empty);
-    bs.sm.createMainFileIDForMemBuffer(membuf); // ownership of membuf passes to sm
+    bs.sm.createFileID(membuf); // ownership of membuf passes to sm
     MyPass1Consumer c;
     c.setup(&bs);
     ParseAST(bs.pp, &c, bs.astctxt);    // calls EnterMainSourceFile() for us
@@ -1115,7 +1116,7 @@ BridgeSupportParser::pass2(const char **headers, const char *content, const std:
     src.append(*macros);
     //llvm::errs() << "-----------\n" << src << "-----------\n"; //DEBUG
     llvm::MemoryBuffer *membuf = llvm::MemoryBuffer::getMemBuffer(src.c_str(), src.c_str() + src.length());
-    bs.sm.createMainFileIDForMemBuffer(membuf); // ownership of membuf passes to sm
+    bs.sm.createFileID(membuf); // ownership of membuf passes to sm
     MyPass2Consumer c;
     c.setup(&bs);
     MyParseAST(&bs, &c);    // calls EnterMainSourceFile() for us

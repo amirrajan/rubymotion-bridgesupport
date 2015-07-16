@@ -63,7 +63,6 @@ class VarDecl;
 #include "clang/Sema/ExternalSemaSource.h"
 #include "clang/Sema/Sema.h"
 #include "clang/Sema/SemaConsumer.h"
-#include "llvm/ADT/OwningPtr.h"
 #include "llvm/Config/config.h"
 #include "llvm/Support/MemoryBuffer.h"
 #include "llvm/Support/raw_ostream.h"
@@ -110,16 +109,23 @@ public:
 };
 
 class MyModuleLoader : public clang::ModuleLoader {
-    virtual clang::ModuleLoadResult loadModule(clang::SourceLocation ImportLoc,
+    clang::ModuleLoadResult loadModule(clang::SourceLocation ImportLoc,
 	    clang::ModuleIdPath Path,
 	    clang::Module::NameVisibilityKind Visibility,
-	    bool IsInclusionDirective) {
+	    bool IsInclusionDirective) override {
 	return clang::ModuleLoadResult();
     }
 
-    virtual void makeModuleVisible(clang::Module *Mod,
+    void makeModuleVisible(clang::Module *Mod,
 	    clang::Module::NameVisibilityKind Visibility,
 	    clang::SourceLocation ImportLoc,
-	    bool Complain) { }
+	    bool Complain) override { }
+
+    clang::GlobalModuleIndex *loadGlobalModuleIndex(clang::SourceLocation TriggerLoc) override {
+	return nullptr;
+    }
+    bool lookupMissingImports(llvm::StringRef Name, clang::SourceLocation TriggerLoc) override {
+	return 0;
+    };
 };
 #endif /* SWIG */
