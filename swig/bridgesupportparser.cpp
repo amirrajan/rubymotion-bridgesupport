@@ -819,6 +819,7 @@ BridgeSupportParser::BridgeSupportParser(const char **headers, const std::string
 	  astctxt(opts, sm, pp.getIdentifierTable(), pp.getSelectorTable(), pp.getBuiltinInfo()),
 	  verbose(verbose)
 {
+    pp.Initialize(*target);
     diagClient.BeginSourceFile(opts, &pp);
     diags.setSuppressSystemWarnings(true);
     diags.setSeverity(diag::ext_multichar_character_literal, diag::Severity::Ignored, SourceLocation());
