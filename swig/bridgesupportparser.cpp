@@ -815,7 +815,7 @@ BridgeSupportParser::BridgeSupportParser(const char **headers, const std::string
 	  sm(diags, fm),
 	  hs(new HeaderSearchOptions(sysroot), sm, diags, opts, target),
 	  ModLoader(),
-	  pp(ppo, diags, opts, sm, hs, ModLoader),
+	  pp(&ppo, diags, opts, sm, hs, ModLoader),
 	  astctxt(opts, sm, pp.getIdentifierTable(), pp.getSelectorTable(), pp.getBuiltinInfo()),
 	  verbose(verbose)
 {
@@ -858,7 +858,6 @@ BridgeSupportParser::BridgeSupportParser(const char **headers, const std::string
 	}
     }
 
-    PreprocessorOptions ppo;
     const char **p;
 
     // Add the list of header files to parse
@@ -876,6 +875,7 @@ BridgeSupportParser::BridgeSupportParser(const char **headers, const std::string
     }
     FrontendOptions feo;
     InitializePreprocessor(pp, ppo, feo);
+    ApplyHeaderSearchOptions(pp.getHeaderSearchInfo(), hso, pp.getLangOpts(), pp.getTargetInfo().getTriple());
 
     // create a dummy FieldDecl for getObjCEncodingForType()
     dummyFD = FieldDecl::Create(astctxt, NULL, SourceLocation(), SourceLocation(), NULL, QualType(), NULL, NULL, false, ICIS_NoInit);
