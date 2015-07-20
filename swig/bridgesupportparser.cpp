@@ -826,6 +826,7 @@ BridgeSupportParser::BridgeSupportParser(const char **headers, const std::string
     MyModuleLoader ModLoader;
     pp = new Preprocessor(&ppo, *diags, *opts, *sm, *hs, ModLoader);
     astctxt = new ASTContext(*opts, *sm, pp->getIdentifierTable(), pp->getSelectorTable(), pp->getBuiltinInfo());
+    astctxt->InitBuiltinTypes(*target);
 
     pp->Initialize(*target);
     diagClient->BeginSourceFile(*opts, pp);
