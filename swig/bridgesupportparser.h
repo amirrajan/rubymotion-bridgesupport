@@ -20,10 +20,7 @@ private:
     std::map<std::string,size_t> dirs;
     std::map<clang::FileID,bool> inDirCache;
 
-    clang::TargetInfo* target;
-    clang::Preprocessor *pp;
-    clang::SourceManager *sm;
-    clang::ASTContext *astctxt;
+    clang::CompilerInstance compiler;
     clang::FieldDecl* dummyFD;
     bool verbose;
 

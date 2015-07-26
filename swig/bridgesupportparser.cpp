@@ -372,7 +372,7 @@ struct ExprData {
 
 class MySema : public Sema {
 public:
-    MySema(BridgeSupportParser *_BSP, ASTConsumer &consumer, TranslationUnitKind TUKind=TU_Complete, CodeCompleteConsumer *CompletionConsumer=0) : Sema(*_BSP->pp, *_BSP->astctxt, consumer, TUKind, CompletionConsumer), BSP(_BSP), customActOn(0) {}
+    MySema(BridgeSupportParser *_BSP, ASTConsumer &consumer, TranslationUnitKind TUKind=TU_Complete, CodeCompleteConsumer *CompletionConsumer=0) : Sema(_BSP->compiler.getPreprocessor(), _BSP->compiler.getASTContext(), consumer, TUKind, CompletionConsumer), BSP(_BSP), customActOn(0) {}
 
 #if 0
     virtual void ActOnEndOfTranslationUnit() {
@@ -407,9 +407,10 @@ public:
 			FloatingLiteral *F = static_cast<FloatingLiteral *>(E);
 			SourceRange r = F->getSourceRange();
 			bool invalid0, invalid1;
-			const char *begin = BSP->sm.getCharacterData(r.getBegin(), &invalid0);
-			const char *end = BSP->sm.getCharacterData(r.getEnd(), &invalid1);
-			const char *loc = BSP->sm.getCharacterData(F->getLocation());
+			SourceManager &sm = BSP->compiler.getSourceManager();
+			const char *begin = sm.getCharacterData(r.getBegin(), &invalid0);
+			const char *end = sm.getCharacterData(r.getEnd(), &invalid1);
+			const char *loc = sm.getCharacterData(F->getLocation());
 			if(!invalid0 && !invalid1) {
 			    std::string str(begin, end - begin);
 			    fprintf(stderr, ">>FloatingLiteral: begin=%p end=%p loc=%p getValueAsApproximateDouble=%.18g %.10s\n", begin, end, loc, F->getValueAsApproximateDouble(), loc);
@@ -465,8 +466,8 @@ public:
 		    rettype = C->getCallReturnType();
 
 		    if(rettype->isVectorType() || C->getNumArgs() > 1) break;
-		    if(rettype->isIntegralType(*BSP->astctxt) || rettype->isRealFloatingType()) {
-			if(C->getNumArgs() == 1 && !C->getArg(0)->getType()->isIntegralType(*BSP->astctxt)) break;
+		    if(rettype->isIntegralType(BSP->compiler.getASTContext()) || rettype->isRealFloatingType()) {
+			if(C->getNumArgs() == 1 && !C->getArg(0)->getType()->isIntegralType(BSP->compiler.getASTContext())) break;
 			customActOn->kind = ExprCallNumber;
 			customActOn->str.append("(CallExprNumber)");
 		    } else if(rettype.getAsString() == "CFStringRef") {
@@ -545,13 +546,14 @@ ignoreMacro(const MacroInfo *MI) {
 class MyPass1Consumer : public ASTConsumer {
 public:
     virtual void HandleTranslationUnit (ASTContext &Ctx) {
-	Preprocessor::macro_iterator M = BSP->pp->macro_begin(false), ME = BSP->pp->macro_end(false);
+	Preprocessor &pp = BSP->compiler.getPreprocessor();
+	Preprocessor::macro_iterator M = pp.macro_begin(false), ME = pp.macro_end(false);
 	if(M == ME) return;
 
 	for (int i = 0; M != ME; M++) {
 	    const IdentifierInfo *I = M->first;
 	    const MacroInfo *V = M->second->getMacroInfo();
-	    if(!V->isEnabled() || V->isBuiltinMacro() || !BSP->inDir(BSP->sm->getFileID(V->getDefinitionLoc())) || V->isFunctionLike()) continue;
+	    if(!V->isEnabled() || V->isBuiltinMacro() || !BSP->inDir(BSP->compiler.getSourceManager().getFileID(V->getDefinitionLoc())) || V->isFunctionLike()) continue;
 	    if(ignoreMacro(V)) continue;
 	    //llvm::errs() << I->getName() << " "; BSP->pp->DumpMacro(*V); //DEBUG
 	    std::string data = I->getName().str();
@@ -609,7 +611,7 @@ public:
 
 	    sl = ND->getLocation();
 	    if(!sl.isValid() || !sl.isFileID()) continue;
-	    const char *path = locgetpath(BSP->sm, sl);
+	    const char *path = locgetpath(&BSP->compiler.getSourceManager(), sl);
 
 	    switch(ND->getKind()) {
 	      case Decl::Enum: {
@@ -689,15 +691,15 @@ public:
 			if(expr.kind == ExprUnknown) continue;
 
 			llvm::StringRef name(ND->getName().substr(sizeof(MACROPREFIX) - 1));
-			IdentifierInfo *II = BSP->pp->getIdentifierInfo(name);
+			IdentifierInfo *II = BSP->compiler.getPreprocessor().getIdentifierInfo(name);
 			if(!II) rb_raise(rb_eRuntimeError, "Can't lookup identifier %s", name.data());
-			const MacroInfo *M = BSP->pp->getMacroInfo(II);
+			const MacroInfo *M = BSP->compiler.getPreprocessor().getMacroInfo(II);
 			if(!M) rb_raise(rb_eRuntimeError, "Can't find macro info for %s", name.data());
 			SourceLocation sl = M->getDefinitionLoc();
 			if(!sl.isValid() || !sl.isFileID()) continue;
-			path = locgetpath(BSP->sm, sl);
+			path = locgetpath(&BSP->compiler.getSourceManager(), sl);
 #define tokN(n)		(M->getReplacementToken(start + (n)))
-#define spellN(n)	(BSP->pp->getSpelling(tokN(n)))
+#define spellN(n)	(BSP->compiler.getPreprocessor().getSpelling(tokN(n)))
 #define tokNIs(n,k)	(tokN(n).getKind() == k)
 			switch(expr.kind) {
 			case ExprCallCFSTR: {
@@ -808,33 +810,24 @@ private:
 BridgeSupportParser::BridgeSupportParser(const char **headers, const std::string& triple, const char **defines, const char **incdirs, const std::string& sysroot, bool verbose)
 	:  verbose(verbose)
 {
-    IntrusiveRefCntPtr<DiagnosticOptions> diagOpts = new DiagnosticOptions();
-    TextDiagnosticPrinter *diagClient = new TextDiagnosticPrinter(verbose ? llvm::errs() : llvm::nulls(), &*diagOpts);
-    llvm::IntrusiveRefCntPtr<clang::DiagnosticIDs> diagID(new DiagnosticIDs());
-    DiagnosticsEngine *diags = new DiagnosticsEngine(diagID, &*diagOpts, diagClient, false);
-    MyTargetOptions targetOpts(triple);
-    target = TargetInfo::CreateTargetInfo(*diags, std::make_shared<TargetOptions>(targetOpts));
+    MyObjCLangOptions opts;
+    TextDiagnosticPrinter *client = new TextDiagnosticPrinter(verbose ? llvm::errs() : llvm::nulls(), &compiler.getDiagnosticOpts());
+    compiler.createDiagnostics(client);
+    compiler.getInvocation().setLangDefaults(opts, IK_ObjC);
 
-    FileManager *fm = new FileManager(FileSystemOptions());
-    sm = new SourceManager(*diags, *fm);
+    const char **header_end;
+    for(header_end = headers; *header_end; header_end++);
+    CompilerInvocation::CreateFromArgs(compiler.getInvocation(), nullptr, nullptr, compiler.getDiagnostics());
 
-    MyObjCLangOptions *opts = new MyObjCLangOptions;
-    HeaderSearchOptions hso(sysroot);
-    HeaderSearch *hs = new HeaderSearch(&hso, *sm, *diags, *opts, target);
+    TargetInfo *target = clang::TargetInfo::CreateTargetInfo(compiler.getDiagnostics(), compiler.getInvocation().TargetOpts);
+    compiler.setTarget(target);
 
-    PreprocessorOptions ppo;
-    MyModuleLoader ModLoader;
-    pp = new Preprocessor(&ppo, *diags, *opts, *sm, *hs, ModLoader);
-    astctxt = new ASTContext(*opts, *sm, pp->getIdentifierTable(), pp->getSelectorTable(), pp->getBuiltinInfo());
-    astctxt->InitBuiltinTypes(*target);
-
-    pp->Initialize(*target);
-    diagClient->BeginSourceFile(*opts, pp);
-    diags->setSuppressSystemWarnings(true);
-    diags->setSeverity(diag::ext_multichar_character_literal, diag::Severity::Ignored, SourceLocation());
-    pp->getBuiltinInfo().InitializeBuiltins(pp->getIdentifierTable(), pp->getLangOpts());
+    compiler.createFileManager();
+    compiler.createSourceManager(compiler.getFileManager());
+    compiler.getDiagnosticClient().BeginSourceFile(compiler.getLangOpts(), nullptr);
 
     // Add header search directories
+    HeaderSearchOptions &hso = compiler.getHeaderSearchOpts();
     hso.AddPath(*defaultIncludePath, frontend::After, false, false);
 
     /*
@@ -866,6 +859,7 @@ BridgeSupportParser::BridgeSupportParser(const char **headers, const std::string
 	}
     }
 
+    PreprocessorOptions &ppo = compiler.getPreprocessorOpts();
     const char **p;
 
     // Add the list of header files to parse
@@ -881,24 +875,24 @@ BridgeSupportParser::BridgeSupportParser(const char **headers, const std::string
 	for(const char **d = defines; *d; d++)
 	    ppo.addMacroDef(*d);
     }
-    FrontendOptions feo;
-    InitializePreprocessor(*pp, ppo, feo);
-    ApplyHeaderSearchOptions(pp->getHeaderSearchInfo(), hso, pp->getLangOpts(), pp->getTargetInfo().getTriple());
+
+    compiler.createPreprocessor(clang::TU_Complete);
+    compiler.createASTContext();
 
     // create a dummy FieldDecl for getObjCEncodingForType()
-    dummyFD = FieldDecl::Create(*astctxt, NULL, SourceLocation(), SourceLocation(), NULL, QualType(), NULL, NULL, false, ICIS_NoInit);
+    dummyFD = FieldDecl::Create(compiler.getASTContext(), NULL, SourceLocation(), SourceLocation(), NULL, QualType(), NULL, NULL, false, ICIS_NoInit);
 }
 
 BridgeSupportParser::~BridgeSupportParser()
 {
-    delete target;
+    //delete target;
 }
 
 void
 BridgeSupportParser::addFile(const char *file) {
     const DirectoryLookup *CurDir;
     SmallVector<std::pair<const FileEntry *, const DirectoryEntry *>, 0> Includers;
-    const FileEntry *fe = pp->getHeaderSearchInfo().LookupFile(file, SourceLocation(), false, NULL, CurDir, Includers, NULL, NULL, NULL);
+    const FileEntry *fe = compiler.getPreprocessor().getHeaderSearchInfo().LookupFile(file, SourceLocation(), false, NULL, CurDir, Includers, NULL, NULL, NULL);
     if(!fe)
 	rb_raise(rb_eRuntimeError, "addFile: Couldn't lookup file: %s", file);
     char path[PATH_MAX];
@@ -923,7 +917,7 @@ BridgeSupportParser::inDir(FileID file) {
     std::map<clang::FileID,bool>::iterator et = inDirCache.end();
     if(it != et) return it->second;
 
-    const clang::FileEntry *fe = sm->getFileEntryForID(file);
+    const clang::FileEntry *fe = compiler.getSourceManager().getFileEntryForID(file);
     char path[PATH_MAX];
     if(fe) {
 	if(realpath(fe->getName(), path) == NULL) {
@@ -948,7 +942,7 @@ BridgeSupportParser::inDir(FileID file) {
 void
 BridgeSupportParser::getObjCEncodingForType(QualType t, std::string &S, const FieldDecl *Field)
 {
-    astctxt->getObjCEncodingForType(t, S, Field);
+    compiler.getASTContext().getObjCEncodingForType(t, S, Field);
     /*
      * Remove any leading 'r', which can't be removed with getUnqualifiedType()
      * or others.
@@ -978,69 +972,48 @@ rubyarr2c(VALUE arr)
 // MyParseAST is based on ParseAST.cpp
 void MyParseAST(BridgeSupportParser *BSP, MyPass2Consumer *Consumer) {
     MySema S(BSP, *Consumer);
-    Parser P(*BSP->pp, S, false);
-    BSP->pp->EnterMainSourceFile();
+    Parser P(BSP->compiler.getPreprocessor(), S, false);
+    BSP->compiler.getPreprocessor().EnterMainSourceFile();
 
     // Initialize the parser.
     P.Initialize();
 
-    Consumer->Initialize(*BSP->astctxt);
-    Consumer->InitializeMySema(S);
-
-    if (ExternalASTSource *External = BSP->astctxt->getExternalSource()) {
-	if (ExternalSemaSource *ExternalSema =
-	    dyn_cast<ExternalSemaSource>(External))
-	    ExternalSema->InitializeSema(S);
-
-	External->StartTranslationUnit(Consumer);
-    }
-
     Parser::DeclGroupPtrTy ADecl;
     bool found = false;
+    ExternalASTSource *External = S.getASTContext().getExternalSource();
+    if (External)
+	External->StartTranslationUnit(Consumer);
 
-    while (!P.ParseTopLevelDecl(ADecl)) {    // Not end of file.
-	// If we got a null return and something *was* parsed, ignore it.    This
-	// is due to a top-level semicolon, an action override, or a parse error
-	// skipping something.
-	if (!ADecl) continue;
-	DeclGroupRef D = static_cast<DeclGroupRef>(ADecl.get());
-	for(DeclGroupRef::const_iterator I = D.begin(), E = D.end(); I != E; I++) {
-	    if((*I)->getKind() == Decl::ObjCInterface) {
-		const ObjCInterfaceDecl *ID = static_cast<const ObjCInterfaceDecl *>(*I);
-		//llvm::errs() << "ObjCInterface: " << ID->getNameAsCString() << "\n"; //DEBUG
-		if(ID->getName().equals(CONTENTEND)) {
-		    //llvm::errs() << "Found " CONTENTEND "\n";
-		    found = true;
+    if (P.ParseTopLevelDecl(ADecl)) {
+	if (!External && !S.getLangOpts().CPlusPlus)
+	    P.Diag(-1/*diag::ext_empty_translation_unit*/);
+    } else {
+	do {
+	    // If we got a null return and something *was* parsed, ignore it.  This
+	    // is due to a top-level semicolon, an action override, or a parse error
+	    // skipping something.
+	    DeclGroupRef D = static_cast<DeclGroupRef>(ADecl.get());
+	    for(DeclGroupRef::const_iterator I = D.begin(), E = D.end(); I != E; I++) {
+		if((*I)->getKind() == Decl::ObjCInterface) {
+		    const ObjCInterfaceDecl *ID = static_cast<const ObjCInterfaceDecl *>(*I);
+		    llvm::errs() << "ObjCInterface: " << ID->getName() << "\n"; //DEBUG
+		    if(ID->getName().equals(CONTENTEND)) {
+			//llvm::errs() << "Found " CONTENTEND "\n";
+			found = true;
+		    }
 		}
 	    }
-	    break; // Only check the first
-	}
-	if (found) break;
-	Consumer->HandleTopLevelDecl(D);
+	} while (!P.ParseTopLevelDecl(ADecl));
     }
     if(!found) rb_raise(rb_eRuntimeError, "%s not found", CONTENTEND);
 
-    // Check for any pending objective-c implementation decl.
-    //----------
-    // TODO:
-    //----------
-    // while ((ADecl = P.FinishPendingObjCActions()))
-    // 	Consumer->HandleTopLevelDecl(ADecl.getAsVal<DeclGroupRef>());
-
     // Process any TopLevelDecls generated by #pragma weak.
-    for (llvm::SmallVector<Decl*,2>::iterator
-	I = S.WeakTopLevelDecls().begin(),
-	E = S.WeakTopLevelDecls().end(); I != E; ++I)
+    for (SmallVectorImpl<Decl *>::iterator
+	     I = S.WeakTopLevelDecls().begin(),
+	     E = S.WeakTopLevelDecls().end(); I != E; ++I)
 	Consumer->HandleTopLevelDecl(DeclGroupRef(*I));
 
-    Consumer->HandleTranslationUnit(*BSP->astctxt);
-    Consumer->HandleMacros(P);
-
-    if (ExternalSemaSource *ESS =
-	dyn_cast_or_null<ExternalSemaSource>(BSP->astctxt->getExternalSource()))
-	ESS->ForgetSema();
-
-    Consumer->ForgetSema();
+    Consumer->HandleTranslationUnit(BSP->compiler.getASTContext());
 }
 
 void
@@ -1104,15 +1077,18 @@ BridgeSupportParser::pass1(const char **headers, const std::string& triple, cons
     BridgeSupportParser bs(headers, triple, defines, incdirs, sysroot, verbose);
     // Limit pass 1 output to just files in the same directories (or
     // subdirectories) as the files in "headers".
-    for(const char **p = headers; *p; p++)
-	bs.addFile(*p);
+    // for(const char **p = headers; *p; p++)
+    // 	bs.addFile(*p);
 
     const char *empty = "";
     llvm::MemoryBuffer *membuf = llvm::MemoryBuffer::getMemBuffer(empty, empty);
-    bs.sm->createFileID(membuf); // ownership of membuf passes to sm
+    FileID fileID = bs.compiler.getSourceManager().createFileID(membuf); // ownership of membuf passes to sm
     MyPass1Consumer c;
     c.setup(&bs);
-    ParseAST(*bs.pp, &c, *bs.astctxt);    // calls EnterMainSourceFile() for us
+    bs.compiler.setASTConsumer(llvm::make_unique<MyPass1Consumer>(c));
+    bs.compiler.getSourceManager().setMainFileID(fileID);
+
+    ParseAST(bs.compiler.getPreprocessor(), &c, bs.compiler.getASTContext());    // calls EnterMainSourceFile() for us
     return c.getMacros();
 }
 
@@ -1125,9 +1101,12 @@ BridgeSupportParser::pass2(const char **headers, const char *content, const std:
     src.append(*macros);
     //llvm::errs() << "-----------\n" << src << "-----------\n"; //DEBUG
     llvm::MemoryBuffer *membuf = llvm::MemoryBuffer::getMemBuffer(src.c_str(), src.c_str() + src.length());
-    bs.sm->createFileID(membuf); // ownership of membuf passes to sm
+    FileID fileID = bs.compiler.getSourceManager().createFileID(membuf); // ownership of membuf passes to sm
     MyPass2Consumer c;
     c.setup(&bs);
+    bs.compiler.setASTConsumer(llvm::make_unique<MyPass2Consumer>(c));
+    bs.compiler.getSourceManager().setMainFileID(fileID);
+
     MyParseAST(&bs, &c);    // calls EnterMainSourceFile() for us
 }
 
@@ -1523,7 +1502,7 @@ AnObjCMethod::info()
 {
     //std::string type = MD->getResultType().isNull() ? "id" : MD->getResultType().getAsString();
     std::string menc, retenc;
-    BSP->astctxt->getObjCEncodingForMethodDecl(MD, menc);
+    BSP->compiler.getASTContext().getObjCEncodingForMethodDecl(MD, menc);
     QualType rettype = MD->getReturnType();
     BSP->getObjCEncodingForType(rettype, retenc);
     if(rettype->isFunctionPointerType() || rettype->isBlockPointerType()) {
