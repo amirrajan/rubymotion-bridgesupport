@@ -88,14 +88,16 @@ $(SYMROOT_MADE): $(OBJROOT_MADE)
 	$(TOUCH) $@
 
 # Subdirectories
-CLANG_VERS = clang-602.0.53
-CLANG_TARBALL = $(CLANG_VERS).tar.gz
+CLANG_VERS = clang-37
 CLANG_DIR = $(OBJROOT)/$(CLANG_VERS)
 SWIG_DIR = $(OBJROOT)/swig
 
 CLANG_DIR_MADE = $(CLANG_DIR)/$(MADEFILE)
 $(CLANG_DIR_MADE): $(OBJROOT_MADE)
-	$(TAR) -xjof $(SRCROOT)/$(CLANG_TARBALL) -C $(OBJROOT)
+	mkdir -p $(OBJROOT)
+	cd $(OBJROOT) && svn co http://llvm.org/svn/llvm-project/llvm/branches/release_37 $(CLANG_VERS)
+	cd $(CLANG_DIR)/tools && svn co http://llvm.org/svn/llvm-project/cfe/branches/release_37 clang
+	cd $(CLANG_DIR)/projects && svn co http://llvm.org/svn/llvm-project/compiler-rt/branches/release_37 compiler-rt
 	cd $(SRCROOT)
 	$(TOUCH) $@
 
@@ -105,7 +107,7 @@ $(SWIG_DIR_MADE): $(OBJROOT_MADE)
 	$(TOUCH) $@
 
 ifeq ($(words $(RC_ARCHS)),1)
-CLANGROOT = $(CLANG_DIR)/src/darwin-$(RC_ARCHS)/ROOT
+CLANGROOT = $(CLANG_DIR)/darwin-$(RC_ARCHS)/ROOT
 else
 CLANGROOT = $(OBJROOT)/ROOT
 ARCHIVE_DIR = lib
@@ -119,23 +121,23 @@ $(CLANGROOT_MADE): $(CLANG_DIR_MADE)
 	@/bin/echo -n '*** Started Building $(CLANG_VERS): ' && date
 	@set -x && \
 	for arch in $(RC_ARCHS); do \
-	    $(RMDIR) $(CLANG_DIR)/src/darwin-$$arch && \
-	    $(MKDIR) $(CLANG_DIR)/src/darwin-$$arch && \
-	    (cd $(CLANG_DIR)/src/darwin-$$arch && \
+	    $(RMDIR) $(CLANG_DIR)/darwin-$$arch && \
+	    $(MKDIR) $(CLANG_DIR)/darwin-$$arch && \
+	    (cd $(CLANG_DIR)/darwin-$$arch && \
 	    $(MKDIR) ROOT && \
 	    ../configure --prefix=$(CLANG_PREFIX) MACOSX_DEPLOYMENT_TARGET=10.7 --enable-libcpp --enable-debug-runtime --enable-debug-symbols --enable-optimized --disable-timestamps --disable-assertions --with-optimize-option='-Os' --without-llvmgcc --without-llvmgxx --disable-bindings --disable-doxygen --with-extra-options='-DDISABLE_SMART_POINTERS' CC="$(CC) -arch $$arch" CXX="$(CXX) -arch $$arch" && \
 	    make -j$(shell sysctl -n hw.ncpu) && \
-	    $(MKDIR) $(CLANG_DIR)/src/darwin-$$arch/ROOT && \
-	    make install DESTDIR=$(CLANG_DIR)/src/darwin-$$arch/ROOT) || exit 1; \
+	    $(MKDIR) $(CLANG_DIR)/darwin-$$arch/ROOT && \
+	    make install DESTDIR=$(CLANG_DIR)/darwin-$$arch/ROOT) || exit 1; \
 	done
 ifneq ($(words $(RC_ARCHS)),1)
 	$(MKDIR) $(CLANGROOT)$(CLANG_PREFIX)
-	cd $(CLANG_DIR)/src/darwin-$(firstword $(ORDERED_ARCHS))/ROOT$(CLANG_PREFIX) && $(RSYNC) $(COPY_DIRS) $(CLANGROOT)$(CLANG_PREFIX)
-	cd $(CLANG_DIR)/src/darwin-$(firstword $(ORDERED_ARCHS))/ROOT$(CLANG_PREFIX)/$(ARCHIVE_DIR) && ls *.a > $(ARCHIVE_LIST)
+	cd $(CLANG_DIR)/darwin-$(firstword $(ORDERED_ARCHS))/ROOT$(CLANG_PREFIX) && $(RSYNC) $(COPY_DIRS) $(CLANGROOT)$(CLANG_PREFIX)
+	cd $(CLANG_DIR)/darwin-$(firstword $(ORDERED_ARCHS))/ROOT$(CLANG_PREFIX)/$(ARCHIVE_DIR) && ls *.a > $(ARCHIVE_LIST)
 	$(MKDIR) $(CLANGROOT)$(CLANG_PREFIX)/$(ARCHIVE_DIR)
 	@set -x && \
 	for a in `cat $(ARCHIVE_LIST)`; do \
-	    $(LIPO) -create -output $(CLANGROOT)$(CLANG_PREFIX)/$(ARCHIVE_DIR)/$$a $(foreach arch,$(RC_ARCHS),-arch $(arch) $(CLANG_DIR)/src/darwin-$(arch)/ROOT$(CLANG_PREFIX)/$(ARCHIVE_DIR)/$$a) && \
+	    $(LIPO) -create -output $(CLANGROOT)$(CLANG_PREFIX)/$(ARCHIVE_DIR)/$$a $(foreach arch,$(RC_ARCHS),-arch $(arch) $(CLANG_DIR)/darwin-$(arch)/ROOT$(CLANG_PREFIX)/$(ARCHIVE_DIR)/$$a) && \
 	    $(RANLIB) $(CLANGROOT)$(CLANG_PREFIX)/$(ARCHIVE_DIR)/$$a || exit 1; \
 	done
 endif
@@ -212,14 +214,14 @@ install_additional_files: $(BRIDGESUPPORT_5)
 ifeq ($(RC_XBS),YES) # Apple build system
 
 # make binary submission verifier happy
-install_source::
-	@set -x && \
-	cd $(SRCROOT) && \
-	$(TAR) -xjof $(CLANG_TARBALL) && \
-	find $(CLANG_VERS) -name \*.a -delete -print && \
-	$(RM) $(CLANG_TARBALL) && \
-	$(TAR) -cjf $(CLANG_TARBALL) $(CLANG_VERS) && \
-	$(RMDIR) $(CLANG_VERS)
+# install_source::
+# 	@set -x && \
+# 	cd $(SRCROOT) && \
+# 	$(TAR) -xjof $(CLANG_TARBALL) && \
+# 	find $(CLANG_VERS) -name \*.a -delete -print && \
+# 	$(RM) $(CLANG_TARBALL) && \
+# 	$(TAR) -cjf $(CLANG_TARBALL) $(CLANG_VERS) && \
+# 	$(RMDIR) $(CLANG_VERS)
 
 else # normal make targets
 
