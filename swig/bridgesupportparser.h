@@ -17,24 +17,12 @@ private:
     static void pass2(const char **headers, const char* content, const std::string& triple, const char **defines, const char **incdirs, const std::string& sysroot, bool verbose, std::string *macros);
 
     static std::string *defaultIncludePath;
-
-    MyDiagnosticOptions diagOpts;
-    llvm::IntrusiveRefCntPtr<clang::DiagnosticIDs> diagID;
-    clang::TextDiagnosticPrinter diagClient;
-    clang::DiagnosticsEngine diags;
-    MyTargetOptions targOpts;
-    clang::TargetInfo* target;
-    clang::FileManager fm;
-    clang::HeaderSearch hs;
-    MyObjCLangOptions opts;
-    clang::SourceManager sm;
-    MyModuleLoader ModLoader;
-    clang::Preprocessor pp;
-    clang::ASTContext astctxt;
-    bool verbose;
-    clang::FieldDecl* dummyFD;
     std::map<std::string,size_t> dirs;
     std::map<clang::FileID,bool> inDirCache;
+
+    clang::CompilerInstance compiler;
+    clang::FieldDecl* dummyFD;
+    bool verbose;
 
     friend class AnEnum;
     friend class AFunctionDecl;

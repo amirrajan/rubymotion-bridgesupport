@@ -35,8 +35,9 @@ class VarDecl;
 #include "clang/AST/Stmt.h"
 #include "clang/AST/Type.h"
 #include "clang/AST/TypeLoc.h"
-#include "clang/Basic/DiagnosticIDs.h"
 #include "clang/Basic/Diagnostic.h"
+#include "clang/Basic/DiagnosticIDs.h"
+#include "clang/Basic/DiagnosticOptions.h"
 #include "clang/Basic/FileManager.h"
 #include "clang/Basic/FileSystemOptions.h"
 #include "clang/Basic/IdentifierTable.h"
@@ -44,17 +45,17 @@ class VarDecl;
 #include "clang/Basic/SourceManager.h"
 #include "clang/Basic/TargetInfo.h"
 #include "clang/Basic/TargetOptions.h"
-#include "clang/Frontend/DiagnosticOptions.h"
+#include "clang/Frontend/CompilerInstance.h"
 #include "clang/Frontend/FrontendOptions.h"
-#include "clang/Frontend/HeaderSearchOptions.h"
-#include "clang/Frontend/PreprocessorOptions.h"
 #include "clang/Frontend/TextDiagnosticPrinter.h"
 #include "clang/Frontend/Utils.h"
 #include "clang/Lex/HeaderSearch.h"
+#include "clang/Lex/HeaderSearchOptions.h"
 #include "clang/Lex/LexDiagnostic.h"
 #include "clang/Lex/MacroInfo.h"
 #include "clang/Lex/ModuleLoader.h"
 #include "clang/Lex/Preprocessor.h"
+#include "clang/Lex/PreprocessorOptions.h"
 #include "clang/Lex/Token.h"
 #include "clang/Driver/Action.h"
 #include "clang/Sema/Ownership.h"
@@ -63,7 +64,6 @@ class VarDecl;
 #include "clang/Sema/ExternalSemaSource.h"
 #include "clang/Sema/Sema.h"
 #include "clang/Sema/SemaConsumer.h"
-#include "llvm/ADT/OwningPtr.h"
 #include "llvm/Config/config.h"
 #include "llvm/Support/MemoryBuffer.h"
 #include "llvm/Support/raw_ostream.h"
@@ -93,7 +93,7 @@ class MyObjCLangOptions: public clang::LangOptions {
 public:
     MyObjCLangOptions()
     {
-	BCPLComment = Blocks = Bool = C99 = GNUMode = HexFloats = 1;
+	LineComment = Blocks = Bool = C99 = GNUMode = HexFloats = 1;
 	ObjC1 = ObjC2 = ObjCAutoRefCount = ObjCARCWeak = 1;
     }
 };
@@ -110,11 +110,23 @@ public:
 };
 
 class MyModuleLoader : public clang::ModuleLoader {
-    virtual clang::Module *loadModule(clang::SourceLocation ImportLoc, clang::ModuleIdPath Path,
-			       clang::Module::NameVisibilityKind Visibility,
-			       bool IsInclusionDirective)
-    {
-	return 0;
+    clang::ModuleLoadResult loadModule(clang::SourceLocation ImportLoc,
+	    clang::ModuleIdPath Path,
+	    clang::Module::NameVisibilityKind Visibility,
+	    bool IsInclusionDirective) override {
+	return clang::ModuleLoadResult();
     }
+
+    void makeModuleVisible(clang::Module *Mod,
+	    clang::Module::NameVisibilityKind Visibility,
+	    clang::SourceLocation ImportLoc,
+	    bool Complain) override { }
+
+    clang::GlobalModuleIndex *loadGlobalModuleIndex(clang::SourceLocation TriggerLoc) override {
+	return nullptr;
+    }
+    bool lookupMissingImports(llvm::StringRef Name, clang::SourceLocation TriggerLoc) override {
+	return 0;
+    };
 };
 #endif /* SWIG */
