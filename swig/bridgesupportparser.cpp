@@ -1107,7 +1107,9 @@ BridgeSupportParser::pass2(const char **headers, const char *content, const std:
     bs.compiler.setASTConsumer(llvm::make_unique<MyPass2Consumer>(c));
     bs.compiler.getSourceManager().setMainFileID(fileID);
 
-    MyParseAST(&bs, &c);    // calls EnterMainSourceFile() for us
+    // FIXME
+    // MyParseAST(&bs, &c);    // calls EnterMainSourceFile() for us
+    ParseAST(bs.compiler.getPreprocessor(), &c, bs.compiler.getASTContext());    // calls EnterMainSourceFile() for us
 }
 
 #define RB_STR_NEW2(x) ((x) ? rb_str_new2(x) : Qnil)
