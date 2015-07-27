@@ -853,7 +853,8 @@ BridgeSupportParser::BridgeSupportParser(const char **headers, const std::string
 		g = frontend::Angled;
 		break;
 	    }
-	    u = ((*d)[1] == 'T');
+	    // FIXME
+	    u = false;//((*d)[1] == 'T');
 	    f = ((*d)[2] == 'T');
 	    hso.AddPath(*d + 3, g, u, f);
 	}
@@ -1077,8 +1078,8 @@ BridgeSupportParser::pass1(const char **headers, const std::string& triple, cons
     BridgeSupportParser bs(headers, triple, defines, incdirs, sysroot, verbose);
     // Limit pass 1 output to just files in the same directories (or
     // subdirectories) as the files in "headers".
-    // for(const char **p = headers; *p; p++)
-    // 	bs.addFile(*p);
+    for(const char **p = headers; *p; p++)
+	bs.addFile(*p);
 
     const char *empty = "";
     llvm::MemoryBuffer *membuf = llvm::MemoryBuffer::getMemBuffer(empty, empty);
