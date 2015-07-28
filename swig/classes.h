@@ -109,24 +109,4 @@ public:
     }
 };
 
-class MyModuleLoader : public clang::ModuleLoader {
-    clang::ModuleLoadResult loadModule(clang::SourceLocation ImportLoc,
-	    clang::ModuleIdPath Path,
-	    clang::Module::NameVisibilityKind Visibility,
-	    bool IsInclusionDirective) override {
-	return clang::ModuleLoadResult();
-    }
-
-    void makeModuleVisible(clang::Module *Mod,
-	    clang::Module::NameVisibilityKind Visibility,
-	    clang::SourceLocation ImportLoc,
-	    bool Complain) override { }
-
-    clang::GlobalModuleIndex *loadGlobalModuleIndex(clang::SourceLocation TriggerLoc) override {
-	return nullptr;
-    }
-    bool lookupMissingImports(llvm::StringRef Name, clang::SourceLocation TriggerLoc) override {
-	return 0;
-    };
-};
 #endif /* SWIG */
