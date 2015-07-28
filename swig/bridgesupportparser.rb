@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 require 'pathname'
 require 'rexml/document'
 require 'set'
@@ -565,12 +566,21 @@ module Bridgesupportparser
 	    self[:name] <=> x[:name]
 	end
 
-	def dylib_wrapper(prefix = '_dw_')
+	# Split dylib_wrapper() into 32 and 64-bit handlers.  The new
+	# dylib_wrapper() now adds #ifdef __LP64__/#else/#endif if both
+	# 32 and 64-bit are enabled.  The 32-bit handler returns the empty
+	# string if the return value or any argment doesn't have _ctype
+	# (meaning the inline routine was only defined in 64-bit).  The
+	# 64-bit handler uses _ctype64 if available (meaning the 64-bit
+	# prototype is different from the 32-bit one).
+	def _dylib_wrapper32(prefix = '_dw_')
+	    return '' if @ret._ctype.nil?
 	    lines = []
 	    args = []
 	    targs = []
 	    i = 0
 	    @args.each do |a|
+		return '' if a._ctype.nil?
 		ai = "_a#{i}"
 		args << ai
 		targs << "#{a._ctype} #{ai}"
@@ -586,6 +596,44 @@ module Bridgesupportparser
 	    lines << cline
 	    lines << "}\n"
 	    lines.join("\n")
+	end
+
+	def _dylib_wrapper64(prefix = '_dw_')
+	    lines = []
+	    args = []
+	    targs = []
+	    i = 0
+	    @args.each do |a|
+		ai = "_a#{i}"
+		args << ai
+		targs << "#{a._ctype64.nil? ? a._ctype : a._ctype64} #{ai}"
+		i += 1
+	    end
+	    name = "#{prefix}#{self[:name]}"
+	    proto = "#{@ret._ctype64.nil? ? @ret._ctype : @ret._ctype64} #{name}(#{targs.join(', ')})"
+	    lines << "#{proto} __asm(\"_#{self[:name]}\");"
+	    lines << "#{proto} {"
+	    cline = "    "
+	    cline << "return " unless @ret.type == 'v'
+	    cline << "#{self[:name]}(#{args.join(', ')});"
+	    lines << cline
+	    lines << "}\n"
+	    lines.join("\n")
+	end
+
+	def dylib_wrapper(enable_32, enable_64, prefix = '_dw_')
+	    pre = mid = post = ''
+	    if enable_32 && enable_64
+		pre = "#ifdef __LP64__\n"
+		mid = "#else\n"
+		post = "#endif\n"
+	    end
+	    wrapper = ''
+	    wrapper << pre
+	    wrapper << _dylib_wrapper64(prefix) if enable_64
+	    wrapper << mid
+	    wrapper << _dylib_wrapper32(prefix) if enable_32
+	    wrapper << post
 	end
 
 	def element
@@ -812,6 +860,16 @@ module Bridgesupportparser
 	end
     end
 
+    FOUNDATIONSPECIAL = {
+	# Special case: <Foundation/NSObject.h> may be split off into
+	# <objc/NSObject.h> and <objc/NSObjCRuntime.h>
+	'/usr/include/objc/NSObject.h' => [true, true],
+	'/usr/include/objc/NSObjCRuntime.h' => [true, true],
+    }
+    SPECIALPATHDATA = {
+	'Foundation.framework' => FOUNDATIONSPECIAL,
+    }
+
     class Parser
 	attr_reader :all_attrs, :all_categories, :all_cftypes, :all_enums, :all_funcs, :all_func_aliases, :all_informal_protocols, :all_interfaces, :all_macronumbers, :all_macronumberfunccalls, :all_macrostrings, :all_opaques, :all_protocols, :all_structs, :all_varinfos, :all_vars, :custom_recursive_merge, :every_cftype, :special_method_encodings, :special_type_encodings
 
@@ -829,10 +887,10 @@ module Bridgesupportparser
 	    'CarbonCore' => true,
 	    'JavaScriptCore' => true,
 	}
-	# This regexp extracts system framework names (including nested ones)
-	FRAMEWORK_RE = Regexp.new('/System/Library/(?:Private)?Frameworks/(?:.*/)?([^/]*)\.framework/')
+	# This regexp extracts the (bare) framework name
+	FRAMEWORK_RE = Regexp.new('([^/]*)\.framework/')
 
-	def initialize(incs, paths, special_methods, special_types, defines = nil, incdirs = nil, sysroot = '/')
+	def initialize(incs, paths, special_methods, special_types, defines = nil, incdirs = nil, defaultincs = nil, sysroot = '/')
 	    @all_attrs = []
 	    @parsepaths = incs
 	    puts "incs:\n#{incs.join("\n")}" if $DEBUG #DEBUG
@@ -863,6 +921,7 @@ module Bridgesupportparser
 	    #@parsedefines.concat(defines) unless defines.nil?
 	    @parsedefines = defines;
 	    @parseincdirs = incdirs
+	    @parsedefaultincs = defaultincs
 	    @parsesysroot = sysroot
 	    # Allow header files in the directory hierarchies.  For framework
 	    # directories, allow sub-framework headers.  The basename of the
@@ -870,14 +929,54 @@ module Bridgesupportparser
 	    @parse_select = Set.new
 	    @parse_select_basenames = {}
 	    select = Set.new
+	    walk = nil
 	    paths.each do |p|
-		select << Pathname.new(p).realpath.parent.to_s
+		# If p is a relative path, walk through incdirs to find the
+		# full path.
+		pn = Pathname.new(p)
+		if pn.relative?
+		    if walk.nil?
+			# This algorithm is simplistic, and doesn't reorder
+			# based on whether incdirs entries are Angled, Quoted
+			# or System, or are marked isFramework.  If that is
+			# ever needed, this code will need to be extended.
+			walk = incdirs.collect { |i| i[3..-1] }
+			walk << '/usr/local/include'
+			walk << '/usr/include'
+			walk.concat(defaultincs)
+			walk.map! { |i| i.start_with?('/usr/', '/System/') ? File.join(sysroot, i) : i } unless sysroot == '/'
+		    end
+		    pp = nil
+		    unless walk.any? do |i|
+			pp = File.join(i, p)
+			File.exists?(pp)
+		    end then
+			raise "Can't find \"#{p}\""
+		    end
+		    p = pp
+		    pn = Pathname.new(p)
+		end
+		select << pn.realpath.parent.to_s
 		@parse_select_basenames[File.basename(p)] = true
 	    end
-	    select.each { |p| @parse_select << p.sub(/\.framework\/.*/, '.framework') }
+	    # For frameworks, remove everything except the framework name
+	    select.each { |p| @parse_select << p.sub(%r{.*/([^/]*\.framework)/.*}, "\\1") }
 	    #puts "@parse_select:\n#{@parse_select.to_a.join("\n")}" #DEBUG
 	    #puts "@parse_select_basenames:\n#{@parse_select_basenames.keys.join("\n")}" #DEBUG
 	    @parsepathcache = {CONTENT => [true, true]}
+	    # Special cases: If a framework header splits off into header files
+	    # that are not co-located, we can add entries to SPECIALPATHDATA,
+	    # which get processed into @specialpathcache and are triggered in
+	    # inParseTree().
+	    @specialpathcache = {}
+	    SPECIALPATHDATA.each do |k, v|
+		if @parse_select.include?(k)
+		    v.each do |p, a|
+			p = sysroot + p;
+			@specialpathcache[Pathname.new(p).realpath.to_s] = a if File.exists?(p)
+		    end
+		end
+	    end
 	    @all_categories = {}
 	    @all_cftypes = Bridgesupportparser::MergingHash.new('all_cftypes')
 	    @all_enums = Bridgesupportparser::MergingHash.new('all_enums')
@@ -989,9 +1088,13 @@ module Bridgesupportparser
 	def inParseTree?(path)
 	    x = @parsepathcache[path]
 	    return x unless x.nil?
-	    # allow header files in the directory hierarchies that match
-	    # the basenames
-	    p = Pathname.new(path).realpath.parent.to_s
+	    # Allow header files in the directory hierarchies that match
+	    # the basenames.  For frameworks, strip leading path components.
+	    pr = Pathname.new(path).realpath
+	    c = @specialpathcache[pr.to_s]
+	    return @parsepathcache[path] = c unless c.nil?
+	    p0 = pr.parent.to_s
+	    p = p0.sub(%r{.*/([^/]*\.framework/.*)}, "\\1")
 	    len = p.length
 	    i = @parse_select.any? do |d|
 		dlen = d.length
@@ -1005,8 +1108,13 @@ module Bridgesupportparser
 		end
 		intree && @parse_select_basenames[File.basename(path)]
 	    end
-	    m = FRAMEWORK_RE.match(p)
-	    c = (!m || DISABLE_CFTYPES[m[1]]) ? true : false
+	    # Only consider allowing CF types if the original path was in
+	    # /System.
+	    c = true
+	    if p0 =~ %r{/System/Library/Frameworks/}
+		m = FRAMEWORK_RE.match(p)
+		c = (!m || DISABLE_CFTYPES[m[1]]) ? true : false
+	    end
 	    @parsepathcache[path] = [i, c]
 	end
 
@@ -1024,9 +1132,10 @@ module Bridgesupportparser
 	    #realp = Pathname.new(path).realpath
 	    #dir = File.dirname(realpath(path))
 	    #puts triple #DEBUG
-	    Bridgesupportparser::BridgeSupportParser.parse(@parsepaths, @parsecontent, triple, @parsedefines, @parseincdirs, @parsesysroot, $DEBUG) do |top|
+	    Bridgesupportparser::BridgeSupportParser.parse(@parsepaths, @parsecontent, triple, @parsedefines, @parseincdirs, @parsedefaultincs, @parsesysroot, $DEBUG) do |top|
 		next if @only_classes[top.class]
 		intree, disableCFTypes = inParseTree?(top.path)
+		#puts "_parse: name=#{top.info[0]} path=#{top.path} intree=#{intree} disableCFTypes=#{disableCFTypes}" #DEBUG
 		case top
 		when Bridgesupportparser::ATypedef
 		    tname, ttype, tattrs = top.info
@@ -1125,6 +1234,7 @@ module Bridgesupportparser
 		when Bridgesupportparser::AnObjCInterface
 		    iname = top.info
 		    content, idx = splitName(iname)
+		    #puts "AnObjCInterface #{iname} content=#{content} idx=#{idx}" #DEBUG
 		    if content == CONTENTMETHOD
 			top.each_method do |m|
 			    sel, menc, rettype, retenc, retattrs, retfunc, mattrs, classmeth, variadic = m.info
@@ -1225,6 +1335,7 @@ module Bridgesupportparser
 	    @all_interfaces.sort.each do |k, interface|
 		e = interface.element
 		root.add_element(e) unless e.nil?
+		#puts "addXML: not add_element #{k} #{interface.methods.length}" if e.nil? #DEBUG
 	    end
 	    $bsp_informal_protocols = true
 	    @all_informal_protocols.sort.each do |k, ip|
@@ -1238,6 +1349,13 @@ module Bridgesupportparser
 	    if block_given?
 		@all_attrs.each { |a| yield a }
 	    end
+	end
+
+	def rename64!
+	    rename_attrs(Bridgesupportparser.rename_attrs64)
+	    # We need to fix up "string_constant" objects, which only have
+	    # "value" attributes (and *not* "value64").
+	    @all_macrostrings.each { |k, v| v[:value] = v.delete(:value64) }
 	end
 
 	def mergeWith64!(p64)
@@ -1342,14 +1460,20 @@ module Bridgesupportparser
 	    # with structure name showing as '?', we replace the '?' with the
 	    # type from the corresponding field.  We have to make multiple
 	    # passes over the structures, until no more changes can be made.
-	    anyunresolved = true
+	    # Throw an exception if no changes occurs during a pass.
+	    changed = true
 	    tagged_structs = {}
-	    while anyunresolved
-		anyunresolved = false
+	    unresolved_structs = ['dummy']
+	    while unresolved_structs.length > 0
+		raise "Infinite loop detected due to unresolved structure(s) that aren't resolving: #{unresolved_structs.inspect}" unless changed
+		changed = false
+		unresolved_structs.clear
 		@all_structs.each do |structname, struct|
 		    next if struct.resolved
+		    #puts "struct #{structname} type=#{struct.type}" #DEBUG
 		    unless struct.type.match(/"\^*\{\?/)
 			struct.resolved = true
+			changed = true
 			#puts "struct #{structname} already resolved" #DEBUG
 			next
 		    end
@@ -1359,30 +1483,51 @@ module Bridgesupportparser
 			sname = f.declared_type.sub(/\s*\*$/, '')
 			s = @all_structs[sname]
 			if s
+			    #puts "field=#{f.name} f.type=#{f.type} sname=#{sname} s.type=#{s.type}" #DEBUG
 			    if s.resolved
 				#resolvedtype = s.type.gsub(/"[^"]*"/, '')
 				#puts "struct #{structname} field #{f.name} type=\"#{f.type}\" resolvedtype=\"#{resolvedtype}\"" #DEBUG
 				#f.type[f.type.index(/\{/)..-1] = resolvedtype[resolvedtype.index(/\{/)..-1]
 				f.type[f.type.index(/\{/)..-1] = s.type[s.type.index(/\{/)..-1]
 				f.resolved = s.type.sub(/^\^*/, '')
+				changed = true
 				#puts "struct #{structname} field #{f.name} => #{f.type} (#{f.resolved})" #DEBUG
+			    elsif m = f.type.match('^\^*\{([^=}]+)')
+				# special case: the field is a (pointer to)
+				# the structure itself (via a typedef)
+				if m[1] == structname
+				    f.resolved = true
+				    changed = true
+				    #puts "struct #{structname} field #{f.name} refers to structure itself: resolved" #DEBUG
+				# special case: if the field is a (pointer to)
+				# typedef to a resolved structure, resolve it
+				elsif fs = @all_structs[m[1]] and fs.resolved
+				    f.type[f.type.index(/\{/)..-1] = fs.type[s.type.index(/\{/)..-1]
+				    f.resolved = fs.type.sub(/^\^*/, '')
+				    changed = true
+				    #puts "struct #{structname} field #{f.name} refers to resolved structure #{fs.name}: resolved" #DEBUG
+				else
+				    unresolved = true
+				    #puts "struct #{structname} field #{f.name}: struct #{s.name} still unresolved" #DEBUG
+				end
 			    else
 				unresolved = true
 				#puts "struct #{structname} field #{f.name}: struct #{s.name} still unresolved" #DEBUG
 			    end
 			else
 			    f.resolved = true
+			    changed = true
 			end
 		    end
 		    if unresolved
-			anyunresolved = true
+			unresolved_structs << structname
 			#puts "struct #{structname} remains unresolved" #DEBUG
 		    else
 			origtype = struct.type.dup
 			struct.each_field do |f|
 			    #puts "struct #{structname} field #{f.name} resolved=#{f.resolved}" #DEBUG
 			    next if f.resolved == true
-			    left = struct.type.index(/"#{f.name}"\^*\{/)
+			    left = struct.type.index(/"#{f.name}"[^{]*\{/)
 			    left = struct.type.index(/\{/, left.nil? ? 0 : left)
 			    right = matchingbrace(struct.type, left)
 			    #puts ">struct #{structname} field #{f.name} => #{f.resolved}" #DEBUG
@@ -1397,6 +1542,7 @@ module Bridgesupportparser
 			    #puts "\"#{struct.type}\"" #DEBUG
 			end
 			struct.resolved = true
+			changed = true
 			#puts "struct #{structname} is now resolved" #DEBUG
 		    end
 		end

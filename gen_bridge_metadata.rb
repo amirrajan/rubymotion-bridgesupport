@@ -1,5 +1,6 @@
 #!/usr/bin/ruby
-# Copyright (c) 2006-2010, Apple Inc. All rights reserved.
+# -*- coding: utf-8 -*-
+# Copyright (c) 2006-2012, Apple Inc. All rights reserved.
 # Copyright (c) 2005-2006 FUJIMOTO Hisakuni
 #
 # Redistribution and use in source and binary forms, with or without
@@ -40,10 +41,20 @@ $:.unshift(_slbr_) unless $:.any? do |p|
 end
 if $slb == $_slb_
     rel = $0.dup
-    if rel.sub!(/\/usr\/bin\/gen_bridge_metadata$/, '') and !rel.empty?
+    if rel.sub!(%r{/usr/bin/gen_bridge_metadata$}, '') and !rel.empty?
 	$slb = "#{rel}/#{$_slb_}"
     end
 end
+
+def getcc(sdkroot = '/')
+    return $_cc if $_cc
+    if File.exists?('/usr/bin/xcrun')
+	out = `/usr/bin/xcrun -sdk #{sdkroot} -find cc`.chomp
+	return $_cc = out unless out.empty?
+    end
+    return $_cc = 'cc'
+end
+
 require 'rexml/document'
 require 'fileutils'
 require 'optparse'
@@ -55,6 +66,7 @@ require 'bridgesupportparser'
 
 class OCHeaderAnalyzer
     CPP = ['/usr/bin/cpp-4.2', '/usr/bin/cpp-4.0', '/usr/bin/cpp'].find { |x| File.exist?(x) }
+    raise "Can't find cpp: have you installed Xcode and the command-line tools?" if CPP.nil?
     CPPFLAGS = "-D__APPLE_CPP__ -include /usr/include/AvailabilityMacros.h"
     CPPFLAGS << " -D__GNUC__" unless /^cpp-4/.match(File.basename(CPP))
 
@@ -95,8 +107,8 @@ class OCHeaderAnalyzer
 	    @file_content = File.read(@path)
 	    # This is very naive, and won't work with embedded comments, but it
 	    # should be enough for now.
-	    @file_content.gsub!(/\/\*([^*]+)\*\//, '')
-	    @file_content.gsub!(/\/\/.+$/, '')
+	    @file_content.gsub!(%r{/\*([^*]+)\*/}, '')
+	    @file_content.gsub!(%r{//.+$}, '')
 	end
 	@file_content
     end
@@ -504,10 +516,30 @@ class OCHeaderAnalyzer
     end
 end
 
+# class to print xml with attributes in a fixed order, so that diff-ing
+# .bridgesupport files is more meaningful.  From:
+#     http://stackoverflow.com/questions/574724/rexml-preserve-attributes-order
+class OrderedAttributes < REXML::Formatters::Pretty
+    def write_element(elm, out)
+        att = elm.attributes
+
+        class <<att
+            alias _each_attribute each_attribute
+
+            def each_attribute(&b)
+                to_enum(:_each_attribute).sort_by {|x| x.name}.each(&b)
+            end
+        end
+
+        super(elm, out)
+    end
+end
+
 PRODUCTVERSION = `sw_vers -productVersion`.strip.to_f
 TIGER_OR_BELOW = PRODUCTVERSION <= 10.4
 SNOWLEOPARD_OR_BELOW = PRODUCTVERSION <= 10.6
 IS_PPC = `arch`.strip == 'ppc'
+OBJC_GC_COMPACTION = SNOWLEOPARD_OR_BELOW ? '': '-Wl,-objc_gc_compaction'
 
 class BridgeSupportGenerator
     VERSION = '1.0'
@@ -518,8 +550,8 @@ class BridgeSupportGenerator
     FORMAT_FINAL, FORMAT_TEMPLATE, FORMAT_DYLIB, FORMAT_COMPLETE = FORMATS
 
     attr_accessor :headers, :generate_format, :private, :frameworks,
-	:exception_paths, :compiler_flags, :enable_64, :out_file,
-	:pch_files, :emulate_ppc
+	:exception_paths, :compiler_flags, :enable_32, :enable_64, :out_file,
+	:emulate_ppc, :install_name
 
     attr_reader :resolved_structs, :resolved_cftypes, :resolved_enums,
 	:types_encoding, :defines, :resolved_inf_protocols_encoding
@@ -533,10 +565,12 @@ class BridgeSupportGenerator
 	@incdirs = []
 	@exception_paths = []
 	@out_file = nil
+	@install_name = nil
 	@generate_format = FORMAT_FINAL
 	@private = false
 	@compiler_flags = nil
 	@frameworks = []
+	@enable_32 = false
 	@enable_64 = false
 	@emulate_ppc = false # PPC support is disabled since SnowLeopard
      end
@@ -552,15 +586,15 @@ class BridgeSupportGenerator
 #	g.frameworks = @frameworks
 #	g.enable_64 = @enable_64
 #	g.emulate_ppc = @emulate_ppc
-#	g.pch_files = @pch_files
 #	return g
 #    end
 
     def add_header(path)
+	h = (Pathname.new(path).absolute? || File.exists?(path)) ? File.basename(path) : path
 	@headers << path
-	@imports << File.basename(path)
+	@imports << h
 	@import_directive ||= ''
-	@import_directive << "\n#include <#{File.basename(path)}>"
+	@import_directive << "\n#include <#{h}>"
     end
 
     # Encodes the 4 include path pieces into a single string.
@@ -576,7 +610,7 @@ class BridgeSupportGenerator
 	bool_types = []
 	@method_exception_types.each_index { |i| bool_types[i] = @method_exception_types[i].gsub(/\b(?:BOOL|Boolean)\b/, 'bool') }
 
-	parser = Bridgesupportparser::Parser.new(args.imports, @headers, bool_sel_types, bool_types, args.defines, args.incdirs, args.sysroot)
+	parser = Bridgesupportparser::Parser.new(args.imports, @headers, bool_sel_types, bool_types, args.defines, args.incdirs, args.defaultincs, args.sysroot)
 
 	case @generate_format
 	when FORMAT_DYLIB
@@ -620,6 +654,18 @@ class BridgeSupportGenerator
 	    end
 	end
 	add_tollfree(parser)
+
+	# If a cftype doesn't have either tollfree or a gettypeid function,
+	# it probably an opaque; convert it.
+	cfdel = []
+	parser.all_cftypes.each do |name, cf|
+	    if cf.tollfree.nil? and cf.gettypeid_func.nil?
+		cfdel << name
+		type = cf.type || "^{#{name}=}"
+		parser.all_opaques[name] = Bridgesupportparser::OpaqueInfo.new(parser, name, type)
+	    end
+	end
+	cfdel.each { |c| parser.all_cftypes.delete(c) }
 
 	# opaques
 	@opaques_to_ignore.each { |o| parser.all_opaques.delete(o) }
@@ -684,7 +730,7 @@ class BridgeSupportGenerator
 	incdirs = []
 	incsys = []
 	includes = []
-	sysroot = '/'
+	sysroot = ENV['SDKROOT'] || '/'
 	words = Shellwords.shellwords(args)
 	until words.empty?
 	    o = words.shift
@@ -704,18 +750,30 @@ class BridgeSupportGenerator
     end
     protected :parse_cc_args
 
-    def parse(enable_64, compiler_flags_64 = nil)
+    def parse(enable_32, enable_64, compiler_flags_64 = nil)
 	_darwinvers = makedarwinvers(ENV.has_key?('MACOSX_DEPLOYMENT_TARGET') ? ENV['MACOSX_DEPLOYMENT_TARGET'] : `sw_vers -productVersion`)
 	darwinvers = nil
 	defines = []
 	incdirs = []
 	includes = []
-	sysroot = '/'
+	sysroot = ENV['SDKROOT'] || '/'
 	unless compiler_flags.nil?
 	    darwinvers, defines, incdirs, includes, sysroot = parse_cc_args(compiler_flags)
 	end
+	getcc(sysroot) #initialize cached value
+	defaultincs = []
+	IO.popen("#{getcc()} -print-search-dirs") do |io|
+	    io.each do |line|
+		if m = line.chomp.match(/^libraries: =(.*)/)
+		    m[1].split(':').each do |path|
+			i = File.join(path, 'include')
+			defaultincs << i if File.directory?(i)
+		    end
+		end
+	    end
+	end
 
-	prepare(sysroot == '/' ? '' : sysroot)
+	prepare(sysroot == '/' ? '' : sysroot, enable_32, enable_64)
 	@incdirs << encode_includes("#{$slb}/include", 'A', false, false)
 	@incdirs << encode_includes('/System/Library/Frameworks/CoreServices.framework/Frameworks', 'S', false, true)
 	@imports.unshift('AvailabilityMacros.h')
@@ -724,29 +782,35 @@ class BridgeSupportGenerator
 	args = OpenStruct.new
 	args.darwinvers = darwinvers.nil? ? _darwinvers : darwinvers
 	args.imports = includes + @imports
-	args.defines = defines + %w{__APPLE_CPP__=1}
+	args.defines = defines + %w{__APPLE_CPP__=1} + %w{ObjectType=id}
 	args.incdirs = incdirs + @incdirs
+	args.defaultincs = defaultincs
 	args.sysroot = sysroot
 
-	@parser = _parse(args, ARCH)
-	if enable_64
+	@parser = _parse(args, ARCH) if @enable_32
+	if @enable_64
 	    unless compiler_flags_64.nil? || compiler_flags == compiler_flags_64
 		darwinvers, defines, incdirs, includes, sysroot = parse_cc_args(compiler_flags_64)
 		args.darwinvers = darwinvers.nil? ? _darwinvers : darwinvers
 		args.imports = includes + @imports
 		args.defines = defines + %w{__APPLE_CPP__=1}
 		args.incdirs = incdirs + @incdirs
+		args.defaultincs = defaultincs
 		args.sysroot = sysroot
 	    end
 	    parser64 = _parse(args, ARCH64, true)
-	    @parser.mergeWith64!(parser64)
+	    if @parser.nil?
+		parser64.rename64!
+		@parser = parser64
+	    else
+		@parser.mergeWith64!(parser64)
+	    end
 	end
     end
 
     def write
 	case @generate_format
 	when FORMAT_DYLIB
-	    generate_precompiled_header
 	    generate_dylib
 	when FORMAT_TEMPLATE
 	    generate_template
@@ -756,7 +820,6 @@ class BridgeSupportGenerator
     end
 
     def cleanup
-	delete_precompiled_header
     end
 
     def xml_document
@@ -813,7 +876,7 @@ class BridgeSupportGenerator
 		dpath = m[0]
 		next if File.basename(dpath) == name
 		next if dpath.include?('PrivateFrameworks')
-		next unless dpath.sub!(/\.framework\/Versions\/\w+\/\w+$/, '')
+		next unless dpath.sub!(%r{\.framework/Versions/\w+/\w+$}, '')
 		dpath + '.framework'
 	    }.compact
 	    @dependencies[path] = deps
@@ -864,7 +927,7 @@ class BridgeSupportGenerator
 	sel
     end
 
-    def prepare(prefix_sysroot)
+    def prepare(prefix_sysroot, enable_32, enable_64)
 	# Clear previously-harvested stuff.
 	[ @resolved_structs,
 	    @resolved_inf_protocols_encoding,
@@ -876,7 +939,42 @@ class BridgeSupportGenerator
 
 	@cpp_flags = @compiler_flags ? @compiler_flags.scan(/-[ID][^\s]+/).join(' ') + ' ' : ''
 
-	@frameworks.each { |f| handle_framework(prefix_sysroot, f) }
+	framework_paths = []
+	@frameworks.each { |f| framework_paths << handle_framework(prefix_sysroot, f) }
+
+	# set @enable_32 and @enable_64 depending on what is requested (via
+	# enable_32 and enable_64), and what architectures are actually
+	# available in the frameworks, if any.
+
+	if framework_paths.empty? 
+	    @enable_32 = enable_32
+	    @enable_64 = enable_64
+	else
+	    no_32 = false
+	    no_64 = false
+	    framework_paths.each do |fp|
+		p = File.join(fp, File.basename(fp, '.framework'))
+		lipo = `lipo -info "#{p}"`
+		raise "Couldn't determine architectures in #{p}" unless $?.exited? and $?.exitstatus == 0
+		lipo.chomp!
+		lipo.sub!(/^.*: /, '')
+		have32 = have64 = false
+		lipo.split.each do |arch|
+		    if /64$/ =~ arch
+			have64 = true
+		    else
+			have32 = true
+		    end
+		end
+		no_32 = true unless have32
+		no_64 = true unless have64
+	    end
+	    raise "Frameworks need to have consistent architectures" if no_32 and no_64
+	    @enable_32 = (enable_32 && !no_32)
+	    @enable_64 = (enable_64 && !no_64)
+	    $stderr.puts "Disabling 32-bit because framework is 64-bit only" if @enable_32 != enable_32
+	    $stderr.puts "Disabling 64-bit because framework is 32-bit only" if @enable_64 != enable_64
+	end
 
 	if @headers.empty?
 	    raise "No headers to parse"
@@ -886,10 +984,6 @@ class BridgeSupportGenerator
 	end
 	if @generate_format == FORMAT_DYLIB and @out_file.nil?
 	    raise "Generating dylib format requires an output file"
-	end
-	if @enable_64 and (@generate_format != FORMAT_FINAL \
-					     and @generate_format != FORMAT_COMPLETE)
-	    raise "Enabling 64-bit only works with the final metadata format"
 	end
 
 	# Link against Foundation by default.
@@ -946,14 +1040,6 @@ class BridgeSupportGenerator
 		    ary.concat(elem.get_elements('arg'))
 		    ary.compact.each do |elem2|
 			type = elem2.attributes['type']
-			if @enable_64
-			    type64 = elem2.attributes['type64']
-			    if type64 == ''
-				type = nil
-			    elsif type != type64
-				type = type64
-			    end
-			end
 			@method_exception_types << type if type
 			if sel_type = elem2.attributes['sel_of_type']
 			    @all_sel_types << sel_type
@@ -1125,6 +1211,9 @@ EOS
 	code = <<EOS
 #{@import_directive}
 #import <objc/objc-class.h>
+#import <signal.h>
+#import <stdlib.h>
+#import <mach/task.h>
 
 /* Tiger compat */
 #ifndef _C_ULNG_LNG
@@ -1134,6 +1223,12 @@ EOS
 #ifndef _C_LNG_LNG
 #define _C_LNG_LNG 'q'
 #endif
+
+static void
+sighandler(int sig)
+{
+    _Exit(-1);
+}
 
 static const char *
 printf_format (const char *str)
@@ -1159,6 +1254,12 @@ int main (int argc, char **argv)
 {
     const char *fmt;
     if(argc != 2) return -1;
+    /* EVERYTHING IS AWESOME! radar:18982956 */
+    if (task_set_bootstrap_port(mach_task_self(), MACH_PORT_NULL) != KERN_SUCCESS) {
+	_Exit(1);
+    }
+    signal(SIGTRAP, sighandler);
+    signal(SIGBUS, sighandler);
     switch(atoi(argv[1])) {
 #{lines.join('')}
     }
@@ -1196,13 +1297,25 @@ EOS
 #{@import_directive}
 #import <objc/objc-class.h>
 #import <stdlib.h>
+#import <signal.h>
+#import <unistd.h>
 
 CFTypeRef _CFRuntimeCreateInstance(CFAllocatorRef allocator, CFTypeID typeID, #{TIGER_OR_BELOW ? 'uint32_t' : 'CFIndex'} extraBytes, unsigned char *category);
+
+static void
+sighandler(int sig)
+{
+    _Exit(-1);
+}
 
 int main (int argc, char **argv)
 {
     CFTypeRef ref;
     if(argc != 2) return -1;
+    signal(SIGTRAP, sighandler);
+    signal(SIGBUS, sighandler);
+    signal(SIGALRM, SIG_DFL);
+    alarm(30);
     switch(atoi(argv[1])) {
 #{lines.join('')}
     }
@@ -1215,6 +1328,8 @@ EOS
 		if $?.success?
 		    tollfree = out.strip
 		    cftypes[i][:tollfree] = tollfree unless tollfree.empty? or tollfree == 'NSCFType'
+		elsif $?.signaled? and $?.termsig == Signal.list["ALRM"]
+		    $stderr.puts "*** Timeout processing #{cftypes[i].name}"
 		end
 	    end
 	end
@@ -1241,16 +1356,33 @@ EOS
 	    return
 	end
 	code = "#{@import_directive}\n"
-	inline_functions.each { |f| code << f.dylib_wrapper('__dummy_') }
+	inline_functions.each { |f| code << f.dylib_wrapper(@enable_32, @enable_64, '__dummy_') }
 	tmp_src = File.open(unique_tmp_path('src', '.m'), 'w')
 	tmp_src.puts code
 	tmp_src.close
 	if File.extname(@out_file) != '.dylib'
 	    @out_file << '.dylib'
 	end
-	gcc = "/usr/bin/gcc #{ENV['CFLAGS']} #{tmp_src.path} -o #{@out_file} #{@compiler_flags} -dynamiclib -O3 -current_version #{VERSION} -compatibility_version #{VERSION} -fobjc-gc"
-	unless system(gcc)
-	    raise "Can't compile dylib source file '#{tmp_src.path}'\nLine was: #{gcc}"
+	cflags = []
+	doarch = false
+	(ENV['CFLAGS'] || '-arch i386 -arch x86_64').split.each do |f|
+	    if doarch
+		doarch = false
+		if /64$/ =~ f
+		    cflags << '-arch' << f if @enable_64
+		else
+		    cflags << '-arch' << f if @enable_32
+		end
+	    elsif f == '-arch'
+		doarch = true
+	    else
+		cflags << f
+	    end
+	end
+	cc = "#{getcc()} #{cflags.join(' ')} #{tmp_src.path} -o #{@out_file} #{@compiler_flags} -dynamiclib -O3 -current_version #{VERSION} -compatibility_version #{VERSION} -fobjc-gc #{OBJC_GC_COMPACTION}"
+	cc << " -install_name #{@install_name}" unless @install_name.nil?
+	unless system(cc)
+	    raise "Can't compile dylib source file '#{tmp_src.path}'\nLine was: #{cc}"
 	end
 	File.unlink(tmp_src.path)
     end
@@ -1276,7 +1408,7 @@ EOS
 	document << REXML::XMLDecl.new
 	unless @generate_format == FORMAT_COMPLETE
 	    document << REXML::DocType.new(['signatures', 'SYSTEM',
-		'"file://localhost/System/Library/DTDs/BridgeSupport.dtd"'])
+		'file://localhost/System/Library/DTDs/BridgeSupport.dtd'])
 	end
 	root = document.add_element('signatures')
 	root.add_attribute('version', VERSION)
@@ -1530,11 +1662,11 @@ EOS
 	return document
     end
 
-    def new_xml_document(doctype)
+    def new_xml_document(doctype=true)
 	document = REXML::Document.new
 	document << REXML::XMLDecl.new
 	document << REXML::DocType.new(['signatures', 'SYSTEM',
-	    '"file://localhost/System/Library/DTDs/BridgeSupport.dtd"']) if doctype
+	    'file://localhost/System/Library/DTDs/BridgeSupport.dtd']) if doctype
 	root = document.add_element('signatures')
 	root.add_attribute('version', VERSION)
 	return document, root
@@ -1696,7 +1828,7 @@ EOS
 		    a.delete(:type)
 		    a.delete(:type64)
 		end
-		x = a.select { |k, v| k.to_s[0] != ?_ && !blockattr.call(k) }
+		x = a.select { |k, v| k.to_s[0] != ?_ && !blockattr.call(k) }.to_a
 		return nil if x.empty?
 		x << [:index, index] if index
 		x
@@ -1721,13 +1853,14 @@ EOS
 	    element.add_attribute('path', fpath)
 	end
 	@parser.addXML(root)
+	fmt = OrderedAttributes.new(indent)
 	if @out_file
 	    File.open(@out_file, 'w') do |io|
-		document.write(io, indent)
+		fmt.write(document, io)
 		io.print "\n"
 	    end
 	else
-	    document.write(STDOUT, indent)
+	    fmt.write(document, STDOUT)
 	    print "\n"
 	end
     end
@@ -1760,20 +1893,26 @@ EOS
     end
 
     def merge_exception_attrs_sel_of_type(obj, element, where)
-	override = false
+	errors = []
 	element.attributes.each do |name, value|
 	    case name
 	    when 'index'
 		next
 	    when 'sel_of_type'
 		seltype = @sel_types[value]
-		raise "No sel_of_type for \"#{value}\" in #{where}" if seltype.nil?
+		if seltype.nil?
+		    errors <<  "No sel_of_type for \"#{value}\" in #{where}"
+		    next
+		end
 		obj.delete(:sel_of_type)
 		obj[:sel_of_type] = seltype
 		obj[:_override] = true
 	    when 'type'
 		type = @types[value]
-		raise "No type for \"#{value}\" in #{where}" if type.nil?
+		if type.nil?
+		    errors << "No type for \"#{value}\" in #{where}"
+		    next
+		end
 		obj.delete(:type)
 		obj[:type] = type
 		obj[:_type_override] = true
@@ -1785,6 +1924,32 @@ EOS
 		end
 	    end
 	end
+	return errors unless obj.is_a?(Bridgesupportparser::VarInfo)
+	obj_func = obj.function_pointer
+	obj_args = obj_func.nil? ? nil : obj_func.args
+	element.elements.each('arg') do |arg_element|
+	    if obj_args.nil?
+		errors << "#{where} has no arguments, but an argument exception was specified"
+		break
+	    end
+	    idx = arg_element.attributes['index'].to_i
+	    orig_arg_element = obj_args[idx]
+	    if orig_arg_element.nil?
+		errors << "argument '#{idx}' of #{where} is described with more arguments than it should"
+		next
+	    end
+	    errors.concat(merge_exception_attrs_sel_of_type(orig_arg_element, arg_element, "argument #{idx} of #{where}"))
+	end
+	retval_element = element.elements['retval']
+	if retval_element
+	    orig_retval = obj_func.nil? ? nil : obj_func.ret
+	    if orig_retval.nil?
+		errors << "retval of '#{where}' is described in an exception file but the return value has not been discovered by the final generator"
+	    else
+		errors.concat(merge_exception_attrs_sel_of_type(orig_retval, retval_element, "retval of #{where}"))
+	    end
+	end
+	return errors
     end
 
     def merge_with_exceptions(parser, exception_document, ignore_errors = false)
@@ -1830,7 +1995,7 @@ EOS
 		orig_enum.delete(:value64)
 		orig_enum[:_override] = true
 	    else
-		merge_exception_attrs_sel_of_type(orig_enum, enum_element, "enum #{enum_name}")
+		errors.concat(merge_exception_attrs_sel_of_type(orig_enum, enum_element, "enum #{enum_name}"))
 	    end
 	end
 	# Merge functions.
@@ -1850,7 +2015,7 @@ EOS
 		    errors << "Function '#{func_name}' is described with more arguments than it should"
 		    next
 		end
-		merge_exception_attrs_sel_of_type(orig_arg_element, arg_element, "argument #{idx} of func \"#{func_name}\"")
+		errors.concat(merge_exception_attrs_sel_of_type(orig_arg_element, arg_element, "argument #{idx} of func \"#{func_name}\""))
 	    end
 	    retval_element = func_element.elements['retval']
 	    if retval_element
@@ -1858,7 +2023,7 @@ EOS
 		if orig_retval.nil?
 		    errors << "Function '#{func_name}' is described with a return value in an exception file but the return value has not been discovered by the final generator"
 		else
-		    merge_exception_attrs_sel_of_type(orig_retval, retval_element, "retval of func \"#{func_name}\"")
+		    errors.concat(merge_exception_attrs_sel_of_type(orig_retval, retval_element, "retval of func \"#{func_name}\""))
 		end
 	    end
 	end
@@ -1870,24 +2035,25 @@ EOS
 		errors << "Class '#{class_name}' is described in an exception file but it has not been discovered by the final generator"
 		next
 	    end
-	    # Merge methods.
+	    # Merge methods.  To keep class and instance methods separate, we
+	    # prepend 'c' or 'i' to the selector, respectively.
 	    methods = {}
-	    orig_class.each_method { |m| methods[m.selector] = m }
+	    orig_class.each_method { |m| methods[(m.class_method? ? 'c' : 'i') + m.selector] = m }
 	    class_element.elements.each('method') do |element|
 		selector = element.attributes['selector']
 		ignore = element.attributes['ignore'] == 'true'
-		orig_meth = methods[selector]
+		orig_meth = methods[(element.attributes['class_method'] == 'true' ? 'c' : 'i') + selector]
 		if orig_meth.nil?
 		    ## Method is not defined in the original document, we can append it.
 		    ##orig_element = orig_class_element.add_element(element)
 		    # error for now
 		    errors << "Method with selector '#{selector}' of class '#{class_name}' is described in an exception file but it has not been discovered by the final generator" unless ignore
 		    next
-		#elsif ignore
-		    #orig_class.methods.delete(orig_meth)
+		elsif ignore
+		    orig_class.methods.delete(orig_meth)
 		end
 		# Smart merge of attributes.
-		merge_exception_attrs_sel_of_type(orig_meth, element, "method with selector \"#{selector}\" of class \"#{class_name}\"")
+		errors.concat(merge_exception_attrs_sel_of_type(orig_meth, element, "method with selector \"#{selector}\" of class \"#{class_name}\""))
 		# Merge the arg elements.
 		orig_retval = orig_meth.ret
 		element.elements.each('arg') do |child|
@@ -1903,7 +2069,7 @@ EOS
 			errors << "Method with selector '#{selector}' of class '#{class_name}' is described with more arguments than it should"
 			next
 		    end
-		    merge_exception_attrs_sel_of_type(orig_arg, child, "argument #{index} of method with selector \"#{selector}\" of class \"#{class_name}\"")
+		    errors.concat(merge_exception_attrs_sel_of_type(orig_arg, child, "argument #{index} of method with selector \"#{selector}\" of class \"#{class_name}\""))
 		end
 		# Merge the retval element.
 		retval = element.elements['retval']
@@ -1912,7 +2078,7 @@ EOS
 			#orig_retval = orig_element.add_element(retval)
 			errors << "Method with selector '#{selector}' of class '#{class_name}' is described with a return value in an exception file but the return value has not been discovered by the final generator"
 		    else
-			merge_exception_attrs_sel_of_type(orig_retval, retval, "retval of method with selector \"#{selector}\" of class \"#{class_name}\"")
+			errors.concat(merge_exception_attrs_sel_of_type(orig_retval, retval, "retval of method with selector \"#{selector}\" of class \"#{class_name}\""))
 		    end
 		end
 	    end
@@ -2056,7 +2222,7 @@ EOS
 	raise "Can't locate framework '#{val}'" if path.nil?
 	(@framework_paths ||= []) << File.dirname(path)
 	raise "Can't find framework '#{val}'" if path.nil?
-	parent_path, name = path.scan(/^(.+)\/(\w+)\.framework\/?$/)[0]
+	parent_path, name = path.scan(%r{^(.+)/(\w+)\.framework/?$})[0]
 	if @private
 	    headers_path = File.join(path, 'PrivateHeaders')
 	    raise "Can't locate private framework headers at '#{headers_path}'" unless File.exist?(headers_path)
@@ -2064,7 +2230,7 @@ EOS
 	    public_headers_path = File.join(path, 'Headers')
 	    public_headers = if File.exist?(public_headers_path)
 		OCHeaderAnalyzer::CPPFLAGS << " -I#{public_headers_path} "
-		@incdir.unshift(encode_includes(public_headers_path, 'A', true, false))
+		@incdirs.unshift(encode_includes(public_headers_path, 'A', true, false))
 		Dir.glob(File.join(headers_path, '**', '*.h')).reject { |f| !File.exist?(f) }
 	    else
 		[]
@@ -2076,10 +2242,12 @@ EOS
 	end
 	# We can't just "#import <x/x.h>" as the main Framework header might not include _all_ headers.
 	# So we are tricking this by importing the main header first, then all headers.
-	header_basenames = (headers | public_headers).map { |x| x.sub(/#{headers_path}\/*/, '') }
-	if idx = header_basenames.index("#{name}.h")
-	    header_basenames.delete_at(idx)
-	    header_basenames.unshift("#{name}.h")
+	# (Also look for main header in a case-insensitive way.)
+	header_basenames = (headers | public_headers).map { |x| x.sub(%r{#{Regexp.escape(headers_path)}/*}, '') }
+	name_h = name + ".h"
+	if idx = header_basenames.index { |x| name_h.casecmp(x) == 0 }
+	    x = header_basenames.delete_at(idx)
+	    header_basenames.unshift(x)
 	end
 	@import_directive = header_basenames.map { |x| "#import <#{name}/#{x}>" }.join("\n")
 	header_basenames.each { |x| @imports << "#{name}/#{x}" }
@@ -2109,6 +2277,7 @@ EOS
 	@headers.concat(headers)
 	# Memorize the dependencies.
 	@dependencies = BridgeSupportGenerator.dependencies_of_framework(path)
+	return path
     end
 
     def framework_path(prefix_sysroot, val)
@@ -2144,21 +2313,22 @@ EOS
 	tmp_log_path = unique_tmp_path('log')
 
 	arch_flag =
-	    if @enable_64
-		" -arch #{IS_PPC ? 'ppc64' : 'x86_64'}"
+	    # prefer building 32-bit
+	    if @enable_32
+		" -arch #{IS_PPC ? 'ppc' : 'i386'}"
 	    elsif emulate_ppc
 		' -arch ppc -arch i386'
 	    else
-		" -arch #{IS_PPC ? 'ppc' : 'i386'}"
+		" -arch #{IS_PPC ? 'ppc64' : 'x86_64'}"
 	    end
 
-	line = "/usr/bin/gcc #{arch_flag} #{tmp_src.path} -o #{tmp_bin_path} #{@compiler_flags} 2>#{tmp_log_path}"
+	line = "#{getcc()} #{arch_flag} #{tmp_src.path} -o #{tmp_bin_path} #{@compiler_flags} 2>#{tmp_log_path}"
 	#puts "compile_and_execute_code: #{line}" #DEBUG
 	#puts caller(1).join("\n") #DEBUG
 	while !system(line)
 	    r = File.read(tmp_log_path)
 	    if /built for GC-only/.match(r)
-		line = "/usr/bin/gcc -fobjc-gc-only #{arch_flag} #{tmp_src.path} -o #{tmp_bin_path} #{@compiler_flags} 2>#{tmp_log_path}"
+		line = "#{getcc()} -fobjc-gc-only #{arch_flag} #{tmp_src.path} -o #{tmp_bin_path} #{@compiler_flags} 2>#{tmp_log_path}"
 		break if system(line)
 		r = File.read(tmp_log_path)
 	    end
@@ -2199,42 +2369,6 @@ EOS
 
 	return out
     end
-
-    def generate_precompiled_header
-	return if @import_directive.nil? or @compiler_flags.nil?
-	return unless @pch_files.nil?
-
-	tmp_header = File.open(unique_tmp_path('src', '.h'), 'w')
-	tmp_header.puts @import_directive
-	tmp_header.close
-
-	tmp_log_path = unique_tmp_path('log')
-	tmp_pch_path = "#{tmp_header.path}.gch"
-
-	line = "/usr/bin/gcc -c -x objective-c-header #{tmp_header.path} -o #{tmp_pch_path} #{@compiler_flags} 2>#{tmp_log_path}"
-	unless system(line)
-	    msg = "Can't precompile header... aborting\ncommand was: #{line}\n\n#{File.read(tmp_log_path)}"
-	    File.unlink(tmp_log_path)
-	    File.unlink(tmp_header.path)
-	    raise msg
-	end
-	@pch_files = [ tmp_pch_path, tmp_header.path ]
-
-	@import_directive_before_pch = @import_directive
-	@compiler_flags_before_pch = @compiler_flags
-	@import_directive = ""
-	@compiler_flags << " -include #{tmp_header.path} "
-
-	File.unlink(tmp_log_path)
-    end
-
-    def delete_precompiled_header
-	return unless @pch_files
-	@pch_files.each { |filepath| File.unlink(filepath) }
-	@import_directive = @import_directive_before_pch if @import_directive_before_pch
-	@compiler_flags = @compiler_flags_before_pch if @compiler_flags_before_pch
-	@pch_files = nil
-    end
 end
 
 def die(*msg)
@@ -2266,9 +2400,12 @@ if __FILE__ == $0
 	    g.exception_paths << opt
 	end
 
-	enable_64 = true # both 32 & 64 bit is now the default
+	enable_32 = enable_64 = true # both 32 & 64 bit is now the default
 	opts.on(nil, '--64-bit', 'Write 64-bit annotations (now the default).') do
 	    enable_64 = true
+	end
+	opts.on(nil, '--no-32-bit', 'Do not write 32-bit annotations.') do
+	    enable_32 = false
 	end
 	opts.on(nil, '--no-64-bit', 'Do not write 64-bit annotations.') do
 	    enable_64 = false
@@ -2307,13 +2444,15 @@ if __FILE__ == $0
 
 	opts.separator ''
 
+	raise "Both 32 and 64-bit have been disable" if !enable_32 and !enable_64
+
 	if ARGV.empty?
 	    die opts.banner
 	else
 	    begin
 		opts.parse!(ARGV)
 		ARGV.each { |header| g.add_header(header) }
-		g.parse(enable_64, compiler_flags_64)
+		g.parse(enable_32, enable_64, compiler_flags_64)
 #		g.collect
 #		if enable_64
 #		    g2 = g.duplicate
