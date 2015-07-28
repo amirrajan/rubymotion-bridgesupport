@@ -2,7 +2,7 @@
 
 class BridgeSupportParser {
 public:
-    static void parse(VALUE headers, const char* content, const std::string& triple, VALUE defines = Qnil, VALUE incdirs = Qnil, const std::string& sysroot = "/", bool verbose = false);
+    static void parse(VALUE headers, const char* content, const std::string& triple, VALUE defines = Qnil, VALUE incdirs = Qnil, VALUE rubydefaultincs = Qnil, const std::string& sysroot = "/", bool verbose = false);
 
 private:
     // Takes ownership of client.

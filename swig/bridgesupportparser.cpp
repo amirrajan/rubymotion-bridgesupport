@@ -1020,51 +1020,23 @@ void MyParseAST(BridgeSupportParser *BSP, MyPass2Consumer *Consumer) {
 }
 
 void
-BridgeSupportParser::parse(VALUE rubyheaders, const char *content, const std::string& triple, VALUE rubydefines, VALUE rubyincdirs, const std::string& sysroot, bool verbose)
+BridgeSupportParser::parse(VALUE rubyheaders, const char *content, const std::string& triple, VALUE rubydefines, VALUE rubyincdirs, VALUE rubydefaultincs, const std::string& sysroot, bool verbose)
 {
     if (!rb_block_given_p()) rb_raise(rb_eRuntimeError, "BridgeSupportParser::parse must be called with a block");
     if (rubyheaders == Qnil) rb_raise(rb_eRuntimeError, "BridgeSupportParser::parse: No headers specified");
 
-    // get the (default) gcc/llvm include path
-    if(!defaultIncludePath) {
-	FILE *p;
-	std::string cc;
-	char buf[PATH_MAX + 16];
-	char *nl;
-	cc = "xcrun -find cc -sdk ";
-	cc += sysroot;
-	*buf = 0;
-	if((p = popen(cc.c_str(), "r")) != NULL) {
-	    if(fgets(buf, sizeof(buf), p)) {
-		nl = strchr(buf, '\n');
-		if(nl) *nl = 0;
-	    }
-	    pclose(p);
-	}
-	cc = (*buf ? buf : "cc");
-	if(verbose) llvm::errs() << "cc=" << cc << "\n";
-	cc += " -print-search-dirs";
-	defaultIncludePath = new std::string();
-	if((p = popen(cc.c_str(), "r")) != NULL) {
-	    while(fgets(buf, sizeof(buf), p)) {
-		if(strncmp(buf, "install: ", 9) == 0) {
-		    nl = strchr(buf, '\n');
-		    if(nl) *nl = 0;
-		    defaultIncludePath->append(buf + 9);
-		    defaultIncludePath->append("include");
-		    while(fgets(buf, sizeof(buf), p)) {} // drain the source
-		    break;
-		}
-	    }
-	    pclose(p);
-	}
-	if(defaultIncludePath->empty()) defaultIncludePath->append("/usr/lib/gcc/i686-apple-darwin11/4.2.1/include");
-	if(verbose) llvm::errs() << "defaultIncludePath=" << *defaultIncludePath << "\n";
-    }
-
     const char **headers = rubyarr2c(rubyheaders);
     const char **defines = (rubydefines != Qnil) ? rubyarr2c(rubydefines) : NULL;
     const char **incdirs = (rubyincdirs != Qnil) ? rubyarr2c(rubyincdirs) : NULL;
+    const char **defaultincs = (rubydefaultincs != Qnil) ? rubyarr2c(rubydefaultincs) : NULL;
+
+    // get the (default) gcc/llvm include path
+    defaultIncludePath = new std::string();
+    if(defaultincs) {
+	defaultIncludePath->append(defaultincs[0]);
+	if(verbose) llvm::errs() << "defaultIncludePath=" << *defaultIncludePath << "\n";
+    }
+    if(defaultIncludePath->empty()) defaultIncludePath->append("/usr/lib/gcc/i686-apple-darwin11/4.2.1/include");
 
     std::string *macros = pass1(headers, triple, defines, incdirs, sysroot, verbose);
     pass2(headers, content, triple, defines, incdirs, sysroot, verbose, macros);
@@ -1073,6 +1045,7 @@ BridgeSupportParser::parse(VALUE rubyheaders, const char *content, const std::st
     free(incdirs);
     free(defines);
     free(headers);
+    free(defaultincs);
 }
 
 std::string *

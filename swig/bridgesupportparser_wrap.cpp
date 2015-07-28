@@ -2068,15 +2068,83 @@ _wrap_BridgeSupportParser_parse__SWIG_0(int argc, VALUE *argv, VALUE self) {
   std::string *arg3 = 0 ;
   VALUE arg4 = (VALUE) 0 ;
   VALUE arg5 = (VALUE) 0 ;
-  std::string *arg6 = 0 ;
-  bool arg7 ;
+  VALUE arg6 = (VALUE) 0 ;
+  std::string *arg7 = 0 ;
+  bool arg8 ;
   int res2 ;
   char *buf2 = 0 ;
   int alloc2 = 0 ;
   int res3 = SWIG_OLDOBJ ;
-  int res6 = SWIG_OLDOBJ ;
-  bool val7 ;
-  int ecode7 = 0 ;
+  int res7 = SWIG_OLDOBJ ;
+  bool val8 ;
+  int ecode8 = 0 ;
+  
+  if ((argc < 8) || (argc > 8)) {
+    rb_raise(rb_eArgError, "wrong # of arguments(%d for 8)",argc); SWIG_fail;
+  }
+  arg1 = argv[0];
+  res2 = SWIG_AsCharPtrAndSize(argv[1], &buf2, NULL, &alloc2);
+  if (!SWIG_IsOK(res2)) {
+    SWIG_exception_fail(SWIG_ArgError(res2), Ruby_Format_TypeError( "", "char const *","BridgeSupportParser::parse", 2, argv[1] ));
+  }
+  arg2 = reinterpret_cast< char * >(buf2);
+  {
+    std::string *ptr = (std::string *)0;
+    res3 = SWIG_AsPtr_std_string(argv[2], &ptr);
+    if (!SWIG_IsOK(res3)) {
+      SWIG_exception_fail(SWIG_ArgError(res3), Ruby_Format_TypeError( "", "std::string const &","BridgeSupportParser::parse", 3, argv[2] )); 
+    }
+    if (!ptr) {
+      SWIG_exception_fail(SWIG_ValueError, Ruby_Format_TypeError("invalid null reference ", "std::string const &","BridgeSupportParser::parse", 3, argv[2])); 
+    }
+    arg3 = ptr;
+  }
+  arg4 = argv[3];
+  arg5 = argv[4];
+  arg6 = argv[5];
+  {
+    std::string *ptr = (std::string *)0;
+    res7 = SWIG_AsPtr_std_string(argv[6], &ptr);
+    if (!SWIG_IsOK(res7)) {
+      SWIG_exception_fail(SWIG_ArgError(res7), Ruby_Format_TypeError( "", "std::string const &","BridgeSupportParser::parse", 7, argv[6] )); 
+    }
+    if (!ptr) {
+      SWIG_exception_fail(SWIG_ValueError, Ruby_Format_TypeError("invalid null reference ", "std::string const &","BridgeSupportParser::parse", 7, argv[6])); 
+    }
+    arg7 = ptr;
+  }
+  ecode8 = SWIG_AsVal_bool(argv[7], &val8);
+  if (!SWIG_IsOK(ecode8)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode8), Ruby_Format_TypeError( "", "bool","BridgeSupportParser::parse", 8, argv[7] ));
+  } 
+  arg8 = static_cast< bool >(val8);
+  BridgeSupportParser::parse(arg1,(char const *)arg2,(std::string const &)*arg3,arg4,arg5,arg6,(std::string const &)*arg7,arg8);
+  if (alloc2 == SWIG_NEWOBJ) delete[] buf2;
+  if (SWIG_IsNewObj(res3)) delete arg3;
+  if (SWIG_IsNewObj(res7)) delete arg7;
+  return Qnil;
+fail:
+  if (alloc2 == SWIG_NEWOBJ) delete[] buf2;
+  if (SWIG_IsNewObj(res3)) delete arg3;
+  if (SWIG_IsNewObj(res7)) delete arg7;
+  return Qnil;
+}
+
+
+SWIGINTERN VALUE
+_wrap_BridgeSupportParser_parse__SWIG_1(int argc, VALUE *argv, VALUE self) {
+  VALUE arg1 = (VALUE) 0 ;
+  char *arg2 = (char *) 0 ;
+  std::string *arg3 = 0 ;
+  VALUE arg4 = (VALUE) 0 ;
+  VALUE arg5 = (VALUE) 0 ;
+  VALUE arg6 = (VALUE) 0 ;
+  std::string *arg7 = 0 ;
+  int res2 ;
+  char *buf2 = 0 ;
+  int alloc2 = 0 ;
+  int res3 = SWIG_OLDOBJ ;
+  int res7 = SWIG_OLDOBJ ;
   
   if ((argc < 7) || (argc > 7)) {
     rb_raise(rb_eArgError, "wrong # of arguments(%d for 7)",argc); SWIG_fail;
@@ -2100,48 +2168,43 @@ _wrap_BridgeSupportParser_parse__SWIG_0(int argc, VALUE *argv, VALUE self) {
   }
   arg4 = argv[3];
   arg5 = argv[4];
+  arg6 = argv[5];
   {
     std::string *ptr = (std::string *)0;
-    res6 = SWIG_AsPtr_std_string(argv[5], &ptr);
-    if (!SWIG_IsOK(res6)) {
-      SWIG_exception_fail(SWIG_ArgError(res6), Ruby_Format_TypeError( "", "std::string const &","BridgeSupportParser::parse", 6, argv[5] )); 
+    res7 = SWIG_AsPtr_std_string(argv[6], &ptr);
+    if (!SWIG_IsOK(res7)) {
+      SWIG_exception_fail(SWIG_ArgError(res7), Ruby_Format_TypeError( "", "std::string const &","BridgeSupportParser::parse", 7, argv[6] )); 
     }
     if (!ptr) {
-      SWIG_exception_fail(SWIG_ValueError, Ruby_Format_TypeError("invalid null reference ", "std::string const &","BridgeSupportParser::parse", 6, argv[5])); 
+      SWIG_exception_fail(SWIG_ValueError, Ruby_Format_TypeError("invalid null reference ", "std::string const &","BridgeSupportParser::parse", 7, argv[6])); 
     }
-    arg6 = ptr;
+    arg7 = ptr;
   }
-  ecode7 = SWIG_AsVal_bool(argv[6], &val7);
-  if (!SWIG_IsOK(ecode7)) {
-    SWIG_exception_fail(SWIG_ArgError(ecode7), Ruby_Format_TypeError( "", "bool","BridgeSupportParser::parse", 7, argv[6] ));
-  } 
-  arg7 = static_cast< bool >(val7);
-  BridgeSupportParser::parse(arg1,(char const *)arg2,(std::string const &)*arg3,arg4,arg5,(std::string const &)*arg6,arg7);
+  BridgeSupportParser::parse(arg1,(char const *)arg2,(std::string const &)*arg3,arg4,arg5,arg6,(std::string const &)*arg7);
   if (alloc2 == SWIG_NEWOBJ) delete[] buf2;
   if (SWIG_IsNewObj(res3)) delete arg3;
-  if (SWIG_IsNewObj(res6)) delete arg6;
+  if (SWIG_IsNewObj(res7)) delete arg7;
   return Qnil;
 fail:
   if (alloc2 == SWIG_NEWOBJ) delete[] buf2;
   if (SWIG_IsNewObj(res3)) delete arg3;
-  if (SWIG_IsNewObj(res6)) delete arg6;
+  if (SWIG_IsNewObj(res7)) delete arg7;
   return Qnil;
 }
 
 
 SWIGINTERN VALUE
-_wrap_BridgeSupportParser_parse__SWIG_1(int argc, VALUE *argv, VALUE self) {
+_wrap_BridgeSupportParser_parse__SWIG_2(int argc, VALUE *argv, VALUE self) {
   VALUE arg1 = (VALUE) 0 ;
   char *arg2 = (char *) 0 ;
   std::string *arg3 = 0 ;
   VALUE arg4 = (VALUE) 0 ;
   VALUE arg5 = (VALUE) 0 ;
-  std::string *arg6 = 0 ;
+  VALUE arg6 = (VALUE) 0 ;
   int res2 ;
   char *buf2 = 0 ;
   int alloc2 = 0 ;
   int res3 = SWIG_OLDOBJ ;
-  int res6 = SWIG_OLDOBJ ;
   
   if ((argc < 6) || (argc > 6)) {
     rb_raise(rb_eArgError, "wrong # of arguments(%d for 6)",argc); SWIG_fail;
@@ -2165,32 +2228,20 @@ _wrap_BridgeSupportParser_parse__SWIG_1(int argc, VALUE *argv, VALUE self) {
   }
   arg4 = argv[3];
   arg5 = argv[4];
-  {
-    std::string *ptr = (std::string *)0;
-    res6 = SWIG_AsPtr_std_string(argv[5], &ptr);
-    if (!SWIG_IsOK(res6)) {
-      SWIG_exception_fail(SWIG_ArgError(res6), Ruby_Format_TypeError( "", "std::string const &","BridgeSupportParser::parse", 6, argv[5] )); 
-    }
-    if (!ptr) {
-      SWIG_exception_fail(SWIG_ValueError, Ruby_Format_TypeError("invalid null reference ", "std::string const &","BridgeSupportParser::parse", 6, argv[5])); 
-    }
-    arg6 = ptr;
-  }
-  BridgeSupportParser::parse(arg1,(char const *)arg2,(std::string const &)*arg3,arg4,arg5,(std::string const &)*arg6);
+  arg6 = argv[5];
+  BridgeSupportParser::parse(arg1,(char const *)arg2,(std::string const &)*arg3,arg4,arg5,arg6);
   if (alloc2 == SWIG_NEWOBJ) delete[] buf2;
   if (SWIG_IsNewObj(res3)) delete arg3;
-  if (SWIG_IsNewObj(res6)) delete arg6;
   return Qnil;
 fail:
   if (alloc2 == SWIG_NEWOBJ) delete[] buf2;
   if (SWIG_IsNewObj(res3)) delete arg3;
-  if (SWIG_IsNewObj(res6)) delete arg6;
   return Qnil;
 }
 
 
 SWIGINTERN VALUE
-_wrap_BridgeSupportParser_parse__SWIG_2(int argc, VALUE *argv, VALUE self) {
+_wrap_BridgeSupportParser_parse__SWIG_3(int argc, VALUE *argv, VALUE self) {
   VALUE arg1 = (VALUE) 0 ;
   char *arg2 = (char *) 0 ;
   std::string *arg3 = 0 ;
@@ -2235,7 +2286,7 @@ fail:
 
 
 SWIGINTERN VALUE
-_wrap_BridgeSupportParser_parse__SWIG_3(int argc, VALUE *argv, VALUE self) {
+_wrap_BridgeSupportParser_parse__SWIG_4(int argc, VALUE *argv, VALUE self) {
   VALUE arg1 = (VALUE) 0 ;
   char *arg2 = (char *) 0 ;
   std::string *arg3 = 0 ;
@@ -2278,7 +2329,7 @@ fail:
 
 
 SWIGINTERN VALUE
-_wrap_BridgeSupportParser_parse__SWIG_4(int argc, VALUE *argv, VALUE self) {
+_wrap_BridgeSupportParser_parse__SWIG_5(int argc, VALUE *argv, VALUE self) {
   VALUE arg1 = (VALUE) 0 ;
   char *arg2 = (char *) 0 ;
   std::string *arg3 = 0 ;
@@ -2320,11 +2371,11 @@ fail:
 
 SWIGINTERN VALUE _wrap_BridgeSupportParser_parse(int nargs, VALUE *args, VALUE self) {
   int argc;
-  VALUE argv[7];
+  VALUE argv[8];
   int ii;
   
   argc = nargs;
-  if (argc > 7) SWIG_fail;
+  if (argc > 8) SWIG_fail;
   for (ii = 0; (ii < argc); ++ii) {
     argv[ii] = args[ii];
   }
@@ -2338,7 +2389,7 @@ SWIGINTERN VALUE _wrap_BridgeSupportParser_parse(int nargs, VALUE *args, VALUE s
         int res = SWIG_AsPtr_std_string(argv[2], (std::string**)(0));
         _v = SWIG_CheckState(res);
         if (_v) {
-          return _wrap_BridgeSupportParser_parse__SWIG_4(nargs, args, self);
+          return _wrap_BridgeSupportParser_parse__SWIG_5(nargs, args, self);
         }
       }
     }
@@ -2355,7 +2406,7 @@ SWIGINTERN VALUE _wrap_BridgeSupportParser_parse(int nargs, VALUE *args, VALUE s
         if (_v) {
           _v = (argv[3] != 0);
           if (_v) {
-            return _wrap_BridgeSupportParser_parse__SWIG_3(nargs, args, self);
+            return _wrap_BridgeSupportParser_parse__SWIG_4(nargs, args, self);
           }
         }
       }
@@ -2375,7 +2426,7 @@ SWIGINTERN VALUE _wrap_BridgeSupportParser_parse(int nargs, VALUE *args, VALUE s
           if (_v) {
             _v = (argv[4] != 0);
             if (_v) {
-              return _wrap_BridgeSupportParser_parse__SWIG_2(nargs, args, self);
+              return _wrap_BridgeSupportParser_parse__SWIG_3(nargs, args, self);
             }
           }
         }
@@ -2396,10 +2447,9 @@ SWIGINTERN VALUE _wrap_BridgeSupportParser_parse(int nargs, VALUE *args, VALUE s
           if (_v) {
             _v = (argv[4] != 0);
             if (_v) {
-              int res = SWIG_AsPtr_std_string(argv[5], (std::string**)(0));
-              _v = SWIG_CheckState(res);
+              _v = (argv[5] != 0);
               if (_v) {
-                return _wrap_BridgeSupportParser_parse__SWIG_1(nargs, args, self);
+                return _wrap_BridgeSupportParser_parse__SWIG_2(nargs, args, self);
               }
             }
           }
@@ -2421,15 +2471,46 @@ SWIGINTERN VALUE _wrap_BridgeSupportParser_parse(int nargs, VALUE *args, VALUE s
           if (_v) {
             _v = (argv[4] != 0);
             if (_v) {
-              int res = SWIG_AsPtr_std_string(argv[5], (std::string**)(0));
-              _v = SWIG_CheckState(res);
+              _v = (argv[5] != 0);
               if (_v) {
-                {
-                  int res = SWIG_AsVal_bool(argv[6], NULL);
-                  _v = SWIG_CheckState(res);
-                }
+                int res = SWIG_AsPtr_std_string(argv[6], (std::string**)(0));
+                _v = SWIG_CheckState(res);
                 if (_v) {
-                  return _wrap_BridgeSupportParser_parse__SWIG_0(nargs, args, self);
+                  return _wrap_BridgeSupportParser_parse__SWIG_1(nargs, args, self);
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+  if (argc == 8) {
+    int _v;
+    _v = (argv[0] != 0);
+    if (_v) {
+      int res = SWIG_AsCharPtrAndSize(argv[1], 0, NULL, 0);
+      _v = SWIG_CheckState(res);
+      if (_v) {
+        int res = SWIG_AsPtr_std_string(argv[2], (std::string**)(0));
+        _v = SWIG_CheckState(res);
+        if (_v) {
+          _v = (argv[3] != 0);
+          if (_v) {
+            _v = (argv[4] != 0);
+            if (_v) {
+              _v = (argv[5] != 0);
+              if (_v) {
+                int res = SWIG_AsPtr_std_string(argv[6], (std::string**)(0));
+                _v = SWIG_CheckState(res);
+                if (_v) {
+                  {
+                    int res = SWIG_AsVal_bool(argv[7], NULL);
+                    _v = SWIG_CheckState(res);
+                  }
+                  if (_v) {
+                    return _wrap_BridgeSupportParser_parse__SWIG_0(nargs, args, self);
+                  }
                 }
               }
             }
@@ -2440,9 +2521,10 @@ SWIGINTERN VALUE _wrap_BridgeSupportParser_parse(int nargs, VALUE *args, VALUE s
   }
   
 fail:
-  Ruby_Format_OverloadedError( argc, 7, "BridgeSupportParser.parse", 
-    "    void BridgeSupportParser.parse(VALUE headers, char const *content, std::string const &triple, VALUE defines, VALUE incdirs, std::string const &sysroot, bool verbose)\n"
-    "    void BridgeSupportParser.parse(VALUE headers, char const *content, std::string const &triple, VALUE defines, VALUE incdirs, std::string const &sysroot)\n"
+  Ruby_Format_OverloadedError( argc, 8, "BridgeSupportParser.parse", 
+    "    void BridgeSupportParser.parse(VALUE headers, char const *content, std::string const &triple, VALUE defines, VALUE incdirs, VALUE rubydefaultincs, std::string const &sysroot, bool verbose)\n"
+    "    void BridgeSupportParser.parse(VALUE headers, char const *content, std::string const &triple, VALUE defines, VALUE incdirs, VALUE rubydefaultincs, std::string const &sysroot)\n"
+    "    void BridgeSupportParser.parse(VALUE headers, char const *content, std::string const &triple, VALUE defines, VALUE incdirs, VALUE rubydefaultincs)\n"
     "    void BridgeSupportParser.parse(VALUE headers, char const *content, std::string const &triple, VALUE defines, VALUE incdirs)\n"
     "    void BridgeSupportParser.parse(VALUE headers, char const *content, std::string const &triple, VALUE defines)\n"
     "    void BridgeSupportParser.parse(VALUE headers, char const *content, std::string const &triple)\n");
