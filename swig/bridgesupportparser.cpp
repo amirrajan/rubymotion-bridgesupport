@@ -463,7 +463,7 @@ public:
 		    }
 #endif
 		    //llvm::errs() << ">>CallExpr: callee=" << C->getCallee()->getStmtClassName() << " getCallReturnType=" << C->getCallReturnType().getAsString() << "\n";
-		    rettype = C->getCallReturnType();
+		    rettype = C->getCallReturnType(BSP->compiler.getASTContext());
 
 		    if(rettype->isVectorType() || C->getNumArgs() > 1) break;
 		    if(rettype->isIntegralType(BSP->compiler.getASTContext()) || rettype->isRealFloatingType()) {
@@ -552,7 +552,9 @@ public:
 
 	for (int i = 0; M != ME; M++) {
 	    const IdentifierInfo *I = M->first;
-	    const MacroInfo *V = M->second->getMacroInfo();
+	    auto MD = pp.getMacroDefinition(M->first);
+	    const MacroInfo *V = MD.getMacroInfo();
+	    if (!V) continue;
 	    if(!V->isEnabled() || V->isBuiltinMacro() || !BSP->inDir(BSP->compiler.getSourceManager().getFileID(V->getDefinitionLoc())) || V->isFunctionLike()) continue;
 	    if(ignoreMacro(V)) continue;
 	    //llvm::errs() << I->getName() << " "; BSP->pp->DumpMacro(*V); //DEBUG
@@ -1082,8 +1084,8 @@ BridgeSupportParser::pass1(const char **headers, const std::string& triple, cons
 	bs.addFile(*p);
 
     const char *empty = "";
-    llvm::MemoryBuffer *membuf = llvm::MemoryBuffer::getMemBuffer(empty, empty);
-    FileID fileID = bs.compiler.getSourceManager().createFileID(membuf); // ownership of membuf passes to sm
+    std::unique_ptr<llvm::MemoryBuffer> membuf = llvm::MemoryBuffer::getMemBuffer(empty, empty);
+    FileID fileID = bs.compiler.getSourceManager().createFileID(std::move(membuf)); // ownership of membuf passes to sm
     MyPass1Consumer c;
     c.setup(&bs);
     bs.compiler.setASTConsumer(llvm::make_unique<MyPass1Consumer>(c));
@@ -1101,8 +1103,8 @@ BridgeSupportParser::pass2(const char **headers, const char *content, const std:
     src.append("@interface " CONTENTEND "\n@end\n");
     src.append(*macros);
     //llvm::errs() << "-----------\n" << src << "-----------\n"; //DEBUG
-    llvm::MemoryBuffer *membuf = llvm::MemoryBuffer::getMemBuffer(src.c_str(), src.c_str() + src.length());
-    FileID fileID = bs.compiler.getSourceManager().createFileID(membuf); // ownership of membuf passes to sm
+    std::unique_ptr<llvm::MemoryBuffer> membuf = llvm::MemoryBuffer::getMemBuffer(src.c_str(), src.c_str() + src.length());
+    FileID fileID = bs.compiler.getSourceManager().createFileID(std::move(membuf)); // ownership of membuf passes to sm
     MyPass2Consumer c;
     c.setup(&bs);
     bs.compiler.setASTConsumer(llvm::make_unique<MyPass2Consumer>(c));
