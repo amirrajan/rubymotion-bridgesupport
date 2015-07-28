@@ -89,15 +89,6 @@ public:
     }
 };
 
-class MyObjCLangOptions: public clang::LangOptions {
-public:
-    MyObjCLangOptions()
-    {
-	LineComment = Blocks = Bool = C99 = GNUMode = HexFloats = 1;
-	ObjC1 = ObjC2 = ObjCAutoRefCount = ObjCARCWeak = 1;
-    }
-};
-
 class MyPass2Consumer;
 
 class MyTargetOptions: public clang::TargetOptions {

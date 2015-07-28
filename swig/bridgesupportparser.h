@@ -9,6 +9,7 @@ private:
     BridgeSupportParser(const char **headers, const std::string& triple, const char **defines, const char **incdirs, const std::string& sysroot, bool verbose);
     ~BridgeSupportParser();
 #ifndef SWIG
+    void setLanguageOptions(clang::LangOptions *opt);
     void addFile(const char *file);
     bool inDir(clang::FileID file);
     void getObjCEncodingForType(clang::QualType t, std::string &S, const clang::FieldDecl *Field=0);
