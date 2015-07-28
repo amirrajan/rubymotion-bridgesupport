@@ -817,8 +817,6 @@ BridgeSupportParser::BridgeSupportParser(const char **headers, const std::string
     compiler.createDiagnostics(client);
     compiler.getInvocation().setLangDefaults(opts, IK_ObjC);
 
-    const char **header_end;
-    for(header_end = headers; *header_end; header_end++);
     CompilerInvocation::CreateFromArgs(compiler.getInvocation(), nullptr, nullptr, compiler.getDiagnostics());
 
     TargetInfo *target = clang::TargetInfo::CreateTargetInfo(compiler.getDiagnostics(), compiler.getInvocation().TargetOpts);
