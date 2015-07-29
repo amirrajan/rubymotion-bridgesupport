@@ -10,6 +10,7 @@ private:
     ~BridgeSupportParser();
 #ifndef SWIG
     void setLanguageOptions(clang::LangOptions *opt);
+    void setTargetOptions(clang::TargetOptions &targetOpt, const std::string& triple);
     void addFile(const char *file);
     bool inDir(clang::FileID file);
     void getObjCEncodingForType(clang::QualType t, std::string &S, const clang::FieldDecl *Field=0);

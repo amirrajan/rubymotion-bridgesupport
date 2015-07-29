@@ -809,6 +809,12 @@ private:
     MySema *sema;
 };
 
+void BridgeSupportParser::setTargetOptions(TargetOptions &targetOpt, const std::string& triple)
+{
+    targetOpt.Triple = triple;
+    targetOpt.CPU = "core2";
+}
+
 void BridgeSupportParser::setLanguageOptions(LangOptions *opt)
 {
     opt->ObjC1 = true;
@@ -831,6 +837,7 @@ BridgeSupportParser::BridgeSupportParser(const char **headers, const std::string
 
     CompilerInvocation::CreateFromArgs(compiler.getInvocation(), nullptr, nullptr, compiler.getDiagnostics());
 
+    setTargetOptions(compiler.getInvocation().getTargetOpts(), triple);
     TargetInfo *target = clang::TargetInfo::CreateTargetInfo(compiler.getDiagnostics(), compiler.getInvocation().TargetOpts);
     compiler.setTarget(target);
 

@@ -79,25 +79,6 @@ class VarDecl;
 
 #include "ruby.h"
 
-class MyDiagnosticOptions: public clang::DiagnosticOptions {
-public:
-    MyDiagnosticOptions()
-    {
-	// This avoids an assert when builtins aren't recognized
-	// (when they should)
-	ShowCarets = 0;
-    }
-};
-
 class MyPass2Consumer;
-
-class MyTargetOptions: public clang::TargetOptions {
-public:
-    MyTargetOptions(const std::string& triple = LLVM_DEFAULT_TARGET_TRIPLE)
-    {
-	Triple = triple;
-	CPU = "core2";
-    }
-};
 
 #endif /* SWIG */
