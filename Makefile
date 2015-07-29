@@ -89,15 +89,16 @@ $(SYMROOT_MADE): $(OBJROOT_MADE)
 
 # Subdirectories
 CLANG_VERS = clang-37
+CLANG_BRANCH = release_37
 CLANG_DIR = $(OBJROOT)/$(CLANG_VERS)
 SWIG_DIR = $(OBJROOT)/swig
 
 CLANG_DIR_MADE = $(CLANG_DIR)/$(MADEFILE)
 $(CLANG_DIR_MADE): $(OBJROOT_MADE)
 	mkdir -p $(OBJROOT)
-	cd $(OBJROOT) && svn co http://llvm.org/svn/llvm-project/llvm/branches/release_37 $(CLANG_VERS)
-	cd $(CLANG_DIR)/tools && svn co http://llvm.org/svn/llvm-project/cfe/branches/release_37 clang
-	cd $(CLANG_DIR)/projects && svn co http://llvm.org/svn/llvm-project/compiler-rt/branches/release_37 compiler-rt
+	cd $(OBJROOT) && git clone https://github.com/llvm-mirror/llvm.git $(CLANG_VERS) && cd $(CLANG_DIR) && git checkout -b $(CLANG_BRANCH) origin/$(CLANG_BRANCH)
+	cd $(CLANG_DIR)/tools && git clone https://github.com/llvm-mirror/clang.git && cd $(CLANG_DIR)/tools/clang && git checkout -b $(CLANG_BRANCH) origin/$(CLANG_BRANCH)
+	cd $(CLANG_DIR)/projects && git clone https://github.com/llvm-mirror/compiler-rt.git && cd $(CLANG_DIR)/projects/compiler-rt && git checkout -b $(CLANG_BRANCH) origin/$(CLANG_BRANCH)
 	cd $(SRCROOT)
 	$(TOUCH) $@
 
