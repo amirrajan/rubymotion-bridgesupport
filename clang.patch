@@ -1,0 +1,22 @@
+diff --git a/include/clang/Sema/Sema.h b/include/clang/Sema/Sema.h
+index db7b6f9..f097294 100644
+--- a/include/clang/Sema/Sema.h
++++ b/include/clang/Sema/Sema.h
+@@ -1126,7 +1126,7 @@ public:
+ 
+   void emitAndClearUnusedLocalTypedefWarnings();
+ 
+-  void ActOnEndOfTranslationUnit();
++  virtual void ActOnEndOfTranslationUnit();
+ 
+   void CheckDelegatingCtorCycles();
+ 
+@@ -3222,7 +3222,7 @@ public:
+     return FullExprArg(FE.get());
+   }
+ 
+-  StmtResult ActOnExprStmt(ExprResult Arg);
++  virtual StmtResult ActOnExprStmt(ExprResult Arg);
+   StmtResult ActOnExprStmtError();
+ 
+   StmtResult ActOnNullStmt(SourceLocation SemiLoc,
