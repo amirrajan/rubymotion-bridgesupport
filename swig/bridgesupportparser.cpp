@@ -381,9 +381,9 @@ public:
     }
 #endif
 
-    StmtResult ActOnExprStmt(FullExprArg expr) {
-	if(!customActOn) return Sema::ActOnExprStmt(expr.release());
-	Expr *E = expr.get();
+    StmtResult ActOnExprStmt(ExprResult FE) {
+	if(!customActOn) return Sema::ActOnExprStmt(FE);
+	Expr *E = FE.get();
 	CallExpr *C;
 	QualType rettype;
 	if(E) {
@@ -520,7 +520,7 @@ doObjCString:
 	} else {
 	    customActOn->str.append("NULL");
 	}
-	return static_cast<Stmt*>(E);
+	return StmtResult(FE.getAs<Stmt>());
     }
 
     void setCustomActOn(ExprData *e) { customActOn = e; }
