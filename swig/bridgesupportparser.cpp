@@ -872,8 +872,7 @@ BridgeSupportParser::BridgeSupportParser(const char **headers, const std::string
 		g = frontend::Angled;
 		break;
 	    }
-	    // FIXME
-	    u = false;//((*d)[1] == 'T');
+	    u = ((*d)[1] == 'T');
 	    f = ((*d)[2] == 'T');
 	    hso.AddPath(*d + 3, g, u, f);
 	}
