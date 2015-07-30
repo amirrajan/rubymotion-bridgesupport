@@ -1150,7 +1150,7 @@ module Bridgesupportparser
 				break unless intree
 				make_opaque_or_struct(tname, name, decl)
 				break # only direct structs, no pointers to structs
-			    when 'Pointer'
+			    when 'Pointer', 'Elaborated'
 				# do another loop
 			    when 'Typedef'
 				if name == 'CFTypeRef'
