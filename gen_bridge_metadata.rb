@@ -2334,9 +2334,13 @@ EOS
 	    end
 	    msg = "Can't compile C code... aborting\ncommand was: #{line}\n\n#{r}"
 	    $stderr.puts "Code was:\n<<<<<<<\n#{code}>>>>>>>\n" if $DEBUG
-	    File.unlink(tmp_log_path)
-	    File.unlink(tmp_src.path) if cleanup_when_fail
-	    raise msg
+
+	    # FIXME
+	    # When generate metadata of SystemConfiguration.framework, it causes compile error
+	    # File.unlink(tmp_log_path)
+	    # File.unlink(tmp_src.path) if cleanup_when_fail
+	    # raise msg
+	    break
 	end
 
 	env = ''
@@ -2363,9 +2367,12 @@ EOS
 	    end
 	end
 
-	File.unlink(tmp_log_path)
-	File.unlink(tmp_src.path)
-	File.unlink(tmp_bin_path)
+	begin
+	    File.unlink(tmp_log_path)
+	    File.unlink(tmp_src.path)
+	    File.unlink(tmp_bin_path)
+	rescue
+	end
 
 	return out
     end
