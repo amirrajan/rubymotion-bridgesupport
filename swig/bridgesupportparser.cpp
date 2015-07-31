@@ -425,6 +425,8 @@ public:
 		    customActOn->kind = ExprFloat;
 		} else if(E->getStmtClass() == Stmt::ObjCStringLiteralClass) {
 		    goto doObjCString;
+		} else if(E->getStmtClass() == Stmt::StringLiteralClass) {
+		    goto doCString;
 		} else if(E->getStmtClass() == Stmt::CStyleCastExprClass) {
 		    CStyleCastExpr *CC = static_cast<CStyleCastExpr *>(E);
 		    //llvm::errs() << ">>CStyleCastExprClass: castKind=" << CC->getCastKindName() << " type=" << CC->getType().getAsString() << " subExpr=" << CC->getSubExpr()->getStmtClassName() << " getSubExpr=" << CC->getSubExpr()->getStmtClassName() << "\n";
@@ -507,6 +509,7 @@ doObjCString:
 		    break;
 		}
 		case Stmt::StringLiteralClass: {
+doCString:
 		    StringLiteral *S = static_cast<StringLiteral *>(E);
 		    customActOn->str.append(S->getString().str());
 		    customActOn->kind = ExprString;
