@@ -634,8 +634,10 @@ public:
 	      }
 	      case Decl::ObjCCategory: {
 		const ObjCCategoryDecl *CD = static_cast<const ObjCCategoryDecl *>(ND);
-		AnObjCCategory c(BSP, path, CD);
-		rb_yield(Data_Wrap_Struct(klass_AnObjCCategory, 0, 0, &c));
+		if (CD->getClassInterface()) {
+		    AnObjCCategory c(BSP, path, CD);
+		    rb_yield(Data_Wrap_Struct(klass_AnObjCCategory, 0, 0, &c));
+		}
 		break;
 	      }
 	      case Decl::ObjCInterface: {
