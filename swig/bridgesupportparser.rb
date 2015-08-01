@@ -1186,7 +1186,11 @@ module Bridgesupportparser
 				    break
 				end
 			    when 'Elaborated'
-				# do another loop
+				if tname =~ /Ref$/ && !disableCFTypes
+				    # assume this is a CFType.
+				    @all_cftypes[tname] = Bridgesupportparser::CFTypeInfo.new(self, tname, top.encoding, tattrs) if intree
+				    @every_cftype[tname] = 1
+				end
 			    else
 				break
 			    end
