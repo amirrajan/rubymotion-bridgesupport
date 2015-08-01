@@ -1163,7 +1163,7 @@ module Bridgesupportparser
 			    end
 			when 1
 			    #puts "Typedef 1: name=#{tname} type=#{type} attrs=#{tattrs.inspect}" #DEBUG
-			    break if type == 'Pointer' || type == 'Elaborated'
+			    break if type == 'Pointer'
 			    if tname =~ /Ref$/ && !disableCFTypes
 				# assume this is a CFType.
 				@all_cftypes[tname] = Bridgesupportparser::CFTypeInfo.new(self, tname, top.encoding, tattrs) if intree
