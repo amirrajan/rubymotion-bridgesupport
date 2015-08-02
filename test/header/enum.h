@@ -8,10 +8,6 @@ typedef enum TestEnumValue : NSUInteger {
 // http://hipbyte.myjetbrains.com/youtrack/issue/RM-886
 typedef NS_ENUM(NSInteger, ASScrollDirection) {
   ASScrollDirectionNone,
-  ASScrollDirectionRight,
-  ASScrollDirectionLeft,
-  ASScrollDirectionUp,
-  ASScrollDirectionDown,
 };
 @interface Foo : NSObject
 - (void)foo:(enum ASScrollDirection)scrollDirection;
