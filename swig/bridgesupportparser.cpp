@@ -318,6 +318,7 @@ locgetpath(SourceManager *sm, SourceLocation sl)
 {
     const FileEntry *fe = NULL;
     const char *path;
+    sl = sm->getFileLoc(sl);
     FileID fid = sm->getFileID(sl);
     if(fid == sm->getMainFileID()) return CONTENT;
     fe = sm->getFileEntryForID(fid);
@@ -615,7 +616,7 @@ public:
 	    if(!ND || isDeclUnavailable(ND)) continue;
 
 	    sl = ND->getLocation();
-	    if(!sl.isValid() || !sl.isFileID()) continue;
+	    if(!sl.isValid()) continue;
 	    const char *path = locgetpath(&BSP->compiler.getSourceManager(), sl);
 
 	    switch(ND->getKind()) {
