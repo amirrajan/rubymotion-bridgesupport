@@ -774,7 +774,7 @@ class BridgeSupportGenerator
 	end
 
 	prepare(sysroot == '/' ? '' : sysroot, enable_32, enable_64)
-	@incdirs << encode_includes("#{$slb}/include", 'A', false, false)
+	@incdirs << encode_includes("#{$slb}/include", 'A', false, true)
 	@incdirs << encode_includes('/System/Library/Frameworks/CoreServices.framework/Frameworks', 'S', false, true)
 	@imports.unshift('AvailabilityMacros.h')
 	@imports.unshift('_BS_bool.h')
