@@ -1168,11 +1168,16 @@ module Bridgesupportparser
 				# assume this is a CFType.
 				@all_cftypes[tname] = Bridgesupportparser::CFTypeInfo.new(self, tname, top.encoding, tattrs) if intree
 				@every_cftype[tname] = 1
+				break
 			    elsif type == 'Struct'
 				next unless intree
 				make_opaque_or_struct(tname, name, decl)
+				break
+			    elsif type == 'Elaborated'
+				# do another loop
+			    else
+				break
 			    end
-			    break
 			else
 			    #puts "ATypedef:walk_types #{name} #{type}" #DEBUG
 			    case type
@@ -1190,6 +1195,7 @@ module Bridgesupportparser
 				    # assume this is a CFType.
 				    @all_cftypes[tname] = Bridgesupportparser::CFTypeInfo.new(self, tname, top.encoding, tattrs) if intree
 				    @every_cftype[tname] = 1
+				    break
 				end
 			    else
 				break
