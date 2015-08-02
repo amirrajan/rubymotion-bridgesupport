@@ -736,7 +736,7 @@ class BridgeSupportGenerator
 	    o = words.shift
 	    case o
 	    when o.sub!(/^-D/, '') then defines << (o.empty? ? words.shift : o)
-	    when o.sub!(/^-I/, '') then incdirs << encode_includes(o.empty? ? words.shift : o, 'A', false, false)
+	    when o.sub!(/^-I/, '') then incdirs << encode_includes(o.empty? ? words.shift : o, 'A', false, true)
 	    when o.sub!(/^-F/, '') then incdirs << encode_includes(o.empty? ? words.shift : o, 'A', true, true)
 	    when o.sub!(/^--sysroot=/, '') then sysroot = o
 	    when '-isystem' then incsys << encode_includes(words.shift, 'A', true, false)
