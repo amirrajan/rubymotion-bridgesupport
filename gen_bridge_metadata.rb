@@ -876,7 +876,9 @@ class BridgeSupportGenerator
 		dpath = m[0]
 		next if File.basename(dpath) == name
 		next if dpath.include?('PrivateFrameworks')
-		next unless dpath.sub!(%r{\.framework/Versions/\w+/\w+$}, '')
+		unless dpath.sub!(%r{\.framework/Versions/\w+/\w+$}, '') # OS X
+		    next unless dpath.sub!(%r{\.framework/\w+$}, '') # iOS
+		end
 		dpath + '.framework'
 	    }.compact
 	    @dependencies[path] = deps
