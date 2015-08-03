@@ -516,6 +516,15 @@ doCString:
 		    customActOn->kind = ExprString;
 		    break;
 		}
+		case Stmt::CStyleCastExprClass: {
+		    CStyleCastExpr *CC = static_cast<CStyleCastExpr *>(E);
+		    rettype = CC->getType();
+		    if(rettype.getAsString() == "CFStringRef" && CC->getSubExpr()->getStmtClass() == Stmt::CallExprClass) {
+			C = static_cast<CallExpr *>(CC->getSubExpr());
+			goto doCFSTR;
+		    }
+		    break;
+		}
 		default:
 		    customActOn->str.append("(Evaluate failed)");
 		    break;
