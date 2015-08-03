@@ -67,7 +67,7 @@ require 'bridgesupportparser'
 class OCHeaderAnalyzer
     CPP = ['/usr/bin/cpp-4.2', '/usr/bin/cpp-4.0', '/usr/bin/cpp'].find { |x| File.exist?(x) }
     raise "Can't find cpp: have you installed Xcode and the command-line tools?" if CPP.nil?
-    CPPFLAGS = "-D__APPLE_CPP__ -include /usr/include/AvailabilityMacros.h"
+    CPPFLAGS = "-D__APPLE_CPP__ -D__BLOCKS__ -include /usr/include/AvailabilityMacros.h"
     CPPFLAGS << " -D__GNUC__" unless /^cpp-4/.match(File.basename(CPP))
 
     def self.data(data)
@@ -782,7 +782,7 @@ class BridgeSupportGenerator
 	args = OpenStruct.new
 	args.darwinvers = darwinvers.nil? ? _darwinvers : darwinvers
 	args.imports = includes + @imports
-	args.defines = defines + %w{__APPLE_CPP__=1} + %w{ObjectType=id}
+	args.defines = defines + %w{__APPLE_CPP__=1} + %w{__BLOCKS__=1} + %w{ObjectType=id}
 	args.incdirs = incdirs + @incdirs
 	args.defaultincs = defaultincs
 	args.sysroot = sysroot
@@ -793,7 +793,7 @@ class BridgeSupportGenerator
 		darwinvers, defines, incdirs, includes, sysroot = parse_cc_args(compiler_flags_64)
 		args.darwinvers = darwinvers.nil? ? _darwinvers : darwinvers
 		args.imports = includes + @imports
-		args.defines = defines + %w{__APPLE_CPP__=1}
+		args.defines = defines + %w{__APPLE_CPP__=1} + %w{__BLOCKS__=1}
 		args.incdirs = incdirs + @incdirs
 		args.defaultincs = defaultincs
 		args.sysroot = sysroot
