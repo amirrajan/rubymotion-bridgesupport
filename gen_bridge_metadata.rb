@@ -879,6 +879,7 @@ class BridgeSupportGenerator
 		unless dpath.sub!(%r{\.framework/Versions/\w+/\w+$}, '') # OS X
 		    next unless dpath.sub!(%r{\.framework/\w+$}, '') # iOS
 		end
+		dpath.sub!('//', '/')
 		dpath + '.framework'
 	    }.compact
 	    @dependencies[path] = deps
