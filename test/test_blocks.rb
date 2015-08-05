@@ -12,7 +12,7 @@ class TestBlocks < MiniTest::Unit::TestCase
     assert_equal(klass["name"], "Bar")
 
     method = klass["method"]
-    assert_equal(method[0]["selector"], "enumerateObjectsUsingBlock:")
+    assert_equal(method[0]["selector"], "testBlock:")
 
     arg = method[0]["arg"]
     assert_equal(arg[0]["function_pointer"], "true")
@@ -26,7 +26,7 @@ class TestBlocks < MiniTest::Unit::TestCase
     assert_equal(klass["name"], "Foo")
 
     method = klass["method"]
-    assert_equal(method[0]["selector"], "enumerateObjectsUsingBlock:")
+    assert_equal(method[0]["selector"], "testBlock:")
 
     arg = method[0]["arg"]
     assert_equal(arg[0]["function_pointer"], "true")
