@@ -994,6 +994,16 @@ class BridgeSupportGenerator
 	    @imports.unshift('Foundation/Foundation.h')
 	    @import_directive.insert(0, "#import <Foundation/Foundation.h>\n")
 	    @compiler_flags << ' -framework Foundation '
+	    if prefix_sysroot.include?('iPhone')
+		@imports.unshift('UIKit/UIKit.h')
+		@import_directive.insert(1, "#import <UIKit/UIKit.h>\n")
+		@compiler_flags << ' -framework UIKit '
+	    end
+	    if prefix_sysroot.include?('MacOSX')
+		@imports.unshift('Cocoa/Cocoa.h')
+		@import_directive.insert(1, "#import <Cocoa/Cocoa.h>\n")
+		@compiler_flags << ' -framework Cocoa '
+	    end
 	end
 
 	# Open exceptions, ignore mentionned headers.
