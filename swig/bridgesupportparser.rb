@@ -413,7 +413,7 @@ module Bridgesupportparser
 	end
 
 	def function_pointer?
-	    self[:function_pointer]
+	    self[:function_pointer] && !@funcptr.nil?
 	end
 
 	def recursive_merge!(m)
