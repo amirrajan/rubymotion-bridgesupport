@@ -782,7 +782,7 @@ class BridgeSupportGenerator
 	args = OpenStruct.new
 	args.darwinvers = darwinvers.nil? ? _darwinvers : darwinvers
 	args.imports = includes + @imports
-	args.defines = defines + %w{__APPLE_CPP__=1} + %w{__BLOCKS__=1} + %w{ObjectType=id}
+	args.defines = defines + %w{__APPLE_CPP__=1} + %w{__BLOCKS__=1}
 	args.incdirs = incdirs + @incdirs
 	args.defaultincs = defaultincs
 	args.sysroot = sysroot
