@@ -863,7 +863,7 @@ BridgeSupportParser::BridgeSupportParser(const char **headers, const std::string
     // Add header search directories
     HeaderSearchOptions &hso = compiler.getHeaderSearchOpts();
     hso.Sysroot = sysroot;
-    hso.AddPath(*defaultIncludePath, frontend::After, false, false);
+    hso.AddPath(*defaultIncludePath, frontend::After, false, true);
 
     /*
      * Add include directories and frameworks:
