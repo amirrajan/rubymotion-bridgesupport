@@ -375,7 +375,7 @@ module Bridgesupportparser
 		if enc =~ /^\^*\{\?=/
 		    # An unnamed structure typedef.  Use the typedef name
 		    # from declared_type.
-		    td = self[:declared_type].gsub(/[^\w]/, '')
+		    td = self[:declared_type].gsub(/(_Nonnull|_Nullable)/, '').gsub(/[^\w]/, '')
 		    enc.sub!(/^(\^*)\{\?=/, "\\1{_#{td}=")
 		    self[:_type_override] = true
 		elsif t
