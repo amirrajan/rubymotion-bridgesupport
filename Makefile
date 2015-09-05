@@ -96,9 +96,12 @@ SWIG_DIR = $(OBJROOT)/swig
 CLANG_DIR_MADE = $(CLANG_DIR)/$(MADEFILE)
 $(CLANG_DIR_MADE): $(OBJROOT_MADE)
 	mkdir -p $(OBJROOT)
-	cd $(OBJROOT) && git clone https://github.com/llvm-mirror/llvm.git $(CLANG_VERS) && cd $(CLANG_DIR) && git checkout -b $(CLANG_BRANCH) origin/$(CLANG_BRANCH)
-	cd $(CLANG_DIR)/tools && git clone https://github.com/llvm-mirror/clang.git && cd $(CLANG_DIR)/tools/clang && git checkout -b $(CLANG_BRANCH) origin/$(CLANG_BRANCH)
-	cd $(CLANG_DIR)/projects && git clone https://github.com/llvm-mirror/compiler-rt.git && cd $(CLANG_DIR)/projects/compiler-rt && git checkout -b $(CLANG_BRANCH) origin/$(CLANG_BRANCH)
+	# cd $(OBJROOT) && git clone https://github.com/llvm-mirror/llvm.git $(CLANG_VERS) && cd $(CLANG_DIR) && git checkout -b $(CLANG_BRANCH) origin/$(CLANG_BRANCH)
+	# cd $(CLANG_DIR)/tools && git clone https://github.com/llvm-mirror/clang.git && cd $(CLANG_DIR)/tools/clang && git checkout -b $(CLANG_BRANCH) origin/$(CLANG_BRANCH)
+	# cd $(CLANG_DIR)/projects && git clone https://github.com/llvm-mirror/compiler-rt.git && cd $(CLANG_DIR)/projects/compiler-rt && git checkout -b $(CLANG_BRANCH) origin/$(CLANG_BRANCH)
+	cd $(OBJROOT) && svn co http://llvm.org/svn/llvm-project/llvm/branches/$(CLANG_BRANCH) $(CLANG_VERS)
+	cd $(CLANG_DIR)/tools && svn co http://llvm.org/svn/llvm-project/cfe/branches/$(CLANG_BRANCH) clang
+	cd $(CLANG_DIR)/projects && svn co http://llvm.org/svn/llvm-project/compiler-rt/branches/$(CLANG_BRANCH) compiler-rt
 	cd $(CLANG_DIR)/tools/clang && patch -p1 < $(SRCROOT)/clang.patch
 	cd $(SRCROOT)
 	$(TOUCH) $@
