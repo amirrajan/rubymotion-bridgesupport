@@ -8,8 +8,8 @@ class TestNullability < MiniTest::Unit::TestCase
   end
 
   def test_nullable
-    klass = @bs["class"].first
-    assert_equal(klass["name"], "Foo")
+    klass = @bs["class"][0]
+    assert_equal(klass["name"], "AAA")
 
     method1 = klass["method"][0]
     assert_equal(method1["selector"],       "setSelector1:")
@@ -25,8 +25,8 @@ class TestNullability < MiniTest::Unit::TestCase
   end
 
   def test_nonnull
-    klass = @bs["class"].first
-    assert_equal(klass["name"], "Foo")
+    klass = @bs["class"][0]
+    assert_equal(klass["name"], "AAA")
 
     method4 = klass["method"][3]
     assert_equal(method4["selector"],       "setSelector4:")
@@ -35,6 +35,40 @@ class TestNullability < MiniTest::Unit::TestCase
     method5 = klass["method"][4]
     assert_equal(method5["selector"],       "setSelector5:")
     assert_equal(method5["arg"][0]["type"], ":")
+  end
+
+  def test_arg_type
+    klass = @bs["class"][1]
+    assert_equal(klass["name"], "BBB")
+
+    method1 = klass["method"][0]
+    assert_equal(method1["selector"],       "method1:")
+    assert_equal(method1["arg"][0]["type"], "^{_TestStruct=i}")
+
+    method2 = klass["method"][1]
+    assert_equal(method2["selector"],       "method2:")
+    assert_equal(method2["arg"][0]["type"], "^{_TestStruct=i}")
+
+    method3 = klass["method"][2]
+    assert_equal(method3["selector"],       "method3:")
+    assert_equal(method3["arg"][0]["type"], "^{_TestStruct=i}")
+  end
+
+  def test_ret_type
+    klass = @bs["class"][2]
+    assert_equal(klass["name"], "CCC")
+
+    method1 = klass["method"][0]
+    assert_equal(method1["selector"],          "return1")
+    assert_equal(method1["retval"][0]["type"], "^{_TestStruct=i}")
+
+    method2 = klass["method"][1]
+    assert_equal(method2["selector"],          "return2")
+    assert_equal(method2["retval"][0]["type"], "^{_TestStruct=i}")
+
+    method3 = klass["method"][2]
+    assert_equal(method3["selector"],          "return3")
+    assert_equal(method3["retval"][0]["type"], "^{_TestStruct=i}")
   end
 
 end
