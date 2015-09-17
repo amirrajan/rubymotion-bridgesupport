@@ -1453,7 +1453,9 @@ module Bridgesupportparser
 	    # '^v' with '@' for cftypes
 	    each_attrs do |a|
 		dt = a[:declared_type]
-		next if dt.nil? || @every_cftype[dt].nil?
+		next if dt.nil?
+		dt = dt.gsub(/(_Nonnull|_Nullable)/, '').strip
+		next if @every_cftype[dt].nil?
 		if a[:type] == '^v'
 		    a.delete(:type) # delete to avoid recursive_merge! warning
 		    a[:type] = '@'
