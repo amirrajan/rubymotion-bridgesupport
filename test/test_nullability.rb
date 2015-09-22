@@ -71,4 +71,13 @@ class TestNullability < MiniTest::Unit::TestCase
     assert_equal(method3["retval"][0]["type"], "^{_TestStruct=i}")
   end
 
+  def test_cftyperef
+    klass = @bs["class"][3]
+    assert_equal(klass["name"], "DDD")
+
+    method1 = klass["method"][0]
+    assert_equal(method1["selector"],          "method1:")
+    assert_equal(method1["arg"][0]["type"],    "@")
+  end
+
 end

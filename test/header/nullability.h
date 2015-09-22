@@ -23,3 +23,8 @@ typedef struct {
 - (nonnull TestStruct*)return2;
 - (nullable TestStruct*)return3;
 @end
+
+typedef CFTypeRef ABRecordRef;
+@interface DDD : NSObject
+- (void)method1:(nonnull ABRecordRef)ref;
+@end
