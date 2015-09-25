@@ -2,6 +2,9 @@
 
 #include "__xattr__.h"
 
+#include <sys/time.h>
+#include <sys/resource.h>
+
 /* These values must match those in bridgesupport.rb */
 #define CONTENT			"__9_OxQk__4__c_0_n_T_3_n_t_"
 #define CONTENTEND		"__9_OxQk__4__3_0_F_"
@@ -846,6 +849,13 @@ void BridgeSupportParser::setLanguageOptions(LangOptions *opt)
 BridgeSupportParser::BridgeSupportParser(const char **headers, const std::string& triple, const char **defines, const char **incdirs, const std::string& sysroot, bool verbose)
 	:  verbose(verbose)
 {
+    struct rlimit rl;
+    rl.rlim_max = 10000;
+    rl.rlim_cur = 10000;
+    if (setrlimit(RLIMIT_NOFILE, &rl) == -1) {
+	rb_raise(rb_eRuntimeError, "setrlimit: Couldn't loosen restriction of maximum number for file descriptors");
+    }
+
     TextDiagnosticPrinter *client = new TextDiagnosticPrinter(verbose ? llvm::errs() : llvm::nulls(), &compiler.getDiagnosticOpts());
     compiler.createDiagnostics(client);
     setLanguageOptions(compiler.getInvocation().getLangOpts());
