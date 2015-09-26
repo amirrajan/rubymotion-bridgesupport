@@ -949,7 +949,7 @@ class BridgeSupportGenerator
 	# enable_32 and enable_64), and what architectures are actually
 	# available in the frameworks, if any.
 
-	if framework_paths.empty? 
+	if framework_paths.empty?
 	    @enable_32 = enable_32
 	    @enable_64 = enable_64
 	else
@@ -2358,7 +2358,9 @@ EOS
 
 	env = ''
 	if @framework_paths
-	    env << "DYLD_FRAMEWORK_PATH=\"#{@framework_paths.join(':')}\""
+            if @framework_paths.first
+              env << "DYLD_ROOT_PATH=\"#{File.join(@framework_paths.first, '../../../')}\""
+            end
 	end
 
 	line = "#{env} #{tmp_bin_path}"
