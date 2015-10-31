@@ -853,7 +853,7 @@ BridgeSupportParser::BridgeSupportParser(const char **headers, const std::string
     rl.rlim_max = 10000;
     rl.rlim_cur = 10000;
     if (setrlimit(RLIMIT_NOFILE, &rl) == -1) {
-	rb_raise(rb_eRuntimeError, "setrlimit: Couldn't loosen restriction of maximum number for file descriptors");
+	rb_warn("setrlimit: Couldn't loosen restriction of maximum number for file descriptors");
     }
 
     TextDiagnosticPrinter *client = new TextDiagnosticPrinter(verbose ? llvm::errs() : llvm::nulls(), &compiler.getDiagnosticOpts());
