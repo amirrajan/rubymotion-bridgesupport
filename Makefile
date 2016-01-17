@@ -88,8 +88,9 @@ $(SYMROOT_MADE): $(OBJROOT_MADE)
 	$(TOUCH) $@
 
 # Subdirectories
-CLANG_VERS = clang-37
-CLANG_BRANCH = release_37
+CLANG_VERS = clang-38
+CLANG_BRANCH = trunk
+CLANG_REVISION = @252576
 CLANG_DIR = $(OBJROOT)/$(CLANG_VERS)
 SWIG_DIR = $(OBJROOT)/swig
 
@@ -99,9 +100,9 @@ $(CLANG_DIR_MADE): $(OBJROOT_MADE)
 	# cd $(OBJROOT) && git clone https://github.com/llvm-mirror/llvm.git $(CLANG_VERS) && cd $(CLANG_DIR) && git checkout -b $(CLANG_BRANCH) origin/$(CLANG_BRANCH)
 	# cd $(CLANG_DIR)/tools && git clone https://github.com/llvm-mirror/clang.git && cd $(CLANG_DIR)/tools/clang && git checkout -b $(CLANG_BRANCH) origin/$(CLANG_BRANCH)
 	# cd $(CLANG_DIR)/projects && git clone https://github.com/llvm-mirror/compiler-rt.git && cd $(CLANG_DIR)/projects/compiler-rt && git checkout -b $(CLANG_BRANCH) origin/$(CLANG_BRANCH)
-	cd $(OBJROOT) && svn co http://llvm.org/svn/llvm-project/llvm/branches/$(CLANG_BRANCH) $(CLANG_VERS)
-	cd $(CLANG_DIR)/tools && svn co http://llvm.org/svn/llvm-project/cfe/branches/$(CLANG_BRANCH) clang
-	cd $(CLANG_DIR)/projects && svn co http://llvm.org/svn/llvm-project/compiler-rt/branches/$(CLANG_BRANCH) compiler-rt
+	cd $(OBJROOT) && svn co http://llvm.org/svn/llvm-project/llvm/$(CLANG_BRANCH)$(CLANG_REVISION) $(CLANG_VERS)
+	cd $(CLANG_DIR)/tools && svn co http://llvm.org/svn/llvm-project/cfe/$(CLANG_BRANCH)$(CLANG_REVISION) clang
+	cd $(CLANG_DIR)/projects && svn co http://llvm.org/svn/llvm-project/compiler-rt/$(CLANG_BRANCH)$(CLANG_REVISION) compiler-rt
 	cd $(CLANG_DIR)/tools/clang && patch -p1 < $(SRCROOT)/clang.patch
 	cd $(SRCROOT)
 	$(TOUCH) $@
@@ -130,7 +131,7 @@ $(CLANGROOT_MADE): $(CLANG_DIR_MADE)
 	    $(MKDIR) $(CLANG_DIR)/darwin-$$arch && \
 	    (cd $(CLANG_DIR)/darwin-$$arch && \
 	    $(MKDIR) ROOT && \
-	    env MACOSX_DEPLOYMENT_TARGET=10.7 CC="$(CC) -arch $$arch" CXX="$(CXX) -arch $$arch" ../configure --prefix=$(CLANG_PREFIX) --enable-libcpp --enable-debug-runtime --enable-debug-symbols --enable-optimized --disable-timestamps --disable-assertions --with-optimize-option='-Os' --without-llvmgcc --without-llvmgxx --disable-bindings --disable-doxygen --with-extra-options='-DDISABLE_SMART_POINTERS' && \
+	    env MACOSX_DEPLOYMENT_TARGET=10.7 CC="$(CC) -arch $$arch" CXX="$(CXX) -arch $$arch" cmake ../ -G "Unix Makefiles" -DCMAKE_BUILD_TYPE=Release -DLLVM_ENABLE_LIBCXX=YES -DLLVM_ENABLE_TIMESTAMPS=NO -DCAN_TARGET_10.4_i386=FALSE -DCAN_TARGET_iossim_i386=FALSE -DCAN_TARGET_osx_i386=FALSE && \
 	    env MACOSX_DEPLOYMENT_TARGET=10.7 CC="$(CC) -arch $$arch" CXX="$(CXX) -arch $$arch" make -j$(shell sysctl -n hw.ncpu) && \
 	    $(MKDIR) $(CLANG_DIR)/darwin-$$arch/ROOT && \
 	    make install DESTDIR=$(CLANG_DIR)/darwin-$$arch/ROOT) || exit 1; \
@@ -156,7 +157,7 @@ $(BS_RUBY_MADE): $(CLANGROOT_MADE) $(SWIG_DIR_MADE) $(DSTROOT_MADE) $(SYMROOT_MA
 	@/bin/echo -n '*** Started Building bridgesupport.bundle: ' && date
 	@set -x && \
 	cd $(SWIG_DIR) && \
-	make LLVM-CONFIG=$(CLANGROOT)$(CLANG_PREFIX)/bin/llvm-config RC_CFLAGS='$(RC_CFLAGS)' && \
+	make LLVM-CONFIG=$(CLANGROOT)$(CLANG_PREFIX)/local/bin/llvm-config RC_CFLAGS='$(RC_CFLAGS)' && \
 	$(MKDIR) $(BS_RUBY) && \
 	$(RSYNC) bridgesupportparser.bundle* $(SYMROOT) && \
 	$(RSYNC) bridgesupportparser.bundle $(BS_RUBY) && \

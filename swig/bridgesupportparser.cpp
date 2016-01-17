@@ -937,7 +937,7 @@ void
 BridgeSupportParser::addFile(const char *file) {
     const DirectoryLookup *CurDir;
     SmallVector<std::pair<const FileEntry *, const DirectoryEntry *>, 0> Includers;
-    const FileEntry *fe = compiler.getPreprocessor().getHeaderSearchInfo().LookupFile(file, SourceLocation(), false, NULL, CurDir, Includers, NULL, NULL, NULL);
+    const FileEntry *fe = compiler.getPreprocessor().getHeaderSearchInfo().LookupFile(file, SourceLocation(), false, NULL, CurDir, Includers, NULL, NULL, NULL, NULL);
     if(!fe)
 	rb_raise(rb_eRuntimeError, "addFile: Couldn't lookup file: %s", file);
     char path[PATH_MAX];
