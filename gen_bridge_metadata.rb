@@ -971,12 +971,19 @@ class BridgeSupportGenerator
 	    no_64 = false
 	    framework_paths.each do |fp|
 		p = File.join(fp, File.basename(fp, '.framework'))
-		lipo = `lipo -info "#{p}"`
-		raise "Couldn't determine architectures in #{p}" unless $?.exited? and $?.exitstatus == 0
-		lipo.chomp!
-		lipo.sub!(/^.*: /, '')
+		archs = nil
+		if File.exist?(p)
+		    lipo = `lipo -info "#{p}"`
+		    raise "Couldn't determine architectures in #{p}" unless $?.exited? and $?.exitstatus == 0
+		    lipo.chomp!
+		    lipo.sub!(/^.*: /, '')
+		    archs = lipo.split
+		else
+		    archs = YAML.load_file(p + ".tbd")["archs"]
+		end
+
 		have32 = have64 = false
-		lipo.split.each do |arch|
+		archs.each do |arch|
 		    if /64$/ =~ arch
 			have64 = true
 		    else
