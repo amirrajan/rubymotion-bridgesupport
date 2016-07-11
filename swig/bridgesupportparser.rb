@@ -375,7 +375,7 @@ module Bridgesupportparser
 		if enc =~ /^\^*\{\?=/
 		    # An unnamed structure typedef.  Use the typedef name
 		    # from declared_type.
-		    td = self[:declared_type].gsub(/(_Nonnull|_Nullable)/, '').gsub(/[^\w]/, '')
+		    td = self[:declared_type].gsub(/(_Nonnull|_Nullable|_Null_unspecified)/, '').gsub(/[^\w]/, '')
 		    enc.sub!(/^(\^*)\{\?=/, "\\1{_#{td}=")
 		    self[:_type_override] = true
 		elsif t
@@ -1454,7 +1454,7 @@ module Bridgesupportparser
 	    each_attrs do |a|
 		dt = a[:declared_type]
 		next if dt.nil?
-		dt = dt.gsub(/(_Nonnull|_Nullable)/, '').strip
+		dt = dt.gsub(/(_Nonnull|_Nullable|_Null_unspecified)/, '').strip
 		next if @every_cftype[dt].nil?
 		if a[:type] == '^v'
 		    a.delete(:type) # delete to avoid recursive_merge! warning

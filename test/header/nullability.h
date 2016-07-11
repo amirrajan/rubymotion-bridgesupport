@@ -22,9 +22,14 @@ typedef struct {
 - (TestStruct*)return1;
 - (nonnull TestStruct*)return2;
 - (nullable TestStruct*)return3;
+- (_Null_unspecified TestStruct*)return4;
 @end
 
 typedef CFTypeRef ABRecordRef;
 @interface DDD : NSObject
 - (void)method1:(nonnull ABRecordRef)ref;
+@end
+
+@interface EEE : NSObject
+- (void)method1:(_Null_unspecified TestStruct *)st;
 @end
