@@ -1413,7 +1413,9 @@ EOS
 		cflags << f
 	    end
 	end
-	cc = "#{getcc()} #{cflags.join(' ')} #{tmp_src.path} -o #{@out_file} #{@compiler_flags} -dynamiclib -O3 -current_version #{VERSION} -compatibility_version #{VERSION} -fobjc-gc #{OBJC_GC_COMPACTION}"
+
+    #No more garbage collection in clang for dylib
+	cc = "#{getcc()} #{cflags.join(' ')} #{tmp_src.path} -o #{@out_file} #{@compiler_flags} -dynamiclib -O3 -current_version #{VERSION} -compatibility_version #{VERSION} #{OBJC_GC_COMPACTION}"
 	cc << " -install_name #{@install_name}" unless @install_name.nil?
 	unless system(cc)
 	    raise "Can't compile dylib source file '#{tmp_src.path}'\nLine was: #{cc}"
