@@ -1015,7 +1015,7 @@ class BridgeSupportGenerator
 	    @imports.unshift('Foundation/Foundation.h')
 	    @import_directive.insert(0, "#import <Foundation/Foundation.h>\n")
 	    @compiler_flags << ' -framework Foundation '
-	    if prefix_sysroot.include?('iPhone')
+	    if prefix_sysroot.include?('iPhone') || prefix_sysroot.include?('AppleTV') || prefix_sysroot.include?('Watch')
 		@imports.unshift('UIKit/UIKit.h')
 		@import_directive.insert(0, "#import <UIKit/UIKit.h>\n")
 		@compiler_flags << ' -framework UIKit '
