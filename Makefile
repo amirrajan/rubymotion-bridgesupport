@@ -88,8 +88,8 @@ $(SYMROOT_MADE): $(OBJROOT_MADE)
 	$(TOUCH) $@
 
 # Subdirectories
-CLANG_VERS = clang-38
-CLANG_BRANCH = branches/release_38@271772
+CLANG_VERS = clang-39
+CLANG_BRANCH = branches/release_39@279704
 CLANG_DIR = $(OBJROOT)/$(CLANG_VERS)
 SWIG_DIR = $(OBJROOT)/swig
 
