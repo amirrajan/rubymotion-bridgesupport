@@ -5,3 +5,6 @@
 @property (assign, readonly) NSString *sample2;
 @end
 
+@interface TestClassProperty : NSObject
+@property (class, assign, readonly) NSString *sample1;
+@end
