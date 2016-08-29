@@ -5,9 +5,10 @@ Imported from [http://code.metager.de/source/xref/apple/BridgeSupport](http://co
 ## Requirements
 
 - cmake
+- subversion
 
-You can install `cmake` with following command.
+You can install `cmake` and `subversion` with following command.
 
 ```
-$ brew install cmake
+$ brew install cmake subversion
 ```
