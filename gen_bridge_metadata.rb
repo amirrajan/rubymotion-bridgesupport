@@ -55,7 +55,6 @@ def getcc(sdkroot = '/')
     return $_cc = 'cc'
 end
 
-require 'yaml'
 require 'rexml/document'
 require 'fileutils'
 require 'optparse'
@@ -873,20 +872,8 @@ class BridgeSupportGenerator
 	path = File.join(path, name)
 	deps = @dependencies[path]
 	if deps.nil?
-	    if File.exist?(path)
-		deps = `otool -L "#{path}"`.scan(/\t([^\s]+)/).map { |m|
-		    m[0]
-		}
-	    else
-		tbd = YAML.load_file(path + ".tbd")
-		deps = []
-		tbd["exports"].each do |arch|
-		    deps += arch["re-exports"].to_a
-		end
-		deps
-	    end
-
-	    deps = deps.flatten.map { |dpath|
+	    deps = `otool -L "#{path}"`.scan(/\t([^\s]+)/).map { |m|
+		dpath = m[0]
 		next if File.basename(dpath) == name
 		next if dpath.include?('PrivateFrameworks')
 		unless dpath.sub!(%r{\.framework/Versions/\w+/\w+$}, '') # OS X
@@ -895,7 +882,6 @@ class BridgeSupportGenerator
 		dpath.sub!('//', '/')
 		dpath + '.framework'
 	    }.compact
-
 	    @dependencies[path] = deps
 	end
 	deps
