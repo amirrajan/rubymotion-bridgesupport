@@ -24,3 +24,21 @@ You can install `cmake` and `subversion` with following command.
 ```
 $ brew install cmake subversion
 ```
+
+## Using the Metadata Generator
+
+The metadata generator, as known as gen_bridge_metadata, is documented in a manual page. After having installed the project in your system, you can display the documentation:
+
+```
+$ man gen_bridge_metadata
+```
+
+## About the BridgeSupport Format
+
+Likewise the generator, the BridgeSupport XML format is documented in a manual page.
+
+```
+$ man BridgeSupport
+```
+
+There is also a DTD file available, that should be installed as /System/Library/DTDs/BridgeSupport.dtd.
