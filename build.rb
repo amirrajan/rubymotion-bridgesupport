@@ -109,7 +109,7 @@ end
 # QuickTime - deprecated and 32-bit only
 # vecLib - clang-110 abort when objc type encoding of vector types
 
-ignore_list = %w{IOKit MacRuby QuickTime vecLib}
+ignore_list = %w{IOKit vecLib}
 ignore_list.each { |x| frameworks.delete(x) }
 
 also_gen_private_metadata = []
