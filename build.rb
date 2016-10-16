@@ -160,10 +160,10 @@ def run
     break if work.nil?
     StringIO.open do |sio|
       IO.popen( "ruby #{$0} - '#{work.join("' '")}' 2>&1", 'r' ) do |io|
-	begin
-	  io.each { |line| sio << line }
-	rescue Errno::EIO
-	end
+        begin
+          io.each { |line| sio << line }
+        rescue Errno::EIO
+        end
       end
       #check exit status
       raise "exit status=#{$?.exitstatus}" unless $?.success?
