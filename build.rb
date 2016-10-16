@@ -36,15 +36,15 @@ def work(fname, path, is_private, out_dir, out_file)
   gen.frameworks << path
   gen.emulate_ppc = false # PPC is not supported anymore since SnowLeopard
 
-  exceptions = "exceptions-#{RUBY_PLATFORM}/#{fname}.xml"
-  if File.exist?(exceptions)
-    gen.exception_paths << exceptions
-  else
-    exceptions = "exceptions/#{fname}.xml"
-    if File.exist?(exceptions)
-      gen.exception_paths << exceptions
-    end
-  end
+  # exceptions = "exceptions-#{RUBY_PLATFORM}/#{fname}.xml"
+  # if File.exist?(exceptions)
+  #   gen.exception_paths << exceptions
+  # else
+  #   exceptions = "exceptions/#{fname}.xml"
+  #   if File.exist?(exceptions)
+  #     gen.exception_paths << exceptions
+  #   end
+  # end
 
   a = SDK_VERSION.scan(/(\d+)\.(\d+)/)[0]
   major = a[0].to_i
