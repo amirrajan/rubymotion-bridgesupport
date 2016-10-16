@@ -13,6 +13,8 @@ SLPF = '/System/Library/PrivateFrameworks'
 STDOUT.sync = true
 WORKNARGS = 5
 
+dstroot = (ENV['DSTROOT'] or 'DSTROOT')
+
 def measure(something)
   elapsed = Time.now
   yield
@@ -125,7 +127,6 @@ end
 
 frameworks.delete_if { |fname, path| !ARGV.include?(fname) } unless ARGV.empty?
 
-dstroot = (ENV['DSTROOT'] or '')
 $workq = []
 
 frameworks.sort { |ary, ary2|
