@@ -181,7 +181,7 @@ def run
         end
       end
       #check exit status
-      raise "exit status=#{$?.exitstatus}" unless $?.success?
+      $stderr.puts "\e[1;31m" + "![ERROR] #{work[0]} exit status=#{$?.exitstatus}" + "\e[0m" unless $?.success?
       $stdoutmutex.synchronize { STDOUT.write(sio.string) }
     end
   end
