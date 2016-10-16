@@ -1,4 +1,5 @@
-require 'gen_bridge_metadata'
+$:.unshift("./DSTROOT/System/Library/BridgeSupport/ruby-2.0")
+require_relative 'gen_bridge_metadata'
 require 'pathname'
 require 'fileutils'
 require 'digest/sha1'
