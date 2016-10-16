@@ -16,6 +16,9 @@ WORKNARGS = 5
 
 dstroot = (ENV['DSTROOT'] or 'DSTROOT')
 
+HOST_VERSION = `/usr/bin/sw_vers -productVersion`.strip
+SDK_VERSION = HOST_VERSION.match(/(\d+\.\d+)/)[0]
+
 def measure(something)
   elapsed = Time.now
   yield
@@ -43,8 +46,18 @@ def work(fname, path, is_private, out_dir, out_file)
     end
   end
 
+  a = SDK_VERSION.scan(/(\d+)\.(\d+)/)[0]
+  major = a[0].to_i
+  minor = a[1].to_i
+  if major <= 10 && minor <= 9
+    sdk_version_headers = "#{major}#{minor}0"
+  else
+    sdk_version_headers = "#{major}#{minor}00"
+  end
+
   gen.private = true if is_private 
- 
+  gen.compiler_flags = "-I. -isysroot / -mmacosx-version-min=#{SDK_VERSION} -DTARGET_OS_MAC=1 -D__ENVIRONMENT_MAC_OS_X_VERSION_MIN_REQUIRED__=#{sdk_version_headers} -framework #{fname}"
+
   measure('Parse 32 and 64-bit') { gen.parse(true, true) }
   measure('Write final metadata') do
     mkdir_p(out_dir)
