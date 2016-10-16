@@ -194,7 +194,7 @@ LIBSYSTEM_EXCEPTION = $(shell plat=`ruby -e 'puts "exceptions-\#{RUBY_PLATFORM}/
 $(LIBSYSTEM_BRIDGESUPPORT):
 	@/bin/echo -n '*** Started Building .bridgesupport files: ' && date
 	# TODO : generate BridgeSupport files in each system library frameworks
-	# CFLAGS='$(RC_CFLAGS)' DSTROOT='$(DSTROOT)' RUBYLIB='$(RUBYLIB)' $(RUBY) build.rb
+	# DSTROOT='$(DSTROOT)' RUBYLIB='$(RUBYLIB)' $(RUBY) build.rb
 	RUBYLIB='$(RUBYLIB)' $(RUBY) gen_bridge_metadata.rb -c '-I/usr/include/CommonCrypto' -e $(LIBSYSTEM_EXCEPTION) -o $@ $(LIBSYSTEM_HEADERS)
 	$(INSTALL_DIRECTORY) $(SYSTEM_BRIDGESUPPORT)
 	$(LN) -fs `echo $(SYSTEM_BS) | sed 's,[^/]*,..,g'`/BridgeSupport/libSystem.bridgesupport $(SYSTEM_BRIDGESUPPORT)/System.bridgesupport
