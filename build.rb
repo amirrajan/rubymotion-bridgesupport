@@ -44,7 +44,7 @@ def work(fname, path, is_private, out_dir, out_file)
 
   gen.private = true if is_private 
  
-  measure('Parse 32 and 64-bit') { gen.parse(true) }
+  measure('Parse 32 and 64-bit') { gen.parse(true, true) }
   measure('Write final metadata') do
     mkdir_p(out_dir)
     gen.out_file = out_file
