@@ -126,14 +126,17 @@ if ARGV.include?('--update-exceptions')
     $stderr.puts "Updating #{exception}"
     gen = BridgeSupportGenerator.new
     gen.frameworks << path
-    gen.exception_paths = exception
+    gen.exception_paths << exception
     gen.generate_format = BridgeSupportGenerator::FORMAT_TEMPLATE
     gen.private = path.include?(SLPF)
     gen.out_file = out_file
-    gen.collect
-    gen.write
-    system("xmllint -format #{out_file} > #{exception}")
-    rm out_file
+    begin
+      gen.parse(true, true)
+      gen.write
+      system("xmllint -format #{out_file} > #{exception}")
+      rm out_file
+    rescue
+    end
   end
   $stderr.puts "Done."
   exit 0
