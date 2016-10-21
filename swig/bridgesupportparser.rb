@@ -1,4 +1,4 @@
-# -*- coding: utf-8 -*-
+# -*- coding: utf-8; mode: ruby; indent-tabs-mode: true; ruby-indent-level: 4; tab-width: 8 -*-
 require 'pathname'
 require 'rexml/document'
 require 'set'

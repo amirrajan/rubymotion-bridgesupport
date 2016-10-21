@@ -1,5 +1,5 @@
 #!/usr/bin/ruby
-# -*- coding: utf-8 -*-
+# -*- coding: utf-8; mode: ruby; indent-tabs-mode: true; ruby-indent-level: 4; tab-width: 8 -*-
 # Copyright (c) 2006-2012, Apple Inc. All rights reserved.
 # Copyright (c) 2005-2006 FUJIMOTO Hisakuni
 #
