@@ -13,7 +13,7 @@
 <!-- Structures. -->
 <!ELEMENT struct EMPTY>
 <!ATTLIST struct name CDATA #REQUIRED>
-<!ATTLIST struct type CDATA #REQUIRED>
+<!ATTLIST struct type CDATA #IMPLIED>
 <!ATTLIST struct type64 CDATA #IMPLIED>
 <!ATTLIST struct opaque %boolean; #IMPLIED>
 
@@ -26,7 +26,7 @@
 <!-- CFTypes. -->
 <!ELEMENT cftype EMPTY>
 <!ATTLIST cftype name CDATA #REQUIRED>
-<!ATTLIST cftype type CDATA #REQUIRED>
+<!ATTLIST cftype type CDATA #IMPLIED>
 <!ATTLIST cftype type64 CDATA #IMPLIED>
 <!ATTLIST cftype gettypeid_func CDATA #IMPLIED>
 <!ATTLIST cftype tollfree CDATA #IMPLIED>
@@ -34,7 +34,7 @@
 <!-- Constants. -->
 <!ELEMENT constant EMPTY>
 <!ATTLIST constant name CDATA #REQUIRED>
-<!ATTLIST constant type CDATA #REQUIRED>
+<!ATTLIST constant type CDATA #IMPLIED>
 <!ATTLIST constant type64 CDATA #IMPLIED>
 <!ATTLIST constant magic_cookie %boolean; #IMPLIED>
 
