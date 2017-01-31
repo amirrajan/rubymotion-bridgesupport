@@ -1556,7 +1556,7 @@ AnObjCMethod::info()
 VALUE
 AnObjCProtocol::info()
 {
-    return rb_str_new2(PD->getName().data());
+    return arrayOf2Strings(PD->getName().data(), std::string(PD->getObjCRuntimeNameAsString()).c_str());
 }
 
 void
