@@ -1233,7 +1233,8 @@ module Bridgesupportparser
 		    val.sub!(/"$/, '')
 		    @all_macrostrings[sname] = Bridgesupportparser::StringInfo.new(self, sname, val, objcstr)
 		when Bridgesupportparser::AnObjCCategory
-		    klass, cname = top.info
+		    klass, cname, runtime_name = top.info
+		    runtime_name = nil if runtime_name == cname
 		    #next unless validName(cname) # allow any name, including extensions
 		    #puts "*** adding category #{cname} for #{klass}" #DEBUG
 		    methods = Bridgesupportparser::MergingSet.new("category #{cname} for #{klass}")
@@ -1241,9 +1242,9 @@ module Bridgesupportparser
 		    protocols = Set.new
 		    top.each_protocol { |p| protocols.add(p) }
 		    if klass == 'NSObject'
-			@all_informal_protocols[cname] = Bridgesupportparser::ObjCCategoryInfo.new(self, cname, klass, methods, protocols)
+			@all_informal_protocols[cname] = Bridgesupportparser::ObjCCategoryInfo.new(self, cname, klass, methods, protocols, runtime_name)
 		    else
-			(@all_categories[klass] ||= Bridgesupportparser::MergingHash.new("category #{cname} for #{klass}"))[cname] = Bridgesupportparser::ObjCCategoryInfo.new(self, cname, klass, methods, protocols)
+			(@all_categories[klass] ||= Bridgesupportparser::MergingHash.new("category #{cname} for #{klass}"))[cname] = Bridgesupportparser::ObjCCategoryInfo.new(self, cname, klass, methods, protocols, runtime_name)
 		    end
 		when Bridgesupportparser::AnObjCInterface
 		    iname, runtime_name = top.info

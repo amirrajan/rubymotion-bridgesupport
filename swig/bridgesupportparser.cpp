@@ -1445,7 +1445,8 @@ AnObjCMethodProtocolIter::each_protocol()
 VALUE
 AnObjCCategory::info()
 {
-    return arrayOf2Strings(CD->getClassInterface()->getName().data(), CD->getName().data());
+    std::string runtime_name = std::string(CD->getClassInterface()->getObjCRuntimeNameAsString());
+    return arrayOf3Strings(CD->getClassInterface()->getName().data(), CD->getName().data(), runtime_name.c_str());
 }
 
 VALUE
