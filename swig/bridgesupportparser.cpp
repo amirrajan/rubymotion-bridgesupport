@@ -1451,7 +1451,7 @@ AnObjCCategory::info()
 VALUE
 AnObjCInterface::info()
 {
-    return rb_str_new2(ID->getName().data());
+    return arrayOf2Strings(ID->getName().data(), std::string(ID->getObjCRuntimeNameAsString()).c_str());
 }
 
 void

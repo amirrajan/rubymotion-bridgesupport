@@ -736,17 +736,18 @@ module Bridgesupportparser
     end
 
     class ObjCContainerInfo # abstract
-	attr_reader :methods, :name, :protocols
+	attr_reader :methods, :name, :protocols, :runtime_name
 
 	class << self
 	    attr_reader :element_name
 	end
 
-	def initialize(parser, name, methods, protocols)
+	def initialize(parser, name, methods, protocols, runtime_name=nil)
 	    @parser = parser
 	    @name = name
 	    @methods = methods
 	    @protocols = protocols
+	    @runtime_name = runtime_name
 	end
 
 	def concat(a)
@@ -776,6 +777,7 @@ module Bridgesupportparser
 	    return nil if methods.empty?
 	    e = REXML::Element.new(self.class.element_name)
 	    e.attributes['name'] = @name
+	    e.attributes['runtime_name'] = @runtime_name if @runtime_name
 	    methods.each { |m| e.add_element(m) }
 	    e
 	end
@@ -1244,7 +1246,8 @@ module Bridgesupportparser
 			(@all_categories[klass] ||= Bridgesupportparser::MergingHash.new("category #{cname} for #{klass}"))[cname] = Bridgesupportparser::ObjCCategoryInfo.new(self, cname, klass, methods, protocols)
 		    end
 		when Bridgesupportparser::AnObjCInterface
-		    iname = top.info
+		    iname, runtime_name = top.info
+		    runtime_name = nil if runtime_name == iname
 		    content, idx = splitName(iname)
 		    #puts "AnObjCInterface #{iname} content=#{content} idx=#{idx}" #DEBUG
 		    if content == CONTENTMETHOD
@@ -1261,7 +1264,7 @@ module Bridgesupportparser
 		    top.each_method { |m| methods << make_method(m) }
 		    protocols = Set.new
 		    top.each_protocol { |p| protocols.add(p) }
-		    @all_interfaces[iname] = Bridgesupportparser::ObjCInterfaceInfo.new(self, iname, methods, protocols)
+		    @all_interfaces[iname] = Bridgesupportparser::ObjCInterfaceInfo.new(self, iname, methods, protocols, runtime_name)
 		when Bridgesupportparser::AnObjCProtocol
 		    pname = top.info
 		    next unless validName(pname)
