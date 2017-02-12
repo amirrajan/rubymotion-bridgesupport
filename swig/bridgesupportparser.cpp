@@ -300,9 +300,11 @@ declAttributes(const Decl *D, VALUE rhash = Qnil)
 	  }
 	  case attr::NSReturnsNotRetained: {
 	    m["already_retained"] = "false";
+	    break;
 	  }
 	  case attr::NSReturnsAutoreleased: {
 	    m["already_retained"] = "false";
+	    break;
 	  }
 	}
     }
