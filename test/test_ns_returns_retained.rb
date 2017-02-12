@@ -18,6 +18,9 @@ class TestNSReturnsRetained < MiniTest::Unit::TestCase
 
     method3 = klass["method"][2]
     assert_equal(method3["retval"][0]["already_retained"], nil)
+
+    method4 = klass["method"][3]
+    assert_equal(method4["retval"][0]["already_retained"], "false")
   end
 
 end
