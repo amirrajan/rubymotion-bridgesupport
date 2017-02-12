@@ -1042,6 +1042,10 @@ module Bridgesupportparser
 
 	def make_method(m)
 	    sel, menc, rettype, retenc, retattrs, retfunc, mattrs, classmeth, variadic = m.info
+	    if mattrs
+		retattrs ||= {}
+		retattrs[:already_retained] = mattrs.delete(:already_retained)
+	    end
 	    ret = Bridgesupportparser::ObjCRetvalInfo.new(self, nil, rettype, retenc, retattrs, recursivefuncptr(retfunc))
 	    args = Bridgesupportparser::MergingSequence.new("#{sel}.args")
 	    m.each_argument do |name, type, enc, mod, attrs, funcptr|
