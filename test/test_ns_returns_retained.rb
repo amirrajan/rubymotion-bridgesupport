@@ -7,7 +7,7 @@ class TestNSReturnsRetained < MiniTest::Unit::TestCase
     @bs = gen_bridge_metadata("ns_returns_retained.h")
   end
 
-  def test_returns_retained
+  def test_objc_methods
     klass = @bs["class"].first
 
     method1 = klass["method"][0]
@@ -21,6 +21,11 @@ class TestNSReturnsRetained < MiniTest::Unit::TestCase
 
     method4 = klass["method"][3]
     assert_equal(method4["retval"][0]["already_retained"], "false")
+  end
+
+  def test_functions
+    func = @bs["function"][0]
+    assert_equal(func["retval"][0]["already_retained"], "true")
   end
 
 end

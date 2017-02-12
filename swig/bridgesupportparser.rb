@@ -1031,6 +1031,10 @@ module Bridgesupportparser
 	def recursivefunc(f)
 	    return nil if f.nil?
 	    func, rettype, retenc, retattrs, retfunc, fattrs, variadic, inline = f.info
+	    if fattrs
+		retattrs ||= {}
+		retattrs[:already_retained] = fattrs.delete(:already_retained)
+	    end
 	    #puts "#{func} #{rettype} #{retenc} retattrs=#{retattrs.inspect} fattrs=#{fattrs.inspect} retfunc=#{!retfunc.nil?} variadic=#{variadic} inline=#{inline}" #DEBUG
 	    ret = Bridgesupportparser::RetvalInfo.new(self, nil, rettype, retenc, retattrs, recursivefuncptr(retfunc))
 	    args = Bridgesupportparser::MergingSequence.new('recursivefunc')
