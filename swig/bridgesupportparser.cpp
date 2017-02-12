@@ -294,6 +294,13 @@ declAttributes(const Decl *D, VALUE rhash = Qnil)
 	    m["sentinel"] = buf;
 	    break;
 	  }
+	  case attr::NSReturnsRetained: {
+	    m["already_retained"] = "true";
+	    break;
+	  }
+	  case attr::NSReturnsNotRetained: {
+	    m["already_retained"] = "false";
+	  }
 	}
     }
     if(m.empty()) return rhash;
