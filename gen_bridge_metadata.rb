@@ -618,7 +618,7 @@ class BridgeSupportGenerator
 	end
 
 	target_triple = "#{arch}-apple-darwin#{args.darwinvers}"
-	if m = compiler_flags.match(/\-m(.+)-version-min=([\d.]+)/)
+	if m = compiler_flags.match(/-m(.+)-version-min=([\d\.]+)/)
 	    platform = m[1]
 	    version = m[2]
 	    case platform
