@@ -622,7 +622,7 @@ class BridgeSupportGenerator
 	    platform = m[1]
 	    version = m[2]
 	    case platform
-	    when 'ios', 'ios-simulator', 'iphone'
+	    when 'ios', 'ios-simulator', 'iphoneos'
 		target_triple = "#{arch}-apple-ios#{version}"
 	    when 'macosx'
 		target_triple = "#{arch}-apple-macosx#{version}"
