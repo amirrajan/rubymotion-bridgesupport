@@ -616,9 +616,24 @@ class BridgeSupportGenerator
 	when FORMAT_DYLIB
 	    parser.only_parse_class(Bridgesupportparser::AFunction)
 	end
-	$stderr.puts "### _parse(\"#{arch}-apple-darwin#{args.darwinvers}\")" if $DEBUG
-	parser.parse("#{arch}-apple-darwin#{args.darwinvers}")
 
+	target_triple = "#{arch}-apple-darwin#{args.darwinvers}"
+	if m = compiler_flags.match(/\-m(.+)-version-min=([\d.]+)/)
+	    platform = m[1]
+	    version = m[2]
+	    case platform
+	    when 'ios', 'ios-simulator', 'iphone'
+		target_triple = "#{arch}-apple-ios#{version}"
+	    when 'macosx'
+		target_triple = "#{arch}-apple-macosx#{version}"
+	    when 'tvos', 'tvos-simulator'
+		target_triple = "#{arch}-apple-tvos#{version}"
+	    when 'watchos', 'watchos-simulator'
+		target_triple = "#{arch}-apple-watchos#{version}"
+	    end
+	end
+	$stderr.puts "### _parse(\"#{target_triple}\")" if $DEBUG
+	parser.parse("#{target_triple}")
 	@sel_types = {}
 	@all_sel_types.each_index do |i|
 	    t = parser.special_method_encodings[i]
