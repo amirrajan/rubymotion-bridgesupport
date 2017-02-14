@@ -320,6 +320,8 @@ declAttributes(const Decl *D, VALUE rhash = Qnil)
 static bool
 isDeclUnavailable(const Decl *decl)
 {
+    if(decl->isUnavailable()) return true;
+
     const AttrVec Attrs = decl->getAttrs();
     for (AttrVec::const_iterator i = Attrs.begin(), e = Attrs.end(); i != e; ++i){
 	const Attr *attr = *i;
