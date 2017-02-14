@@ -254,9 +254,11 @@ The name of the original C function the alias points to.
 This element defines an Objective-C class. Only classes where additional metadata is needed are described.
 .Pp
 Mandatory attributes:
-.Bl -tag -width "name"
+.Bl -tag -width "name, runtime_name"
 .It Ar name
 The name of the Objective-C class.
+.It Ar runtime_name
+The runtime name specifies the object’s metadata name instead of the default name.
 .El
 .Pp
 Possible children:
@@ -266,9 +268,11 @@ Possible children:
 This element defines an Objective-C informal protocol.
 .Pp
 Mandatory attributes:
-.Bl -tag -width "name"
+.Bl -tag -width "name, runtime_name"
 .It Ar name
 The name of the Objective-C informal protocol.
+.It Ar runtime_name
+The runtime name specifies the object’s metadata name instead of the default name.
 .El
 .Pp
 Possible children:
