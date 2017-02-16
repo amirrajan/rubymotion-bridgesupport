@@ -24,7 +24,6 @@ private:
 
     clang::CompilerInstance compiler;
     clang::FieldDecl* dummyFD;
-    bool verbose;
 
     friend class AnEnum;
     friend class AFunctionDecl;

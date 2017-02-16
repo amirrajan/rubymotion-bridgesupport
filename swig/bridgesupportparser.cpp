@@ -580,7 +580,7 @@ public:
 	Preprocessor::macro_iterator M = pp.macro_begin(false), ME = pp.macro_end(false);
 	if(M == ME) return;
 
-	for (int i = 0; M != ME; M++) {
+	for (; M != ME; M++) {
 	    const IdentifierInfo *I = M->first;
 	    auto MD = pp.getMacroDefinition(M->first);
 	    const MacroInfo *V = MD.getMacroInfo();
@@ -861,7 +861,6 @@ void BridgeSupportParser::setLanguageOptions(LangOptions *opt)
 }
 
 BridgeSupportParser::BridgeSupportParser(const char **headers, const std::string& triple, const char **defines, const char **incdirs, const std::string& sysroot, bool verbose)
-	:  verbose(verbose)
 {
     struct rlimit rl;
     rl.rlim_max = 10000;
