@@ -87,7 +87,7 @@ public:
     virtual VALUE info();
 protected:
     AFunctionDecl(BridgeSupportParser *bsp, const char *path, const clang::FunctionDecl* fd) : AFunction(bsp, path), FD(fd) {}
-    ~AFunctionDecl() {}
+    virtual ~AFunctionDecl() {}
 
     const clang::FunctionDecl* FD;
     friend class MyPass1Consumer;
@@ -100,7 +100,7 @@ public:
     virtual VALUE info();
 protected:
     AFunctionType(BridgeSupportParser *bsp, const char *path, const clang::FunctionType* ft) : AFunction(bsp, path), FT(ft) {}
-    ~AFunctionType() {}
+    virtual ~AFunctionType() {}
 
     const clang::FunctionType* FT;
     friend class AFunctionDecl;
@@ -123,7 +123,7 @@ public:
     virtual VALUE info();
 protected:
     AMacroValueBase(const char *path, const char *name, const char *value) : AMacroBase(path, name), Value(value) {}
-    ~AMacroValueBase() {}
+    virtual ~AMacroValueBase() {}
 
     const char *Value;
 };
@@ -131,7 +131,7 @@ protected:
 class AMacroFunctionAlias : public AMacroValueBase {
 protected:
     AMacroFunctionAlias(const char *path, const char *name, const char *value) : AMacroValueBase(path, name, value) {}
-    ~AMacroFunctionAlias() {}
+    virtual ~AMacroFunctionAlias() {}
 
     friend class MyPass1Consumer;
     friend class MyPass2Consumer;
@@ -140,7 +140,7 @@ protected:
 class AMacroNumber : public AMacroValueBase {
 protected:
     AMacroNumber(const char *path, const char *name, const char *value) : AMacroValueBase(path, name, value) {}
-    ~AMacroNumber() {}
+    virtual ~AMacroNumber() {}
 
     friend class MyPass1Consumer;
     friend class MyPass2Consumer;
@@ -151,7 +151,7 @@ public:
     virtual VALUE info();
 protected:
     AMacroNumberFuncCall(const char *path, const char *name) : AMacroBase(path, name) {}
-    ~AMacroNumberFuncCall() {}
+    virtual ~AMacroNumberFuncCall() {}
 
     friend class MyPass1Consumer;
     friend class MyPass2Consumer;
@@ -162,7 +162,7 @@ public:
     virtual VALUE info();
 protected:
     AMacroString(const char *path, const char *name, const char *value, bool objcstring) : AMacroValueBase(path, name, value), ObjCString(objcstring) {}
-    ~AMacroString() {}
+    virtual ~AMacroString() {}
 
     bool ObjCString;
     friend class MyPass1Consumer;
@@ -175,7 +175,7 @@ public:
     virtual void each_protocol();
 protected:
     AnObjCMethodProtocolIter(BridgeSupportParser *bsp, const char *path) : TopLevel(bsp, path) {}
-    ~AnObjCMethodProtocolIter() {}
+    virtual ~AnObjCMethodProtocolIter() {}
 #ifndef SWIG
     virtual clang::ObjCContainerDecl::method_iterator meth_begin() = 0;
     virtual clang::ObjCContainerDecl::method_iterator meth_end() = 0;
@@ -189,7 +189,7 @@ public:
     virtual VALUE info();
 protected:
     AnObjCCategory(BridgeSupportParser *bsp, const char *path, const clang::ObjCCategoryDecl* cd) : AnObjCMethodProtocolIter(bsp, path), CD(cd) {}
-    ~AnObjCCategory() {}
+    virtual ~AnObjCCategory() {}
 #ifndef SWIG
     virtual clang::ObjCContainerDecl::method_iterator meth_begin() {return CD->meth_begin();}
     virtual clang::ObjCContainerDecl::method_iterator meth_end() {return CD->meth_end();}
@@ -207,7 +207,7 @@ public:
     virtual VALUE info();
 protected:
     AnObjCInterface(BridgeSupportParser *bsp, const char *path, const clang::ObjCInterfaceDecl* id) : AnObjCMethodProtocolIter(bsp, path), ID(id) {}
-    ~AnObjCInterface() {}
+    virtual ~AnObjCInterface() {}
 #ifndef SWIG
     virtual clang::ObjCContainerDecl::method_iterator meth_begin() {return ID->meth_begin();}
     virtual clang::ObjCContainerDecl::method_iterator meth_end() {return ID->meth_end();}
@@ -226,7 +226,7 @@ public:
     virtual VALUE info();
 protected:
     AnObjCMethod(BridgeSupportParser *bsp, const clang::ObjCMethodDecl* md) : TopLevel(bsp, NULL/*unused*/), MD(md) {}
-    ~AnObjCMethod() {}
+    virtual ~AnObjCMethod() {}
 
     const clang::ObjCMethodDecl* MD;
     friend class AnObjCMethodProtocolIter;
@@ -237,7 +237,7 @@ public:
     virtual VALUE info();
 protected:
     AnObjCProtocol(BridgeSupportParser *bsp, const char *path, const clang::ObjCProtocolDecl* pd) : AnObjCMethodProtocolIter(bsp, path), PD(pd) {}
-    ~AnObjCProtocol() {}
+    virtual ~AnObjCProtocol() {}
 #ifndef SWIG
     virtual clang::ObjCContainerDecl::method_iterator meth_begin() {return PD->meth_begin();}
     virtual clang::ObjCContainerDecl::method_iterator meth_end() {return PD->meth_end();}
@@ -256,7 +256,7 @@ public:
     virtual VALUE info();
 protected:
     AStruct(BridgeSupportParser *bsp, const char *path, const clang::RecordDecl* rd) : TopLevel(bsp, path), RD(rd) {}
-    ~AStruct() {}
+    virtual ~AStruct() {}
 
     const clang::RecordDecl* RD;
     friend class ATypedef;
@@ -271,7 +271,7 @@ public:
     virtual void walk_types();
 protected:
     ATypedef(BridgeSupportParser *bsp, const char *path, const clang::TypedefDecl* td) : TopLevel(bsp, path), TD(td) {}
-    ~ATypedef() {}
+    virtual ~ATypedef() {}
 
     const clang::TypedefDecl* TD;
     friend class MyPass1Consumer;
@@ -283,7 +283,7 @@ public:
     virtual VALUE info();
 protected:
     AVar(BridgeSupportParser *bsp, const char *path, const clang::VarDecl* vd) : TopLevel(bsp, path), VD(vd) {}
-    ~AVar() {}
+    virtual ~AVar() {}
 
     const clang::VarDecl* VD;
     friend class MyPass1Consumer;
