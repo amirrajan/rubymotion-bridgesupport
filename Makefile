@@ -251,3 +251,13 @@ update_exceptions:
 
 sort_exceptions:
 	for i in `ls exceptions/*.xml`; do $(RUBY) sort.rb $$i | xmllint -format - > $$i.new; mv $$i.new $$i; done
+
+# recompile C++ in swig dir & rebuild DSTROOT
+rebuild:
+	rm -rf $(BS_INCLUDE_MADE)
+	rm -rf $(BS_RUBY_MADE)
+	rm -rf $(DSTROOT_MADE)
+	rm -rf $(SYMROOT_MADE)
+	rm -rf $(SWIG_DIR)
+	make
+
