@@ -633,7 +633,7 @@ class BridgeSupportGenerator
 	    end
 	end
 	$stderr.puts "### _parse(\"#{target_triple}\")" if $DEBUG
-	parser.parse("#{target_triple}")
+	parser.parse(target_triple)
 	@sel_types = {}
 	@all_sel_types.each_index do |i|
 	    t = parser.special_method_encodings[i]
