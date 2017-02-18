@@ -726,9 +726,10 @@ public:
 
 			llvm::StringRef name(ND->getName().substr(sizeof(MACROPREFIX) - 1));
 			IdentifierInfo *II = BSP->compiler.getPreprocessor().getIdentifierInfo(name);
-			if(!II) rb_raise(rb_eRuntimeError, "Can't lookup identifier %s", name.data());
+			std::string name_string = name.str();
+			if(!II) rb_raise(rb_eRuntimeError, "Can't lookup identifier %s", name_string.c_str());
 			const MacroInfo *M = BSP->compiler.getPreprocessor().getMacroInfo(II);
-			if(!M) rb_raise(rb_eRuntimeError, "Can't find macro info for %s", name.data());
+			if(!M) rb_raise(rb_eRuntimeError, "Can't find macro info for %s", name_string.c_str());
 			SourceLocation sl = M->getDefinitionLoc();
 			if(!sl.isValid() || !sl.isFileID()) continue;
 			path = locgetpath(&BSP->compiler.getSourceManager(), sl);
@@ -745,14 +746,14 @@ public:
 			    && spellN(0).compare("CFSTR") == 0
 			    && tokNIs(1, tok::l_paren)
 			    && tokNIs(len - 1, tok::r_paren)) {
-				AMacroString s(path, name.data(), expr.str.c_str(), true);
+				AMacroString s(path, name_string.c_str(), expr.str.c_str(), true);
 				rb_yield(Data_Wrap_Struct(klass_AMacroString, 0, 0, &s));
 			    }
 			    //llvm::errs() << "ExprCallCFSTR: " << name << " start=" << start << " len=" << len << " found=" << found << " str=" << str << "\n";
 			    break;
 			}
 			case ExprCallNumber: {
-			    AMacroNumberFuncCall n(path, name.data());
+			    AMacroNumberFuncCall n(path, name_string.c_str());
 			    rb_yield(Data_Wrap_Struct(klass_AMacroNumberFuncCall, 0, 0, &n));
 			    break;
 			}
@@ -786,36 +787,36 @@ public:
 				    str = str.substr(0, i);
 #endif
 				//llvm::errs() << name << ": (float)" << str << "\n";
-				AMacroNumber n(path, name.data(), str.c_str());
+				AMacroNumber n(path, name_string.c_str(), str.c_str());
 				rb_yield(Data_Wrap_Struct(klass_AMacroNumber, 0, 0, &n));
 				continue;
 			    }
 			    //llvm::errs() << name << ": (float)" << expr.str << "\n";
-			    AMacroNumber n(path, name.data(), expr.str.c_str());
+			    AMacroNumber n(path, name_string.c_str(), expr.str.c_str());
 			    rb_yield(Data_Wrap_Struct(klass_AMacroNumber, 0, 0, &n));
 			    break;
 			}
 			case ExprFuncAlias: {
 			    //llvm::errs() << name << ": (funcalias)" << expr.str << "\n";
-			    AMacroFunctionAlias f(path, name.data(), expr.str.c_str());
+			    AMacroFunctionAlias f(path, name_string.c_str(), expr.str.c_str());
 			    rb_yield(Data_Wrap_Struct(klass_AMacroFunctionAlias, 0, 0, &f));
 			    break;
 			}
 			case ExprInt: {
 			    //llvm::errs() << name << ": (int)" << expr.str << "\n";
-			    AMacroNumber n(path, name.data(), expr.str.c_str());
+			    AMacroNumber n(path, name_string.c_str(), expr.str.c_str());
 			    rb_yield(Data_Wrap_Struct(klass_AMacroNumber, 0, 0, &n));
 			    break;
 			}
 			case ExprObjCString: {
 			    //llvm::errs() << name << ": (objcstring)" << expr.str << "\n";
-			    AMacroString s(path, name.data(), expr.str.c_str(), true);
+			    AMacroString s(path, name_string.c_str(), expr.str.c_str(), true);
 			    rb_yield(Data_Wrap_Struct(klass_AMacroString, 0, 0, &s));
 			    break;
 			}
 			case ExprString: {
 			    //llvm::errs() << name << ": (string)" << expr.str << "\n";
-			    AMacroString s(path, name.data(), expr.str.c_str(), false);
+			    AMacroString s(path, name_string.c_str(), expr.str.c_str(), false);
 			    rb_yield(Data_Wrap_Struct(klass_AMacroString, 0, 0, &s));
 			    break;
 			}
@@ -1249,14 +1250,14 @@ void
 AnEnum::each_value()
 {
     for(EnumDecl::enumerator_iterator E = ED->enumerator_begin(), EE = ED->enumerator_end(); E != EE; E++) {
-	rb_yield(arrayOf2Strings((*E)->getName().data(), (*E)->getInitVal().toString(10).c_str()));
+	rb_yield(arrayOf2Strings((*E)->getNameAsString().c_str(), (*E)->getInitVal().toString(10).c_str()));
     }
 }
 
 VALUE
 AnEnum::info()
 {
-    return rb_str_new2(ED->getName().data());
+    return rb_str_new2(ED->getNameAsString().c_str());
 }
 
 void
@@ -1276,7 +1277,7 @@ AFunctionDecl::each_argument()
 	if((*P)->getType()->isFunctionPointerType() || (*P)->getType()->isBlockPointerType()) {
 	    AFunctionType f(BSP, Path, (*P)->getType()->getPointeeType()->getAs<FunctionType>());
 	    rb_yield(arrayOf3Strings2VALUEs(
-		(*P)->getName().data(),
+		(*P)->getNameAsString().c_str(),
 		(*P)->getType().getAsString().c_str(),
 		enc.c_str(),
 		typedefAttributes(
@@ -1287,7 +1288,7 @@ AFunctionDecl::each_argument()
 	    ));
 	} else {
 	    rb_yield(arrayOf3Strings2VALUEs(
-		(*P)->getName().data(),
+		(*P)->getNameAsString().c_str(),
 		(*P)->getType().getAsString().c_str(),
 		enc.c_str(),
 		typedefAttributes(
@@ -1310,7 +1311,7 @@ AFunctionDecl::info()
     if(rettype->isFunctionPointerType() || rettype->isBlockPointerType()) {
 	AFunctionType *f = new AFunctionType(BSP, Path, rettype->getPointeeType()->getAs<FunctionType>());
 	return arrayOf3Strings3VALUEs2Bools(
-	    FD->getName().data(),
+	    FD->getNameAsString().c_str(),
 	    FD->getReturnType().getAsString().c_str(),
 	    retenc.c_str(),
 	    typedefAttributes(rettype.getTypePtr()),
@@ -1321,7 +1322,7 @@ AFunctionDecl::info()
 	);
     } else {
 	return arrayOf3Strings3VALUEs2Bools(
-	    FD->getName().data(),
+	    FD->getNameAsString().c_str(),
 	    FD->getReturnType().getAsString().c_str(),
 	    retenc.c_str(),
 	    typedefAttributes(rettype.getTypePtr()),
@@ -1451,7 +1452,7 @@ void
 AnObjCMethodProtocolIter::each_protocol()
 {
     for(ObjCInterfaceDecl::protocol_iterator P = this->protocol_begin(), PE = this->protocol_end(); P != PE; P++) {
-	rb_yield(rb_str_new2((*P)->getName().data()));
+	rb_yield(rb_str_new2((*P)->getNameAsString().c_str()));
     }
 }
 
@@ -1459,13 +1460,13 @@ VALUE
 AnObjCCategory::info()
 {
     std::string runtime_name = std::string(CD->getClassInterface()->getObjCRuntimeNameAsString());
-    return arrayOf3Strings(CD->getClassInterface()->getName().data(), CD->getName().data(), runtime_name.c_str());
+    return arrayOf3Strings(CD->getClassInterface()->getNameAsString().c_str(), CD->getNameAsString().c_str(), runtime_name.c_str());
 }
 
 VALUE
 AnObjCInterface::info()
 {
-    return arrayOf2Strings(ID->getName().data(), std::string(ID->getObjCRuntimeNameAsString()).c_str());
+    return arrayOf2Strings(ID->getNameAsString().c_str(), std::string(ID->getObjCRuntimeNameAsString()).c_str());
 }
 
 void
@@ -1505,7 +1506,7 @@ AnObjCMethod::each_argument()
 	if((*P)->getType()->isFunctionPointerType() || (*P)->getType()->isBlockPointerType()) {
 	    AFunctionType f(BSP, Path, (*P)->getType()->getPointeeType()->getAs<FunctionType>());
 	    rb_yield(arrayOf4Strings2VALUEs(
-		(*P)->getName().data(),
+		(*P)->getNameAsString().c_str(),
 		type.c_str(),
 		enc.c_str(),
 		type_modifier,
@@ -1517,7 +1518,7 @@ AnObjCMethod::each_argument()
 	    ));
 	} else {
 	    rb_yield(arrayOf4Strings2VALUEs(
-		(*P)->getName().data(),
+		(*P)->getNameAsString().c_str(),
 		type.c_str(),
 		enc.c_str(),
 		type_modifier,
@@ -1570,7 +1571,7 @@ AnObjCMethod::info()
 VALUE
 AnObjCProtocol::info()
 {
-    return arrayOf2Strings(PD->getName().data(), std::string(PD->getObjCRuntimeNameAsString()).c_str());
+    return arrayOf2Strings(PD->getNameAsString().c_str(), std::string(PD->getObjCRuntimeNameAsString()).c_str());
 }
 
 void
@@ -1584,7 +1585,7 @@ AStruct::each_field()
 	if(type->isFunctionPointerType() || type->isBlockPointerType()) {
 	    AFunctionType f(BSP, Path, type->getPointeeType()->getAs<FunctionType>());
 	    rb_yield(arrayOf3Strings2VALUEs(
-		(*F)->getName().data(),
+		(*F)->getNameAsString().c_str(),
 		type.getAsString().c_str(),
 		enc.c_str(),
 		typedefAttributes(
@@ -1595,7 +1596,7 @@ AStruct::each_field()
 	    ));
 	} else {
 	    rb_yield(arrayOf3Strings2VALUEs(
-		(*F)->getName().data(),
+		(*F)->getNameAsString().c_str(),
 		type.getAsString().c_str(),
 		enc.c_str(),
 		typedefAttributes(
@@ -1613,7 +1614,7 @@ AStruct::info()
 {
     std::string enc;
     BSP->getObjCEncodingForType(RD->getTypeForDecl()->getCanonicalTypeInternal(), enc, BSP->dummyFD);
-    return arrayOf2Strings(RD->getName().data(), enc.c_str());
+    return arrayOf2Strings(RD->getNameAsString().c_str(), enc.c_str());
 }
 
 VALUE
@@ -1627,7 +1628,7 @@ ATypedef::encoding()
 VALUE
 ATypedef::info()
 {
-    return arrayOf2Strings1VALUE(TD->getName().data(), TD->getUnderlyingType().getAsString().c_str(), declAttributes(TD));
+    return arrayOf2Strings1VALUE(TD->getNameAsString().c_str(), TD->getUnderlyingType().getAsString().c_str(), declAttributes(TD));
 }
 
 void
@@ -1660,7 +1661,7 @@ redo:
 	      case TypeLoc::Record: {
 		RecordTypeLoc *rl = static_cast<RecordTypeLoc *>(&tl);
 		RecordDecl *R = rl->getDecl();
-		name = R->getName().data();
+		name = R->getNameAsString().c_str();
 		if(!R->isStruct()) {
 		    /*
 		     * No need to test for R->isEnum(), since there is a
@@ -1682,7 +1683,7 @@ redo:
 		TypedefTypeLoc *td = static_cast<TypedefTypeLoc *>(&tl);
 		TypedefNameDecl *T = td->getTypedefNameDecl();
 		NamedDecl *ND = static_cast<NamedDecl *>(T);
-		rb_yield(arrayOf2Strings2VALUEs(ND->getName().data(), type, Qnil, declAttributes(ND)));
+		rb_yield(arrayOf2Strings2VALUEs(ND->getNameAsString().c_str(), type, Qnil, declAttributes(ND)));
 		tsi = T->getTypeSourceInfo();
 		goto again;
 	      }
@@ -1702,7 +1703,7 @@ AVar::info()
     if(type->isFunctionPointerType() || type->isBlockPointerType()) {
 	AFunctionType *f = new AFunctionType(BSP, Path, type->getPointeeType()->getAs<FunctionType>());
 	return arrayOf3Strings2VALUEs(
-	    VD->getName().data(),
+	    VD->getNameAsString().c_str(),
 	    type.getAsString().c_str(),
 	    enc.c_str(),
 	    typedefAttributes(
@@ -1713,7 +1714,7 @@ AVar::info()
 	);
     } else {
 	return arrayOf3Strings2VALUEs(
-	    VD->getName().data(),
+	    VD->getNameAsString().c_str(),
 	    type.getAsString().c_str(),
 	    enc.c_str(),
 	    typedefAttributes(
