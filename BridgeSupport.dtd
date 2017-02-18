@@ -98,12 +98,12 @@
 <!-- Informal protocols. -->
 <!ELEMENT informal_protocol (method*)>
 <!ATTLIST informal_protocol name CDATA #REQUIRED>
-<!ATTLIST informal_protocol runtime_name CDATA #REQUIRED>
+<!ATTLIST informal_protocol runtime_name CDATA #IMPLIED>
 
 <!-- Classes. -->
 <!ELEMENT class (method*)>
 <!ATTLIST class name CDATA #REQUIRED>
-<!ATTLIST class runtime_name CDATA #REQUIRED>
+<!ATTLIST class runtime_name CDATA #IMPLIED>
 
 <!-- Methods. -->
 <!ELEMENT method (arg*,retval?)>
