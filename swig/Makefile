@@ -69,7 +69,7 @@ INCFLAGS = -I. -I$(topdir) -I$(hdrdir) -I$(confdir) -I$(srcdir)
 DEFS     = 
 CPPFLAGS =  $(shell $(LLVM-CONFIG) --cppflags | sed 's/ *-arch [^ ]*//g')
 
-CXXFLAGS = $(CFLAGS) -Wno-non-virtual-dtor -Wno-switch
+CXXFLAGS = $(CFLAGS) -Wno-switch
 ldflags  = $(RC_CFLAGS) -mmacosx-version-min=10.9 $(shell $(LLVM-CONFIG) --ldflags | sed 's/ *-arch [^ ]*//g')
 
 dldflags = 

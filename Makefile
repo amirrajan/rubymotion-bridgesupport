@@ -102,7 +102,7 @@ $(CLANG_DIR_MADE): $(OBJROOT_MADE)
 	cd $(OBJROOT) && svn co http://llvm.org/svn/llvm-project/llvm/$(CLANG_BRANCH) $(CLANG_VERS)
 	cd $(CLANG_DIR)/tools && svn co http://llvm.org/svn/llvm-project/cfe/$(CLANG_BRANCH) clang
 	cd $(CLANG_DIR)/projects && svn co http://llvm.org/svn/llvm-project/compiler-rt/$(CLANG_BRANCH) compiler-rt
-	cd $(CLANG_DIR)/tools/clang && patch -p1 < $(SRCROOT)/clang.patch
+	cd $(CLANG_DIR)/tools/clang && patch -p0 < $(SRCROOT)/clang.patch
 	cd $(SRCROOT)
 	$(TOUCH) $@
 
