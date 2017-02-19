@@ -2,11 +2,13 @@
 
 #define TestStringConstant "foo"
 
-class FooBarBaz {
-    FooBarBaz();
-    ~FooBarBaz();
+namespace TestNameSpace {
+    class FooBarBaz {
+        FooBarBaz();
+        ~FooBarBaz();
 
-  private:
-    int age;
-    std::string name;
+      private:
+        int age;
+        std::string name;
+    };
 }
