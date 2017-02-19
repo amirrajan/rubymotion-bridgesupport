@@ -1131,6 +1131,14 @@ BridgeSupportParser::pass2(const char **headers, const char *content, const std:
     BridgeSupportParser bs(headers, triple, defines, incdirs, sysroot, verbose);
     std::string src;
     if(content) src.append(content);
+
+    // FIXME: RM-477
+    // If C++ metadata would be parsed, next declaration will be dropped in somewhere in parsing AST.
+    // So, if C++ metadata would be parsed at end of header files, it will drop CONTENTEND declaration,
+    // then it will raise an exception because CONTENTEND can't be found.
+    // In order to avoid dropping CONTENTEND declaration, we have to add dummy line in here.
+    src.append(";\n");
+
     src.append("@interface " CONTENTEND "\n@end\n");
     src.append(*macros);
     //llvm::errs() << "-----------\n" << src << "-----------\n"; //DEBUG
