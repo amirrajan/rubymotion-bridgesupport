@@ -887,17 +887,22 @@ class BridgeSupportGenerator
 	path = File.join(path, name)
 	deps = @dependencies[path]
 	if deps.nil?
-	    deps = `otool -L "#{path}"`.scan(/\t([^\s]+)/).map { |m|
-		dpath = m[0]
-		next if File.basename(dpath) == name
-		next if dpath.include?('PrivateFrameworks')
-		unless dpath.sub!(%r{\.framework/Versions/\w+/\w+$}, '') # OS X
-		    next unless dpath.sub!(%r{\.framework/\w+$}, '') # iOS
-		end
-		dpath.sub!('//', '/')
-		dpath + '.framework'
-	    }.compact
-	    @dependencies[path] = deps
+	    if File.exist?(path)
+		deps = `otool -L "#{path}"`.scan(/\t([^\s]+)/).map { |m|
+		    dpath = m[0]
+		    next if File.basename(dpath) == name
+		    next if dpath.include?('PrivateFrameworks')
+		    unless dpath.sub!(%r{\.framework/Versions/\w+/\w+$}, '') # OS X
+			next unless dpath.sub!(%r{\.framework/\w+$}, '') # iOS
+		    end
+		    dpath.sub!('//', '/')
+		    dpath + '.framework'
+		}.compact
+		@dependencies[path] = deps
+	    elsif File.exist?(path + ".tbd")
+		# FIXME
+		# ".tbd" files does not contains correct framework dependencies.
+	    end
 	end
 	deps
     end
@@ -972,16 +977,27 @@ class BridgeSupportGenerator
 	    no_64 = false
 	    framework_paths.each do |fp|
 		p = File.join(fp, File.basename(fp, '.framework'))
-		lipo = `lipo -info "#{p}"`
-		raise "Couldn't determine architectures in #{p}" unless $?.exited? and $?.exitstatus == 0
-		lipo.chomp!
-		lipo.sub!(/^.*: /, '')
-		have32 = have64 = false
-		lipo.split.each do |arch|
-		    if /64$/ =~ arch
-			have64 = true
-		    else
-			have32 = true
+		if File.exist?(p)
+		    lipo = `lipo -info "#{p}"`
+		    raise "Couldn't determine architectures in #{p}" unless $?.exited? and $?.exitstatus == 0
+		    lipo.chomp!
+		    lipo.sub!(/^.*: /, '')
+		    have32 = have64 = false
+		    lipo.split.each do |arch|
+			if /64$/ =~ arch
+			    have64 = true
+			else
+			    have32 = true
+			end
+		    end
+		elsif File.exist?(p + ".tbd")
+		    require 'yaml'
+		    yml = YAML.load(File.read(p + ".tbd"))
+		    yml['exports'].each do |items|
+			items['archs'].each do |arch|
+			    have64 = true if arch.include?('x86_64')
+			    have32 = true if arch.include?('i386')
+			end
 		    end
 		end
 		no_32 = true unless have32
