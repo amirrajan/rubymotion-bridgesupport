@@ -4,19 +4,11 @@ SHELL = /bin/sh
 
 #### Start of system configuration section. ####
 
-ifneq ("$(wildcard /System/Library/Frameworks/Ruby.framework/Versions/2.0)","")
-	ruby_version     = 2.0
-	ruby_abi_version = 2.0.0
-	topdir  = $(shell echo /System/Library/Frameworks/Ruby.framework/Versions/$(ruby_version)/usr/lib/ruby/$(ruby_abi_version)/universal-darwin*)
-	hdrdir  = $(shell echo /System/Library/Frameworks/Ruby.framework/Versions/$(ruby_version)/usr/include/ruby-$(ruby_abi_version))
-	confdir = $(shell echo /System/Library/Frameworks/Ruby.framework/Versions/$(ruby_version)/usr/include/ruby-$(ruby_abi_version)/universal-darwin*)
-else
-	ruby_version     = 1.8
-	ruby_abi_version = 1.8
-	topdir = $(shell echo /System/Library/Frameworks/Ruby.framework/Versions/$(ruby_version)/usr/lib/ruby/$(ruby_abi_version)/universal-darwin*)
-	hdrdir = $(topdir)
-	confdir = .
-endif
+ruby_version     = 2.3
+ruby_abi_version = 2.3.0
+topdir  = $(shell echo /System/Library/Frameworks/Ruby.framework/Versions/$(ruby_version)/usr/lib/ruby/$(ruby_abi_version)/universal-darwin*)
+hdrdir  = $(shell echo /System/Library/Frameworks/Ruby.framework/Versions/$(ruby_version)/usr/include/ruby-$(ruby_abi_version))
+confdir = $(shell echo /System/Library/Frameworks/Ruby.framework/Versions/$(ruby_version)/usr/include/ruby-$(ruby_abi_version)/universal-darwin*)
 
 srcdir = .
 VPATH = $(srcdir):$(topdir):$(hdrdir)
@@ -61,23 +53,23 @@ LIBRUBY_A = lib$(RUBY_SO_NAME)-static.a
 LIBRUBYARG_SHARED = -l$(RUBY_SO_NAME)
 LIBRUBYARG_STATIC = -l$(RUBY_SO_NAME)
 
-RUBY_EXTCONF_H = 
+RUBY_EXTCONF_H =
 LLVM-CONFIG = llvm-config
 CFLAGS   =  $(RC_CFLAGS) -mmacosx-version-min=10.9 $(shell $(LLVM-CONFIG) --cxxflags | sed -e 's/ *-arch [^ ]*//g' -e 's/ *-D[^ ]*//g')
- 
+
 INCFLAGS = -I. -I$(topdir) -I$(hdrdir) -I$(confdir) -I$(srcdir)
-DEFS     = 
+DEFS     =
 CPPFLAGS =  $(shell $(LLVM-CONFIG) --cppflags | sed 's/ *-arch [^ ]*//g')
 
-CXXFLAGS = $(CFLAGS) -Wno-switch
+CXXFLAGS = $(CFLAGS) -Wno-switch -Wno-reserved-user-defined-literal
 ldflags  = $(RC_CFLAGS) -mmacosx-version-min=10.9 $(shell $(LLVM-CONFIG) --ldflags | sed 's/ *-arch [^ ]*//g')
 
-dldflags = 
-archflag = 
+dldflags =
+archflag =
 DLDFLAGS = $(ldflags) $(dldflags) $(archflag)
 LDSHARED = $(CC) $(RC_CFLAGS) -pipe -bundle -undefined dynamic_lookup
 AR = ar
-EXEEXT = 
+EXEEXT =
 
 RUBY_INSTALL_NAME = ruby
 RUBY_SO_NAME = ruby
@@ -95,26 +87,26 @@ COPY = cp
 
 #### End of system configuration section. ####
 
-preload = 
+preload =
 
 libpath = . $(libdir)
 LIBPATH =  -L. -L$(libdir)
-DEFFILE = 
+DEFFILE =
 
 CLEANFILES = mkmf.log bridgesupportparser_wrap.cpp
-DISTCLEANFILES = 
+DISTCLEANFILES =
 
-extout = 
-extout_prefix = 
-target_prefix = 
-LOCAL_LIBS = 
+extout =
+extout_prefix =
+target_prefix =
+LOCAL_LIBS =
 LIBS = $(LIBRUBYARG_SHARED) -lclangCodeGen -lclangAnalysis -lclangARCMigrate -lclangRewriteFrontend -lclangSema -lclangSerialization -lclangFrontend -lclangEdit -lclangDriver -lclangAST -lclangParse -lclangLex -lclangBasic -lLLVMCore -lLLVMSupport -lLLVMBitWriter -lLLVMBitReader -lLLVMCodeGen -lLLVMAnalysis -lLLVMTarget -lLLVMMC -lLLVMMCParser -lLLVMOption
 SRCS = bridgesupportparser.cpp bridgesupportparser_wrap.cpp
 OBJS = bridgesupportparser.o bridgesupportparser_wrap.o
 TARGET = bridgesupportparser
 DLLIB = $(TARGET).bundle
-EXTSTATIC = 
-STATIC_LIB = 
+EXTSTATIC =
+STATIC_LIB =
 
 BINDIR        = $(bindir)
 RUBYCOMMONDIR = $(sitedir)$(target_prefix)
