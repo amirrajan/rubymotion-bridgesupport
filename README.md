@@ -18,12 +18,25 @@ Most recently, BridgeSupport has been rewritten to use the clang parser and prov
 
 - cmake
 - subversion
+- High Sierra or Mojave
+- Xcode 9.2
 
 You can install `cmake` and `subversion` with following command.
 
 ```
 $ brew install cmake subversion
 ```
+
+## Build Instructions:
+
+1. Go to http://developer.apple.com/downloads and download Xcode 9.2.
+2. Unarchive and move Xcode.app into the Applications directory.
+3. Open Xcode 9.2 at least once to accept any EULAs and install additional components.
+4. From the terminal run: `sudo xcode-select --install`, and `sudo xcode-select --reset`.
+5. Clone this repo.
+6. Using terminal, `cd` into the cloned repo.
+7. Using terminal, run `make clean`.
+8. Using terminal, run `make`.
 
 ## Using the Metadata Generator
 
