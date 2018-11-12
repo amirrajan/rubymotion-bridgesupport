@@ -31,7 +31,7 @@
 # the module search path, then set $slb to <ROOT>/System/Library/BridgeSupport.
 # Otherwise, if this script is called as <ROOT>/usr/bin/gen_bridge_metadata,
 # then set $slb to <ROOT>/System/Library/BridgeSupport.
-$slb = $_slb_ = '/System/Library/BridgeSupport'
+$slb = $_slb_ = File.expand_path(File.join(__FILE__, '../../../System/Library/BridgeSupport'))
 _slbr_ = "#{$slb}/ruby-#{RUBY_VERSION.sub(/^(\d+\.\d+)(\..*)?$/, '\1')}"
 $:.unshift(_slbr_) unless $:.any? do |p|
     if %r{#{_slbr_}$} =~ p
@@ -924,7 +924,7 @@ class BridgeSupportGenerator
 	    end
 	    paths << path
 	    paths << alt_path
-	    a = Dir.glob(File.join(fpath, '**', '*.bridgesupport'))
+	    a = Dir.glob(File.join(fpath, '**', '*.bridgesupport')).sort
 	    if a.length == 1
 		paths << a.first
 	    end
@@ -1003,7 +1003,11 @@ class BridgeSupportGenerator
 		no_32 = true unless have32
 		no_64 = true unless have64
 	    end
-	    raise "Frameworks need to have consistent architectures" if no_32 and no_64
+	    #In iOS 11. Some SDKs no longer ship with "fat binaries". If the fat binary isn't present, assume both 32 and 64 bit.
+	    if no_32 and no_64
+		no_32 = false
+		no_64 = false
+	    end
 	    @enable_32 = (enable_32 && !no_32)
 	    @enable_64 = (enable_64 && !no_64)
 	    $stderr.puts "Disabling 32-bit because framework is 64-bit only" if @enable_32 != enable_32
@@ -2263,6 +2267,24 @@ EOS
 	end
     end
 
+    # Apple introducted a new file system in High Sierra (UTF-8).
+    # Mac OS Extended was UTF-16 and the ruby source code `dir.c` explicitly
+    # assumes UTF-16 for the __APPLE__ compiler flag (which as been the
+    # case for the past 30 years until 2018). This causes Dir.glob to #
+    # return a different file order on High Sierra vs Sierra. This
+    # method is a # compatible version of Dir.glob from Sierra and is
+    # used by RM to load ruby and header files in lexicographical order.
+    # See: https://developer.apple.com/library/content/documentation/FileManagement/Conceptual/APFS_Guide/FAQ/FAQ.html
+    # and: https://github.com/ruby/ruby/blob/trunk/dir.c#L120
+    # for more info.
+    def lexicographically pattern
+	supported_extensions = %w( c m cpp cxx mm h rb)
+	pathnames = Pathname.glob pattern
+	pathnames.sort_by do |p|
+	    p.each_filename.to_a.map(&:downcase).unshift supported_extensions.index(p.to_s.split(".").last)
+	end.map { |p| p.to_s }
+    end
+
     def handle_framework(prefix_sysroot, val)
 	path = framework_path(prefix_sysroot, val)
 	raise "Can't locate framework '#{val}'" if path.nil?
@@ -2272,19 +2294,19 @@ EOS
 	if @private
 	    headers_path = File.join(path, 'PrivateHeaders')
 	    raise "Can't locate private framework headers at '#{headers_path}'" unless File.exist?(headers_path)
-	    headers = Dir.glob(File.join(headers_path, '**', '*.h')).reject { |f| !File.exist?(f) }
+	    headers = lexicographically(File.join(headers_path, '**', '*.h')).reject { |f| !File.exist?(f) }
 	    public_headers_path = File.join(path, 'Headers')
 	    public_headers = if File.exist?(public_headers_path)
 		OCHeaderAnalyzer::CPPFLAGS << " -I#{public_headers_path} "
 		@incdirs.unshift(encode_includes(public_headers_path, 'A', true, false))
-		Dir.glob(File.join(headers_path, '**', '*.h')).reject { |f| !File.exist?(f) }
+		lexicographically(File.join(headers_path, '**', '*.h')).reject { |f| !File.exist?(f) }
 	    else
 		[]
 	    end
 	else
 	    headers_path = File.join(path, 'Headers')
 	    raise "Can't locate public framework headers at '#{headers_path}'" unless File.exist?(headers_path)
-	    public_headers = headers = Dir.glob(File.join(headers_path, '**', '*.h')).reject { |f| !File.exist?(f) }
+	    public_headers = headers = lexicographically(File.join(headers_path, '**', '*.h')).reject { |f| !File.exist?(f) }
 	end
 	# We can't just "#import <x/x.h>" as the main Framework header might not include _all_ headers.
 	# So we are tricking this by importing the main header first, then all headers.
