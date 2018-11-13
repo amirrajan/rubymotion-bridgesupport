@@ -67,7 +67,7 @@ ldflags  = $(RC_CFLAGS) -mmacosx-version-min=10.9 $(shell $(LLVM-CONFIG) --ldfla
 dldflags =
 archflag =
 DLDFLAGS = $(ldflags) $(dldflags) $(archflag)
-LDSHARED = $(CC) $(RC_CFLAGS) -pipe -bundle -undefined dynamic_lookup
+LDSHARED = $(CC) $(RC_CFLAGS) -pipe -bundle
 AR = ar
 EXEEXT =
 
@@ -100,7 +100,7 @@ extout =
 extout_prefix =
 target_prefix =
 LOCAL_LIBS =
-LIBS = $(LIBRUBYARG_SHARED) -lclangCodeGen -lclangAnalysis -lclangARCMigrate -lclangRewriteFrontend -lclangSema -lclangSerialization -lclangFrontend -lclangEdit -lclangDriver -lclangAST -lclangParse -lclangLex -lclangBasic -lLLVMCore -lLLVMSupport -lLLVMBitWriter -lLLVMBitReader -lLLVMCodeGen -lLLVMAnalysis -lLLVMTarget -lLLVMMC -lLLVMMCParser -lLLVMOption
+LIBS = $(LIBRUBYARG_SHARED) -lclangCodeGen -lclangAnalysis -lclangARCMigrate -lclangRewriteFrontend -lclangSema -lclangSerialization -lclangFrontend -lclangEdit -lclangDriver -lclangAST -lclangParse -lclangLex -lclangBasic -lLLVMCore -lLLVMSupport -lLLVMBitWriter -lLLVMBitReader -lLLVMCodeGen -lLLVMAnalysis -lLLVMTarget -lLLVMMC -lLLVMMCParser -lLLVMOption -lLLVMProfileData -lz -lcurses
 SRCS = bridgesupportparser.cpp bridgesupportparser_wrap.cpp
 OBJS = bridgesupportparser.o bridgesupportparser_wrap.o
 TARGET = bridgesupportparser
