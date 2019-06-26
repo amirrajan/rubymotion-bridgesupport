@@ -59,3 +59,5 @@ tmp
 Icon?
 ehthumbs.db
 Thumbs.db
+/test/results.bridgesupport
+/test/header.txt
