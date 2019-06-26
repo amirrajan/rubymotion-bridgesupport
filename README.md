@@ -10,18 +10,18 @@ Interface Builder (located at `/System/Library/BridgeSupport/` on MacOS),
 This is a hard fork of Apple's Version with the following
 enhancements:
 
-1. `gen_bridge_metadata` takes in a `--headers` switch which is a collection
-   of header files. This allows the generation of xml metadata for
-   very large codebases without approaching the limits on number of
-   characters that can be sent to the CLI.
-2. The clang target for the C Extension is in lock step with the clang
-   version that Apple ships with Xcode (they are usually a version or
-   two behind LLVM.org).
-3. This version also supports the generation of xml metadata for Java
-   and JNI (which currently isn't in the repository, but will be
-   extracted from RubyMotion and placed here, eventually).
-4. Contains compilation updates to fix Segfault issues on Mojave when
-   compiled against system Ruby.
+- `gen_bridge_metadata` takes in a `--headers` switch which is a collection
+  of header files. This allows the generation of xml metadata for
+  very large codebases without approaching the limits on number of
+  characters that can be sent to the CLI.
+- The clang target for the C Extension is in lock step with the clang
+  version that Apple ships with Xcode (they are usually a version or
+  two behind LLVM.org).
+- This version also supports the generation of xml metadata for Java
+  and JNI (which currently isn't in the repository, but will be
+  extracted from RubyMotion and placed here, eventually).
+- Contains compilation updates to fix Segfault issues on Mojave when
+  compiled against system Ruby.
 
 # How to Build
 
@@ -76,15 +76,26 @@ sudo gem install minitest
 sudo gem install nokogiri
 ```
 
-- Run `make` (the initial compilation will take about an hour given
+(the `sudo` is required for the commands above because we are using system ruby)
+
+- Run `make clean` followed by `make` (the initial compilation will take about an hour given
   that `LLVM` is compiled from source).
 
 - Then run:
 
 ```
-rm -rf ./RubyMotion/lib/BridgeSupport2
-sudo make install DESTDIR=./RubyMotion/lib/BridgeSupport2
+make install DESTDIR=./RubyMotion/lib/BridgeSupport2
 ```
+
+- Once installed, run the following command to perform a precursory test:
+
+```
+cd test
+sh ./sample.sh
+cat ./sample.bridgesupport
+```
+
+If the command above runs without errors, your environment is set up correctly.
 
 - You can run the test suite using the following command:
 
@@ -102,7 +113,7 @@ rake test
 
 ```
 make rebuild
-sudo make install DESTDIR=./RubyMotion/lib/BridgeSupport2
+make install DESTDIR=./RubyMotion/lib/BridgeSupport2
 cd test
 rake test
 ```

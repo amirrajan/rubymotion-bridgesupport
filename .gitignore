@@ -61,3 +61,5 @@ ehthumbs.db
 Thumbs.db
 /test/results.bridgesupport
 /test/header.txt
+RubyMotion/lib
+/test/output
