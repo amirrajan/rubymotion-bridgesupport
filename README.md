@@ -104,7 +104,7 @@ cd test
 rake test
 ```
 
-- Optionally you can run `sudo make install DESTDIR=/Library/RubyMotion/lib/BridgeSupport`
+- Optionally you can run `sudo make install DESTDIR=/Library/RubyMotion/lib/BridgeSupport2`
   if you want to test any patches against your own RubyMotion projects.
 
 - All the source code for BridgeSupport is located under the `./swig`
