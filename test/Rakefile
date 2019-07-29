@@ -2,9 +2,21 @@
 
 require 'rake/testtask'
 
+desc "To run all tests `rake`. To run only a single test file, `rake -- -files=./path_to_test.rb,./path_to_another_test.rb`."
 task :default => [:test]
 
 Rake::TestTask.new do |test|
-  test.test_files = Dir.glob('test_*.rb')
+  if ARGV.join(" ").include?("--")
+    files = (ARGV.join(" ").split("--").last || "").split("-files=").last.strip
+  else
+    files = nil
+  end
+
+  if !files
+    test.test_files = Dir.glob('test_*.rb')
+  else
+    test.test_files = files.gsub("files=", "").split(',')
+  end
+
   test.verbose = true
 end
