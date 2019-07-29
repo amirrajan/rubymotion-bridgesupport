@@ -378,6 +378,10 @@ module Bridgesupportparser
 		    td = self[:declared_type].gsub(/(_Nonnull|_Nullable|_Null_unspecified)/, '').gsub(/[^\w]/, '')
 		    enc.sub!(/^(\^*)\{\?=/, "\\1{_#{td}=")
 		    self[:_type_override] = true
+		elsif enc.end_with?("=#}")
+		    # A type def that includes a template macro, for example:
+		    # typedef NSDictionary<NSString *, id> CPTDictionary;
+		    enc.sub!(enc, "@")
 		elsif t
 		    case t
 		    when /^(BOOL|Boolean)$/
@@ -729,7 +733,7 @@ module Bridgesupportparser
 	def eql?(o)
 	    self[:selector] == o[:selector] && self[:class_method] == o[:class_method]
 	end
-	 
+
 	def hash
 	    self[:selector].hash
 	end
@@ -781,7 +785,7 @@ module Bridgesupportparser
 	    methods.each { |m| e.add_element(m) }
 	    e
 	end
-	
+
 	def recursive_merge!(m)
 	    @methods.recursive_merge!(m.methods)
 	    if @protocols
@@ -1412,7 +1416,7 @@ module Bridgesupportparser
 #		    end
 #		end
 #	    end
-	    
+
 	    # Merge categories into interfaces, creating as needed
 	    @all_categories.each do |iname, h|
 		interf = (@all_interfaces[iname] ||= Bridgesupportparser::ObjCInterfaceInfo.new(self, iname, Bridgesupportparser::MergingSet.new("interface #{iname}"), Set.new))
