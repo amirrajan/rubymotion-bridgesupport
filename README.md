@@ -25,7 +25,7 @@ enhancements:
 
 # How to Build
 
-- Install Xcode 10.2, it is strongly recommended that you do not
+- Install Xcode 10.3, it is strongly recommended that you do not
   install Xcode from the App Store and instead use the archived
   images provided in [Apple's Developer Portal Download Archive].
 - Install Xcode at `/Applications/Xcode.app` (if you have another

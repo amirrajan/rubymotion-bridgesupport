@@ -25,7 +25,7 @@ end
 def gen_bridge_metadata(header_file_name, options = {})
   default_options = {
     #debug: "", # uncomment this option for full debug trace
-    cflags: "-isysroot '/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator12.2.sdk' -miphoneos-version-min=12.2 -D__ENVIRONMENT_IPHONE_OS_VERSION_MIN_REQUIRED__=120200"
+    cflags: "-isysroot '/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator.sdk' -miphoneos-version-min=10.0 -D__ENVIRONMENT_IPHONE_OS_VERSION_MIN_REQUIRED__=120200"
   }
   header_file_include_location = " -I./header -I. -I'.' "
   options = default_options.merge options

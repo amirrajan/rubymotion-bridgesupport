@@ -1,4 +1,4 @@
-// typedef NSDictionary<NSString *, id> CPTDictionary;
+typedef NSDictionary<NSString *, id> CPTDictionary;
 
 @class CPTTextStyle;
 
@@ -10,6 +10,6 @@
 
 @interface CPTTextStyle(CPTPlatformSpecificTextStyleExtensions)
 
-@property (readonly, nonatomic, nonnull) NSDictionary<NSString *, id> *attributes;
+@property (readonly, nonatomic, nonnull) CPTDictionary *attributes;
 
 @end
