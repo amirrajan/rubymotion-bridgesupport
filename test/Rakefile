@@ -2,6 +2,25 @@
 
 require 'rake/testtask'
 
+required_gems = ['xml-simple', 'rake', 'minitest', 'nokogiri']
+list_of_gems = `gem list`
+required_gems.each do |g|
+  if !list_of_gems.include?(g)
+    raise <<-S
+You don't have the correct gems in system Ruby. Please run:
+
+```sh
+sudo gem install xml-simple
+sudo gem install rake
+sudo gem install minitest
+sudo gem install nokogiri
+```
+
+S
+
+  end
+end
+
 desc "To run all tests `rake`. To run only a single test file, `rake -- -files=./path_to_test.rb,./path_to_another_test.rb`."
 task :default => [:test]
 

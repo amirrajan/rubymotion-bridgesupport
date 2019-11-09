@@ -1,5 +1,5 @@
 ##
-# Makefile for BridgeSupport 
+# Makefile for BridgeSupport
 ##
 ifdef RC_ProjectName
 Project = $(RC_ProjectName)
@@ -51,8 +51,8 @@ endif # !BridgeSupport_ext
 BS_INCLUDE = $(BS_LIBS)/include
 BS_RUBY := $(BS_LIBS)/ruby-$(shell $(RUBY) -e 'puts RUBY_VERSION.sub(/^(\d+\.\d+)(\..*)?$$/, "\\1")')
 RUBYLIB = $(BS_RUBY)
-
-LIBSYSTEM_HEADERS = /usr/include/asl.h /usr/include/notify*.h /usr/include/copyfile.h /usr/include/sandbox.h /usr/include/launch.h /usr/include/CommonCrypto/*.h
+USR_INCLUDE = /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk
+LIBSYSTEM_HEADERS = $(USR_INCLUDE)/usr/include/asl.h $(USR_INCLUDE)/usr/include/notify*.h $(USR_INCLUDE)/usr/include/copyfile.h $(USR_INCLUDE)/usr/include/sandbox.h $(USR_INCLUDE)/usr/include/launch.h $(USR_INCLUDE)/usr/include/CommonCrypto/*.h
 
 # For the Apple build system, we split into two separate projects:
 #     BridgeSupport_ext - build extension and save in /usr/local/BridgeSupport
@@ -195,7 +195,7 @@ $(LIBSYSTEM_BRIDGESUPPORT):
 	@/bin/echo -n '*** Started Building .bridgesupport files: ' && date
 	# TODO : generate BridgeSupport files in each system library frameworks
 	# DSTROOT='$(DSTROOT)' RUBYLIB='$(RUBYLIB)' $(RUBY) build.rb
-	RUBYLIB='$(RUBYLIB)' $(RUBY) gen_bridge_metadata.rb -c '-I/usr/include/CommonCrypto' -e $(LIBSYSTEM_EXCEPTION) -o $@ $(LIBSYSTEM_HEADERS)
+	RUBYLIB='$(RUBYLIB)' $(RUBY) gen_bridge_metadata.rb -c '-I/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/CommonCrypto -I/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include' -e $(LIBSYSTEM_EXCEPTION) -o $@ $(LIBSYSTEM_HEADERS)
 	$(INSTALL_DIRECTORY) $(SYSTEM_BRIDGESUPPORT)
 	$(LN) -fs `echo $(SYSTEM_BS) | sed 's,[^/]*,..,g'`/BridgeSupport/libSystem.bridgesupport $(SYSTEM_BRIDGESUPPORT)/System.bridgesupport
 	@/bin/echo -n '*** Finished Building .bridgesupport files: ' && date
@@ -260,4 +260,3 @@ rebuild:
 	rm -rf $(SYMROOT_MADE)
 	rm -rf $(SWIG_DIR)
 	make
-

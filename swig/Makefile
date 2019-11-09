@@ -4,16 +4,17 @@ SHELL = /bin/sh
 
 #### Start of system configuration section. ####
 
-ruby_version     = 2.3
-ruby_abi_version = 2.3.0
-topdir  = $(shell echo /System/Library/Frameworks/Ruby.framework/Versions/$(ruby_version)/usr/lib/ruby/$(ruby_abi_version)/universal-darwin*)
-hdrdir  = $(shell echo /System/Library/Frameworks/Ruby.framework/Versions/$(ruby_version)/usr/include/ruby-$(ruby_abi_version))
-confdir = $(shell echo /System/Library/Frameworks/Ruby.framework/Versions/$(ruby_version)/usr/include/ruby-$(ruby_abi_version)/universal-darwin*)
+ruby_version     = 2.6
+ruby_abi_version = 2.6.0
+usrlib  = /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/System/Library/Frameworks/Ruby.framework/Versions/2.6/usr/include
+topdir  = /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/System/Library/Frameworks/Ruby.framework/Versions/2.6/usr/lib/ruby/2.6.0/universal-darwin19
+hdrdir  = /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/System/Library/Frameworks/Ruby.framework/Versions/2.6/usr/include/ruby-2.6.0
+confdir = /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/System/Library/Frameworks/Ruby.framework/Versions/2.6/usr/include/ruby-2.6.0/universal-darwin19
 
 srcdir = .
 VPATH = $(srcdir):$(topdir):$(hdrdir)
 exec_prefix = $(prefix)
-prefix = $(DESTDIR)/System/Library/Frameworks/Ruby.framework/Versions/$(ruby_version)/usr
+prefix = /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/System/Library/Frameworks/Ruby.framework/Versions/2.6/usr
 sharedstatedir = $(prefix)/com
 mandir = $(DESTDIR)/usr/share/man
 psdir = $(docdir)
@@ -42,11 +43,7 @@ datadir = $(datarootdir)
 localstatedir = $(prefix)/var
 sitelibdir = $(sitedir)/$(ruby_abi_version)
 
-ifneq ("$(wildcard /usr/local/bin/gcc-4.2)","")
-	CC = g++-4.2
-else
-	CC = c++
-endif
+CC = c++
 CXX = $(CC)
 LIBRUBY = $(LIBRUBY_SO)
 LIBRUBY_A = lib$(RUBY_SO_NAME)-static.a
@@ -57,7 +54,7 @@ RUBY_EXTCONF_H =
 LLVM-CONFIG = llvm-config
 CFLAGS   =  $(RC_CFLAGS) -mmacosx-version-min=10.9 $(shell $(LLVM-CONFIG) --cxxflags | sed -e 's/ *-arch [^ ]*//g' -e 's/ *-D[^ ]*//g')
 
-INCFLAGS = -I. -I$(topdir) -I$(hdrdir) -I$(confdir) -I$(srcdir)
+INCFLAGS = -I$(usrlib) -I. -I$(topdir) -I$(hdrdir) -I$(confdir) -I$(srcdir)
 DEFS     =
 CPPFLAGS =  $(shell $(LLVM-CONFIG) --cppflags | sed 's/ *-arch [^ ]*//g')
 
@@ -76,7 +73,7 @@ RUBY_SO_NAME = ruby
 arch = $(shell $(RUBY) -e 'puts RUBY_PLATFORM')
 sitearch = $(arch)
 
-ruby = /System/Library/Frameworks/Ruby.framework/Versions/$(ruby_version)/usr/bin/ruby
+ruby = /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/System/Library/Frameworks/Ruby.framework/Versions/$(ruby_version)/usr/bin/ruby
 RUBY = $(ruby)
 RM = rm -f
 MAKEDIRS = mkdir -p

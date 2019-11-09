@@ -24,11 +24,19 @@ def delete_osx_symlink_if_exists
   end
 end
 
+bridgesupport_version = 1
+
 if File.directory? "/System/Library/BridgeSupport/ruby-2.0/"
   bundled_gbm = File.expand_path(File.join(__FILE__, '../../lib/BridgeSupport/usr/bin/gen_bridge_metadata'))
+  bridgesupport_version = 1
 elsif File.directory? "/System/Library/BridgeSupport/ruby-2.3"
   bundled_gbm = File.expand_path(File.join(__FILE__, '../../lib/BridgeSupport2/usr/bin/gen_bridge_metadata'))
   delete_osx_symlink_if_exists
+  bridgesupport_version = 2
+elsif File.directory? "/System/Library/BridgeSupport/ruby-2.6"
+  bundled_gbm = File.expand_path(File.join(__FILE__, '../../lib/BridgeSupport3/usr/bin/gen_bridge_metadata'))
+  delete_osx_symlink_if_exists
+  bridgesupport_version = 3
 else
   raise "This version of RubyMotion is not supported for this version of MacOS."
 end
@@ -100,7 +108,15 @@ if __FILE__ == $0
       end
     end
 
+
     opts.on('-c', '--cflags FLAGS', 'Specify custom compiler flags.') do |flags|
+      if bridgesupport_version == 3
+        flags ||= ''
+        if !flags.include?('isysroot')
+          raise "-isysroot is required for Catalina. Please provide that for the -c (--cflags) switch."
+        end
+      end
+
       g.compiler_flags ||= ''
       g.compiler_flags << ' ' + flags + ' '
     end

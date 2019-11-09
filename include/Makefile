@@ -7,7 +7,7 @@ INCLUDEOBJC = $(BS_INCLUDE)/objc
 
 include:
 	mkdir -p $(INCLUDEOBJC)
-	cp /System/Library/Frameworks/CoreServices.framework/Frameworks/CarbonCore.framework/Headers/MacTypes.h $(BS_INCLUDE)/BSMacTypes.h
+	cp /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/System/Library/Frameworks/CoreServices.framework/Frameworks/CarbonCore.framework/Headers/MacTypes.h $(BS_INCLUDE)/BSMacTypes.h
 	ed - $(BS_INCLUDE)/BSMacTypes.h < BSMacTypes.h.ed
 	cp /usr/include/objc/objc.h $(INCLUDEOBJC)
 	ed - $(INCLUDEOBJC)/objc.h < objc.h.ed
