@@ -101,7 +101,7 @@ if __FILE__ == $0
     end
 
     # 64-bit is now the only option
-    no_32bit_support = `/usr/bin/sw_vers -productVersion`.strip.match(/^10\.(\d+)/)[1].to_i >= 9
+    no_32bit_support = `/usr/bin/sw_vers -productVersion`.strip.match(/^1[01]\.(\d+)/)[1].to_i >= 9
     if no_32bit_support
       opts.on(nil, '--no-32-bit', 'Do not write 32-bit annotations.') do
         enable_32 = false
