@@ -88,20 +88,15 @@ $(SYMROOT_MADE): $(OBJROOT_MADE)
 	$(TOUCH) $@
 
 # Subdirectories
-CLANG_VERS = clang-39
-CLANG_BRANCH = tags/RELEASE_391/final
+CLANG_VERS = clang-50
+CLANG_BRANCH = llvmorg-5.0.0
 CLANG_DIR = $(OBJROOT)/$(CLANG_VERS)
 SWIG_DIR = $(OBJROOT)/swig
 
 CLANG_DIR_MADE = $(CLANG_DIR)/$(MADEFILE)
 $(CLANG_DIR_MADE): $(OBJROOT_MADE)
 	mkdir -p $(OBJROOT)
-	# cd $(OBJROOT) && git clone https://github.com/llvm-mirror/llvm.git $(CLANG_VERS) && cd $(CLANG_DIR) && git checkout -b $(CLANG_BRANCH) origin/$(CLANG_BRANCH)
-	# cd $(CLANG_DIR)/tools && git clone https://github.com/llvm-mirror/clang.git && cd $(CLANG_DIR)/tools/clang && git checkout -b $(CLANG_BRANCH) origin/$(CLANG_BRANCH)
-	# cd $(CLANG_DIR)/projects && git clone https://github.com/llvm-mirror/compiler-rt.git && cd $(CLANG_DIR)/projects/compiler-rt && git checkout -b $(CLANG_BRANCH) origin/$(CLANG_BRANCH)
-	cd $(OBJROOT) && svn co http://llvm.org/svn/llvm-project/llvm/$(CLANG_BRANCH) $(CLANG_VERS)
-	cd $(CLANG_DIR)/tools && svn co http://llvm.org/svn/llvm-project/cfe/$(CLANG_BRANCH) clang
-	cd $(CLANG_DIR)/projects && svn co http://llvm.org/svn/llvm-project/compiler-rt/$(CLANG_BRANCH) compiler-rt
+	cd $(OBJROOT) && git clone git@github.com:llvm/llvm-project.git -b $(CLANG_BRANCH) $(CLANG_VERS)
 	cd $(CLANG_DIR)/tools/clang && patch -p0 < $(SRCROOT)/clang.patch
 	cd $(SRCROOT)
 	$(TOUCH) $@
@@ -130,7 +125,7 @@ $(CLANGROOT_MADE): $(CLANG_DIR_MADE)
 	    $(MKDIR) $(CLANG_DIR)/darwin-$$arch && \
 	    (cd $(CLANG_DIR)/darwin-$$arch && \
 	    $(MKDIR) ROOT && \
-	    env MACOSX_DEPLOYMENT_TARGET=10.9 CC="$(CC) -arch $$arch" CXX="$(CXX) -arch $$arch" cmake ../ -G "Unix Makefiles" -DCMAKE_BUILD_TYPE=Release -DLLVM_ENABLE_LIBCXX=YES -DLLVM_BUILD_EXTERNAL_COMPILER_RT=YES -DLLVM_TARGETS_TO_BUILD="X86" && \
+	    env MACOSX_DEPLOYMENT_TARGET=10.9 CC="$(CC) -arch $$arch" CXX="$(CXX) -arch $$arch" cmake ../llvm -G "Unix Makefiles" -DCMAKE_BUILD_TYPE=Release -DLLVM_ENABLE_PROJECTS="clang;libcxx;libcxxabi" -DLLVM_BUILD_EXTERNAL_COMPILER_RT=YES -DLLVM_TARGETS_TO_BUILD="X86" && \
 	    env MACOSX_DEPLOYMENT_TARGET=10.9 CC="$(CC) -arch $$arch" CXX="$(CXX) -arch $$arch" make -j$(shell sysctl -n hw.ncpu) && \
 	    $(MKDIR) $(CLANG_DIR)/darwin-$$arch/ROOT && \
 	    make install DESTDIR=$(CLANG_DIR)/darwin-$$arch/ROOT) || exit 1; \
