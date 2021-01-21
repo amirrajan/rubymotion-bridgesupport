@@ -339,7 +339,7 @@ locgetpath(SourceManager *sm, SourceLocation sl)
     FileID fid = sm->getFileID(sl);
     if(fid == sm->getMainFileID()) return CONTENT;
     fe = sm->getFileEntryForID(fid);
-    if(!fe || !(path = fe->getName())) path = "/dev/null";
+    if(!fe || !(path = fe->getName().str().c_str())) path = "/dev/null";
     return path;
 }
 
@@ -950,14 +950,15 @@ BridgeSupportParser::~BridgeSupportParser()
 void
 BridgeSupportParser::addFile(const char *file) {
     const DirectoryLookup *CurDir;
+    bool isMapped;
     SmallVector<std::pair<const FileEntry *, const DirectoryEntry *>, 0> Includers;
-    const FileEntry *fe = compiler.getPreprocessor().getHeaderSearchInfo().LookupFile(file, SourceLocation(), false, NULL, CurDir, Includers, NULL, NULL, NULL, NULL);
+    const FileEntry *fe = compiler.getPreprocessor().getHeaderSearchInfo().LookupFile(file, SourceLocation(), false, NULL, CurDir, Includers, NULL, NULL, NULL, NULL, &isMapped);
     if(!fe)
 	rb_raise(rb_eRuntimeError, "addFile: Couldn't lookup file: %s", file);
     char path[PATH_MAX];
-    if(realpath(fe->getName(), path) == NULL) {
+    if(realpath(fe->getName().str().c_str(), path) == NULL) {
 	int saveerrno = errno;
-	snprintf(path, sizeof(path), "addFile: realpath: %s", fe->getName());
+	snprintf(path, sizeof(path), "addFile: realpath: %s", fe->getName().str().c_str());
 	errno = saveerrno;
 	rb_sys_fail(path);
     }
@@ -979,9 +980,9 @@ BridgeSupportParser::inDir(FileID file) {
     const clang::FileEntry *fe = compiler.getSourceManager().getFileEntryForID(file);
     char path[PATH_MAX];
     if(fe) {
-	if(realpath(fe->getName(), path) == NULL) {
+	if(realpath(fe->getName().str().c_str(), path) == NULL) {
 	    int saveerrno = errno;
-	    snprintf(path, sizeof(path), "inDir: realpath: %s", fe->getName());
+	    snprintf(path, sizeof(path), "inDir: realpath: %s", fe->getName().str().c_str());
 	    errno = saveerrno;
 	    rb_sys_fail(path);
 	}
@@ -1545,7 +1546,7 @@ AnObjCMethod::info()
 {
     //std::string type = MD->getResultType().isNull() ? "id" : MD->getResultType().getAsString();
     std::string menc, retenc;
-    BSP->compiler.getASTContext().getObjCEncodingForMethodDecl(MD, menc);
+    menc = BSP->compiler.getASTContext().getObjCEncodingForMethodDecl(MD);
     QualType rettype = MD->getReturnType();
     BSP->getObjCEncodingForType(rettype, retenc);
     if(rettype->isFunctionPointerType() || rettype->isBlockPointerType()) {

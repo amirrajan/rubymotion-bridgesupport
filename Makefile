@@ -151,7 +151,7 @@ $(BS_RUBY_MADE): $(CLANGROOT_MADE) $(SWIG_DIR_MADE) $(DSTROOT_MADE) $(SYMROOT_MA
 	@/bin/echo -n '*** Started Building bridgesupport.bundle: ' && date
 	@set -x && \
 	cd $(SWIG_DIR) && \
-	make LLVM-CONFIG=$(CLANGROOT)$(CLANG_PREFIX)/local/bin/llvm-config RC_CFLAGS='$(RC_CFLAGS)' && \
+	make VERBOSE=1 LLVM-CONFIG=$(CLANGROOT)$(CLANG_PREFIX)/local/bin/llvm-config RC_CFLAGS='$(RC_CFLAGS)' && \
 	$(MKDIR) $(BS_RUBY) && \
 	$(RSYNC) bridgesupportparser.bundle* $(SYMROOT) && \
 	$(RSYNC) bridgesupportparser.bundle $(BS_RUBY) && \
