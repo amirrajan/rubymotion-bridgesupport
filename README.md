@@ -24,7 +24,14 @@ enhancements:
   compiled against system Ruby.
 
 # How to Build
-
+- Install Xcode 13.1
+- Install [brew](http://brew.sh) and run the following commands:
+```
+brew install gcc
+brew install make
+brew install cmake
+brew install rbenv
+```
 - Install Xcode 10.3, it is strongly recommended that you do not
   install Xcode from the App Store and instead use the archived
   images provided in [Apple's Developer Portal Download Archive].
@@ -33,15 +40,11 @@ enhancements:
   temporarily).
 - After installing Xcode, you _must_ double click Xcode and open it
   at least once to accept EULAs.
-- Open Terminal and run `sudo xcode-select --install`
-  then `sudo xcode-selectt --reset`.
-- Install [brew] and run the following commands:
-
+- Open Terminal and run:
 ```
-brew install gcc
-brew install make
-brew install cmake
-brew install rbenv
+sudo rm -rf /Library/Developer/CommandLineTools
+sudo xcode-select --install
+sudo xcode-select --reset
 ```
 
 NOTE: It is strongly recommended that you use `rbenv` instead of `rvm`
