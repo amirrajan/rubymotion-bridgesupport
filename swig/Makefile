@@ -7,14 +7,14 @@ SHELL = /bin/sh
 ruby_version     = 2.6
 ruby_abi_version = 2.6.0
 usrlib  = /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/System/Library/Frameworks/Ruby.framework/Versions/2.6/usr/include
-topdir  = /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/System/Library/Frameworks/Ruby.framework/Versions/2.6/usr/lib/ruby/2.6.0/universal-darwin19
+topdir  = /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/System/Library/Frameworks/Ruby.framework/Versions/2.6/usr/lib/ruby/2.6.0/universal-darwin20
 hdrdir  = /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/System/Library/Frameworks/Ruby.framework/Versions/2.6/usr/include/ruby-2.6.0
-confdir = /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/System/Library/Frameworks/Ruby.framework/Versions/2.6/usr/include/ruby-2.6.0/universal-darwin19
+confdir = /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/System/Library/Frameworks/Ruby.framework/Versions/2.6/usr/include/ruby-2.6.0/universal-darwin20
 
 srcdir = .
 VPATH = $(srcdir):$(topdir):$(hdrdir)
-exec_prefix = $(prefix)
 prefix = /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/System/Library/Frameworks/Ruby.framework/Versions/2.6/usr
+exec_prefix = $(prefix)
 sharedstatedir = $(prefix)/com
 mandir = $(DESTDIR)/usr/share/man
 psdir = $(docdir)
@@ -54,7 +54,7 @@ RUBY_EXTCONF_H =
 LLVM-CONFIG = llvm-config
 CFLAGS   =  $(RC_CFLAGS) -mmacosx-version-min=10.9 $(shell $(LLVM-CONFIG) --cxxflags | sed -e 's/ *-arch [^ ]*//g' -e 's/ *-D[^ ]*//g')
 
-INCFLAGS = -I$(usrlib) -I. -I$(topdir) -I$(hdrdir) -I$(confdir) -I$(srcdir)
+INCFLAGS = -isystem$(usrlib) -I. -isystem$(topdir) -isystem$(hdrdir) -isystem$(confdir) -I$(srcdir)
 DEFS     =
 CPPFLAGS =  $(shell $(LLVM-CONFIG) --cppflags | sed 's/ *-arch [^ ]*//g')
 
@@ -73,8 +73,8 @@ RUBY_SO_NAME = ruby
 arch = $(shell $(RUBY) -e 'puts RUBY_PLATFORM')
 sitearch = $(arch)
 
-ruby = /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/System/Library/Frameworks/Ruby.framework/Versions/$(ruby_version)/usr/bin/ruby
-RUBY = $(ruby)
+#ruby = /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/System/Library/Frameworks/Ruby.framework/Versions/$(ruby_version)/usr/bin/ruby
+RUBY = /usr/bin/ruby #$(ruby)
 RM = rm -f
 MAKEDIRS = mkdir -p
 INSTALL = /usr/bin/install -c
@@ -97,7 +97,7 @@ extout =
 extout_prefix =
 target_prefix =
 LOCAL_LIBS =
-LIBS = $(LIBRUBYARG_SHARED) -lclangCodeGen -lclangAnalysis -lclangARCMigrate -lclangRewriteFrontend -lclangSema -lclangSerialization -lclangFrontend -lclangEdit -lclangDriver -lclangAST -lclangParse -lclangLex -lclangBasic -lLLVMCore -lLLVMSupport -lLLVMBitWriter -lLLVMBitReader -lLLVMCodeGen -lLLVMAnalysis -lLLVMTarget -lLLVMMC -lLLVMMCParser -lLLVMOption -lLLVMProfileData -lz -lcurses
+LIBS = $(LIBRUBYARG_SHARED) -lclangCodeGen -lclangAnalysis -lclangARCMigrate -lclangRewriteFrontend -lclangSema -lclangSerialization -lclangFrontend -lclangEdit -lclangDriver -lclangAST -lclangParse -lclangLex -lclangBasic -lLLVMBinaryFormat -lLLVMCore -lLLVMDemangle -lLLVMSupport -lLLVMBitWriter -lLLVMBitReader -lLLVMCodeGen -lLLVMAnalysis -lLLVMTarget -lLLVMMC -lLLVMMCParser -lLLVMOption -lLLVMProfileData -lz -lcurses
 SRCS = bridgesupportparser.cpp bridgesupportparser_wrap.cpp
 OBJS = bridgesupportparser.o bridgesupportparser_wrap.o
 TARGET = bridgesupportparser
