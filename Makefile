@@ -88,20 +88,17 @@ $(SYMROOT_MADE): $(OBJROOT_MADE)
 	$(TOUCH) $@
 
 # Subdirectories
-CLANG_VERS = clang-39
-CLANG_BRANCH = tags/RELEASE_391/final
+CLANG_VERS = clang-38
+CLANG_BRANCH = release_38
 CLANG_DIR = $(OBJROOT)/$(CLANG_VERS)
 SWIG_DIR = $(OBJROOT)/swig
 
 CLANG_DIR_MADE = $(CLANG_DIR)/$(MADEFILE)
 $(CLANG_DIR_MADE): $(OBJROOT_MADE)
 	mkdir -p $(OBJROOT)
-	# cd $(OBJROOT) && git clone https://github.com/llvm-mirror/llvm.git $(CLANG_VERS) && cd $(CLANG_DIR) && git checkout -b $(CLANG_BRANCH) origin/$(CLANG_BRANCH)
-	# cd $(CLANG_DIR)/tools && git clone https://github.com/llvm-mirror/clang.git && cd $(CLANG_DIR)/tools/clang && git checkout -b $(CLANG_BRANCH) origin/$(CLANG_BRANCH)
-	# cd $(CLANG_DIR)/projects && git clone https://github.com/llvm-mirror/compiler-rt.git && cd $(CLANG_DIR)/projects/compiler-rt && git checkout -b $(CLANG_BRANCH) origin/$(CLANG_BRANCH)
-	cd $(OBJROOT) && svn co http://llvm.org/svn/llvm-project/llvm/$(CLANG_BRANCH) $(CLANG_VERS)
-	cd $(CLANG_DIR)/tools && svn co http://llvm.org/svn/llvm-project/cfe/$(CLANG_BRANCH) clang
-	cd $(CLANG_DIR)/projects && svn co http://llvm.org/svn/llvm-project/compiler-rt/$(CLANG_BRANCH) compiler-rt
+	cd $(OBJROOT) && git clone https://github.com/llvm-mirror/llvm.git $(CLANG_VERS) && cd $(CLANG_DIR) && git checkout -b $(CLANG_BRANCH) origin/$(CLANG_BRANCH)
+	cd $(CLANG_DIR)/tools && git clone https://github.com/llvm-mirror/clang.git && cd $(CLANG_DIR)/tools/clang && git checkout -b $(CLANG_BRANCH) origin/$(CLANG_BRANCH)
+	cd $(CLANG_DIR)/projects && git clone https://github.com/llvm-mirror/compiler-rt.git && cd $(CLANG_DIR)/projects/compiler-rt && git checkout -b $(CLANG_BRANCH) origin/$(CLANG_BRANCH)
 	cd $(CLANG_DIR)/tools/clang && patch -p0 < $(SRCROOT)/clang.patch
 	cd $(SRCROOT)
 	$(TOUCH) $@
@@ -195,7 +192,7 @@ $(LIBSYSTEM_BRIDGESUPPORT):
 	@/bin/echo -n '*** Started Building .bridgesupport files: ' && date
 	# TODO : generate BridgeSupport files in each system library frameworks
 	# DSTROOT='$(DSTROOT)' RUBYLIB='$(RUBYLIB)' $(RUBY) build.rb
-	RUBYLIB='$(RUBYLIB)' $(RUBY) gen_bridge_metadata.rb -c '-I/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/CommonCrypto -I/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include' -e $(LIBSYSTEM_EXCEPTION) -o $@ $(LIBSYSTEM_HEADERS)
+	RUBYLIB='$(RUBYLIB)' $(RUBY) gen_bridge_metadata.rb -c '-F/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/System/Library/Frameworks -I/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/CommonCrypto -I/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include' -e $(LIBSYSTEM_EXCEPTION) -o $@ $(LIBSYSTEM_HEADERS)
 	$(INSTALL_DIRECTORY) $(SYSTEM_BRIDGESUPPORT)
 	$(LN) -fs `echo $(SYSTEM_BS) | sed 's,[^/]*,..,g'`/BridgeSupport/libSystem.bridgesupport $(SYSTEM_BRIDGESUPPORT)/System.bridgesupport
 	@/bin/echo -n '*** Finished Building .bridgesupport files: ' && date

@@ -24,7 +24,8 @@ enhancements:
   compiled against system Ruby.
 
 # How to Build
-- Install Xcode 13.1
+- Assumses you are on MacOS 13.4.1
+- Install Xcode 14.3.1
 - Install [brew](http://brew.sh) and run the following commands:
 ```
 brew install gcc

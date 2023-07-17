@@ -241,7 +241,7 @@ module Bridgesupportparser
 	    #puts "Base: #{self.name} attrs=#{attrs.inspect}" #DEBUG
 	    return nil if attrs.nil? || attrs.empty?
 	    e = REXML::Element.new(self.class.element_name)
-	    attrs.each { |k, v| e.attributes[k.to_s] = v }
+	    attrs.reject { |k, v| v.to_s.inspect.include? '\x' }.each { |k, v| e.attributes[k.to_s] = v }
 	    e
 	end
 

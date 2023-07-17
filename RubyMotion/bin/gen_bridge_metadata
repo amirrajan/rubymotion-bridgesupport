@@ -101,20 +101,26 @@ if __FILE__ == $0
     end
 
     # 64-bit is now the only option
-    no_32bit_support = `/usr/bin/sw_vers -productVersion`.strip.match(/^1[01]\.(\d+)/)[1].to_i >= 9
+    enable_32 = false
+    enable_64 = true
+    if bridgesupport_version == 3
+      no_32bit_support = true
+    else
+      no_32bit_support = `/usr/bin/sw_vers -productVersion`.strip.match(/^10\.(\d+)/)[1].to_i >= 9
+    end
     if no_32bit_support
       opts.on(nil, '--no-32-bit', 'Do not write 32-bit annotations.') do
         enable_32 = false
       end
     end
 
-
     opts.on('-c', '--cflags FLAGS', 'Specify custom compiler flags.') do |flags|
       if bridgesupport_version == 3
         flags ||= ''
         if !flags.include?('isysroot')
-          raise "-isysroot is required for Catalina. Please provide that for the -c (--cflags) switch."
+          raise "isysroot is required for Catalina. Please provide that for the -c switch."
         end
+        #'-I/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include -F/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/System/Library/Frameworks'
       end
 
       g.compiler_flags ||= ''

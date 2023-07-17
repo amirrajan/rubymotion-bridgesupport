@@ -727,7 +727,7 @@ class BridgeSupportGenerator
 
     def makedarwinvers(vers)
 	pieces = vers.split('.')
-	raise "Version \"#{vers}\" not 10.x[.y]" if pieces.length < 2 || pieces.length > 3 || pieces[0] != '10' || pieces[1] !~ /^\d+$/ || (pieces.length == 3 && pieces[2] !~ /^\d+$/)
+	raise "Version \"#{vers}\" not (10 || 11 || 12 || 13).x[.y]" if pieces.length < 2 || pieces.length > 3 || (pieces[0] != '10' && pieces[0] != '11' && pieces[0] != '12' && pieces[0] != '13' && pieces[0] != '14' && pieces[0] != '15') || pieces[1] !~ /^\d+$/ || (pieces.length == 3 && pieces[2] !~ /^\d+$/)
 	pieces << '0' if pieces.length == 2
 	return sprintf('%d.%s', pieces[1].to_i + 4, pieces[2])
     end
