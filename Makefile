@@ -127,7 +127,7 @@ $(CLANGROOT_MADE): $(CLANG_DIR_MADE)
 	    $(MKDIR) $(CLANG_DIR)/darwin-$$arch && \
 	    (cd $(CLANG_DIR)/darwin-$$arch && \
 	    $(MKDIR) ROOT && \
-	    env MACOSX_DEPLOYMENT_TARGET=10.9 CC="$(CC) -arch $$arch" CXX="$(CXX) -arch $$arch" cmake ../ -G "Unix Makefiles" -DCMAKE_BUILD_TYPE=Release -DLLVM_ENABLE_LIBCXX=YES -DLLVM_BUILD_EXTERNAL_COMPILER_RT=YES -DLLVM_TARGETS_TO_BUILD="X86" && \
+	    env MACOSX_DEPLOYMENT_TARGET=10.9 CC="$(CC) -arch $$arch" CXX="$(CXX) -arch $$arch" cmake ../ -G "Unix Makefiles" -DCMAKE_BUILD_TYPE=Release -DLLVM_ENABLE_LIBCXX=YES -DLLVM_BUILD_EXTERNAL_COMPILER_RT=YES -DLLVM_TARGETS_TO_BUILD="X86;ARM;AArch64" && \
 	    env MACOSX_DEPLOYMENT_TARGET=10.9 CC="$(CC) -arch $$arch" CXX="$(CXX) -arch $$arch" make -j$(shell sysctl -n hw.ncpu) && \
 	    $(MKDIR) $(CLANG_DIR)/darwin-$$arch/ROOT && \
 	    make install DESTDIR=$(CLANG_DIR)/darwin-$$arch/ROOT) || exit 1; \

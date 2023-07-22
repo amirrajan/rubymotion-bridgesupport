@@ -52,14 +52,14 @@ LIBRUBYARG_STATIC = -l$(RUBY_SO_NAME)
 
 RUBY_EXTCONF_H =
 LLVM-CONFIG = llvm-config
-CFLAGS   =  $(RC_CFLAGS) -mmacosx-version-min=10.9 $(shell $(LLVM-CONFIG) --cxxflags | sed -e 's/ *-arch [^ ]*//g' -e 's/ *-D[^ ]*//g')
+CFLAGS   =  $(RC_CFLAGS) -arch x86_64 -arch arm64 -mmacosx-version-min=10.9 $(shell $(LLVM-CONFIG) --cxxflags | sed -e 's/ *-arch [^ ]*//g' -e 's/ *-D[^ ]*//g')
 
 INCFLAGS = -I$(usrlib) -I. -I$(topdir) -I$(hdrdir) -I$(confdir) -I$(srcdir)
 DEFS     =
-CPPFLAGS =  $(shell $(LLVM-CONFIG) --cppflags | sed 's/ *-arch [^ ]*//g')
+CPPFLAGS =  $(shell $(LLVM-CONFIG) -arch x86_64 -arch arm64 --cppflags | sed 's/ *-arch [^ ]*//g')
 
-CXXFLAGS = $(CFLAGS) -Wno-switch -Wno-reserved-user-defined-literal
-ldflags  = $(RC_CFLAGS) -mmacosx-version-min=10.9 $(shell $(LLVM-CONFIG) --ldflags | sed 's/ *-arch [^ ]*//g')
+CXXFLAGS = $(CFLAGS) -arch x86_64 -arch arm64 -Wno-switch -Wno-reserved-user-defined-literal
+ldflags  = $(RC_CFLAGS) -arch x86_64 -arch arm64 -mmacosx-version-min=10.9 $(shell $(LLVM-CONFIG) --ldflags | sed 's/ *-arch [^ ]*//g')
 
 dldflags =
 archflag =
