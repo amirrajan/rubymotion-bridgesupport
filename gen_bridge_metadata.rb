@@ -726,8 +726,7 @@ class BridgeSupportGenerator
     protected :_parse
 
     def makedarwinvers(vers)
-	pieces = vers.split('.')
-	raise "Version \"#{vers}\" not (10 || 11 || 12 || 13).x[.y]" if pieces.length < 2 || pieces.length > 3 || (pieces[0] != '10' && pieces[0] != '11' && pieces[0] != '12' && pieces[0] != '13' && pieces[0] != '14' && pieces[0] != '15') || pieces[1] !~ /^\d+$/ || (pieces.length == 3 && pieces[2] !~ /^\d+$/)
+	pieces = vers.split('.')[0..1]
 	pieces << '0' if pieces.length == 2
 	return sprintf('%d.%s', pieces[1].to_i + 4, pieces[2])
     end
@@ -991,14 +990,7 @@ class BridgeSupportGenerator
 			end
 		    end
 		elsif File.exist?(p + ".tbd")
-		    require 'yaml'
-		    yml = YAML.load(File.read(p + ".tbd"))
-		    yml['exports'].each do |items|
-			items['archs'].each do |arch|
-			    have64 = true if arch.include?('x86_64')
-			    have32 = true if arch.include?('i386')
-			end
-		    end
+		    have64 = true
 		end
 		no_32 = true unless have32
 		no_64 = true unless have64
@@ -1413,7 +1405,7 @@ EOS
 	end
 	cflags = []
 	doarch = false
-	(ENV['CFLAGS'] || '-arch i386 -arch x86_64').split.each do |f|
+	(ENV['CFLAGS'] || '-arch arm64 -arch x86_64').split.each do |f|
 	    if doarch
 		doarch = false
 		if /64$/ =~ f
@@ -2387,7 +2379,7 @@ EOS
 	    elsif emulate_ppc
 		' -arch ppc -arch i386'
 	    else
-		" -arch #{IS_PPC ? 'ppc64' : 'x86_64'}"
+		" -arch #{IS_PPC ? 'ppc64' : 'x86_64'} -arch arm64"
 	    end
 
 	line = "#{getcc()} #{arch_flag} #{tmp_src.path} -o #{tmp_bin_path} #{@compiler_flags} 2>#{tmp_log_path}"

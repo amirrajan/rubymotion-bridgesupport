@@ -31,7 +31,6 @@ enhancements:
 brew install gcc
 brew install make
 brew install cmake
-brew install rbenv
 ```
 - Install Xcode 10.3, it is strongly recommended that you do not
   install Xcode from the App Store and instead use the archived
@@ -48,50 +47,34 @@ sudo xcode-select --install
 sudo xcode-select --reset
 ```
 
-NOTE: It is strongly recommended that you use `rbenv` instead of `rvm`
-      specifically because of:
-
->So, how do these tools get the job done? This is where things get a
->little scary with RVM. RVM overrides the cd shell command in order to
->load the current Ruby environment variables. Not only can the
->override cause unexpected behavior, but it also means that rubies and
->gemsets are loaded when switching directories.
-
-https://metova.com/choosing-a-ruby-version-management-tool-rbenv-vs-rvm/
-
-- After `rbenv` is installed run (which can be used for trouble
-  shooting if `system` Ruby fails for any reason):
-
-```
-rbenv install 2.3.7
-```
-
 NOTE: The version that is used within the repo _must_ be `system`
 Ruby. Do not change the `.ruby-version` file.
 
-- Download the Starter License for [RubyMotion].
+- Download the Starter License for [RubyMotion] (if you want to test an update).
 
 - Clone this repo and `cd` into the directory and run:
 
 ```
+ruby --version # should be: ruby 2.6.10p210 (2022-04-12 revision 67958) [universal.arm64e-darwin22]
 sudo gem install xml-simple
 sudo gem install rake
 sudo gem install minitest
-sudo gem install nokogiri
+sudo gem install nokogiri -v 1.13.10
 ```
 
-(the `sudo` is required for the commands above because we are using `system` ruby)
+NOTE: the `sudo` is required for the commands above because we are using `system` ruby.
 
-- Run `make clean` followed by `make` (the initial compilation will take about an hour given
-  that `LLVM` is compiled from source).
-
-- Then run:
+- Run:
 
 ```
+make clean
+make
 make install DESTDIR=./RubyMotion/lib/BridgeSupport3
 ```
 
-- Once installed, run the following command to perform a precursory test:
+NOTE: compilation will take a while (30 min+).
+
+- Once compiled and installed, run the following command to perform a precursory test:
 
 ```
 cd test

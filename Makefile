@@ -20,7 +20,7 @@ SYMROOT = $(DEF_SYMROOT)
 DESTDIR = /
 RC_ARCHS = x86_64
 ORDERED_ARCHS = $(filter %64,$(RC_ARCHS)) $(filter-out %64,$(RC_ARCHS))
-RC_CFLAGS = $(foreach arch,$(RC_ARCHS),-arch $(arch)) -pipe
+RC_CFLAGS = $(foreach arch,$(RC_ARCHS),-arch $(arch)) -arch arm64 -pipe
 
 RSYNC = /usr/bin/rsync -rlpt
 RUBY = /usr/bin/ruby
@@ -127,8 +127,8 @@ $(CLANGROOT_MADE): $(CLANG_DIR_MADE)
 	    $(MKDIR) $(CLANG_DIR)/darwin-$$arch && \
 	    (cd $(CLANG_DIR)/darwin-$$arch && \
 	    $(MKDIR) ROOT && \
-	    env MACOSX_DEPLOYMENT_TARGET=10.9 CC="$(CC) -arch $$arch" CXX="$(CXX) -arch $$arch" cmake ../ -G "Unix Makefiles" -DCMAKE_BUILD_TYPE=Release -DLLVM_ENABLE_LIBCXX=YES -DLLVM_BUILD_EXTERNAL_COMPILER_RT=YES -DLLVM_TARGETS_TO_BUILD="X86;ARM;AArch64" && \
-	    env MACOSX_DEPLOYMENT_TARGET=10.9 CC="$(CC) -arch $$arch" CXX="$(CXX) -arch $$arch" make -j$(shell sysctl -n hw.ncpu) && \
+	    env MACOSX_DEPLOYMENT_TARGET=10.9 CC="$(CC) -arch $$arch -arch arm64" CXX="$(CXX) -arch $$arch -arch arm64" cmake ../ -G "Unix Makefiles" -DCMAKE_BUILD_TYPE=Release -DLLVM_ENABLE_LIBCXX=YES -DLLVM_BUILD_EXTERNAL_COMPILER_RT=YES -DLLVM_TARGETS_TO_BUILD="X86;ARM;AArch64" && \
+	    env MACOSX_DEPLOYMENT_TARGET=10.9 CC="$(CC) -arch $$arch -arch arm64" CXX="$(CXX) -arch $$arch -arch arm64" make -j$(shell sysctl -n hw.ncpu) && \
 	    $(MKDIR) $(CLANG_DIR)/darwin-$$arch/ROOT && \
 	    make install DESTDIR=$(CLANG_DIR)/darwin-$$arch/ROOT) || exit 1; \
 	done
@@ -139,7 +139,7 @@ ifneq ($(words $(RC_ARCHS)),1)
 	$(MKDIR) $(CLANGROOT)$(CLANG_PREFIX)/$(ARCHIVE_DIR)
 	@set -x && \
 	for a in `cat $(ARCHIVE_LIST)`; do \
-	    $(LIPO) -create -output $(CLANGROOT)$(CLANG_PREFIX)/$(ARCHIVE_DIR)/$$a $(foreach arch,$(RC_ARCHS),-arch $(arch) $(CLANG_DIR)/darwin-$(arch)/ROOT$(CLANG_PREFIX)/$(ARCHIVE_DIR)/$$a) && \
+	    $(LIPO) -create -output $(CLANGROOT)$(CLANG_PREFIX)/$(ARCHIVE_DIR)/$$a $(foreach arch,$(RC_ARCHS),-arch $(arch)) -arch arm64 $(CLANG_DIR)/darwin-$(arch)/ROOT$(CLANG_PREFIX)/$(ARCHIVE_DIR)/$$a) && \
 	    $(RANLIB) $(CLANGROOT)$(CLANG_PREFIX)/$(ARCHIVE_DIR)/$$a || exit 1; \
 	done
 endif

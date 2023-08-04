@@ -1,4 +1,4 @@
 <?xml version='1.0'?>
 <signatures version='1.0'>
-<enum name='FooTestOption' value='42'/>
+<enum name='FooTestOption' value64='42'/>
 </signatures>

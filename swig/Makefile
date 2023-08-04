@@ -4,8 +4,6 @@ SHELL = /bin/sh
 
 #### Start of system configuration section. ####
 
-ruby_version     = 2.6
-ruby_abi_version = 2.6.0
 usrlib  = /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/System/Library/Frameworks/Ruby.framework/Versions/2.6/usr/include
 topdir  = /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/System/Library/Frameworks/Ruby.framework/Versions/2.6/usr/lib/ruby/2.6.0/universal-darwin22
 hdrdir  = /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/System/Library/Frameworks/Ruby.framework/Versions/2.6/usr/include/ruby-2.6.0
@@ -27,11 +25,11 @@ htmldir = $(docdir)
 vendorarchdir = $(vendorlibdir)/$(sitearch)
 includedir = $(prefix)/include
 infodir = $(DESTDIR)/usr/share/info
-vendorlibdir = $(vendordir)/$(ruby_abi_version)
+vendorlibdir = $(vendordir)/2.6.0
 sysconfdir = $(prefix)/etc
 libdir = $(exec_prefix)/lib
 sbindir = $(exec_prefix)/sbin
-rubylibdir = $(libdir)/ruby/$(ruby_abi_version)
+rubylibdir = $(libdir)/ruby/2.6.0
 docdir = $(datarootdir)/doc/$(PACKAGE)
 dvidir = $(docdir)
 vendordir = $(libdir)/ruby/vendor_ruby
@@ -41,7 +39,7 @@ archdir = $(rubylibdir)/$(arch)
 sitearchdir = $(sitelibdir)/$(sitearch)
 datadir = $(datarootdir)
 localstatedir = $(prefix)/var
-sitelibdir = $(sitedir)/$(ruby_abi_version)
+sitelibdir = $(sitedir)/2.6.0
 
 CC = c++
 CXX = $(CC)
@@ -73,7 +71,7 @@ RUBY_SO_NAME = ruby
 arch = $(shell $(RUBY) -e 'puts RUBY_PLATFORM')
 sitearch = $(arch)
 
-ruby = /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/System/Library/Frameworks/Ruby.framework/Versions/$(ruby_version)/usr/bin/ruby
+ruby = /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/System/Library/Frameworks/Ruby.framework/Versions/2.6/usr/include/ruby-2.6.0/universal-darwin22/ruby
 RUBY = $(ruby)
 RM = rm -f
 MAKEDIRS = mkdir -p
