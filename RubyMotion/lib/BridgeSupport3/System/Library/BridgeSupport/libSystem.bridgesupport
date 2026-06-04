@@ -1,0 +1,1293 @@
+<?xml version='1.0'?>
+<!DOCTYPE signatures SYSTEM "file://localhost/System/Library/DTDs/BridgeSupport.dtd">
+<signatures version='1.0'>
+<struct name='CCHmacContext' type='{_CCHmacContext=&quot;ctx&quot;[96I]}'/>
+<struct name='CC_MD2_CTX' type='{CC_MD2state_st=&quot;num&quot;i&quot;data&quot;[16C]&quot;cksm&quot;[16I]&quot;state&quot;[16I]}'/>
+<struct name='CC_MD2state_st' type='{CC_MD2state_st=&quot;num&quot;i&quot;data&quot;[16C]&quot;cksm&quot;[16I]&quot;state&quot;[16I]}'/>
+<struct name='CC_MD4_CTX' type='{CC_MD4state_st=&quot;A&quot;I&quot;B&quot;I&quot;C&quot;I&quot;D&quot;I&quot;Nl&quot;I&quot;Nh&quot;I&quot;data&quot;[16I]&quot;num&quot;I}'/>
+<struct name='CC_MD4state_st' type='{CC_MD4state_st=&quot;A&quot;I&quot;B&quot;I&quot;C&quot;I&quot;D&quot;I&quot;Nl&quot;I&quot;Nh&quot;I&quot;data&quot;[16I]&quot;num&quot;I}'/>
+<struct name='CC_MD5_CTX' type='{CC_MD5state_st=&quot;A&quot;I&quot;B&quot;I&quot;C&quot;I&quot;D&quot;I&quot;Nl&quot;I&quot;Nh&quot;I&quot;data&quot;[16I]&quot;num&quot;i}'/>
+<struct name='CC_MD5state_st' type='{CC_MD5state_st=&quot;A&quot;I&quot;B&quot;I&quot;C&quot;I&quot;D&quot;I&quot;Nl&quot;I&quot;Nh&quot;I&quot;data&quot;[16I]&quot;num&quot;i}'/>
+<struct name='CC_SHA1_CTX' type='{CC_SHA1state_st=&quot;h0&quot;I&quot;h1&quot;I&quot;h2&quot;I&quot;h3&quot;I&quot;h4&quot;I&quot;Nl&quot;I&quot;Nh&quot;I&quot;data&quot;[16I]&quot;num&quot;i}'/>
+<struct name='CC_SHA1state_st' type='{CC_SHA1state_st=&quot;h0&quot;I&quot;h1&quot;I&quot;h2&quot;I&quot;h3&quot;I&quot;h4&quot;I&quot;Nl&quot;I&quot;Nh&quot;I&quot;data&quot;[16I]&quot;num&quot;i}'/>
+<struct name='CC_SHA256_CTX' type='{CC_SHA256state_st=&quot;count&quot;[2I]&quot;hash&quot;[8I]&quot;wbuf&quot;[16I]}'/>
+<struct name='CC_SHA256state_st' type='{CC_SHA256state_st=&quot;count&quot;[2I]&quot;hash&quot;[8I]&quot;wbuf&quot;[16I]}'/>
+<struct name='CC_SHA512_CTX' type='{CC_SHA512state_st=&quot;count&quot;[2Q]&quot;hash&quot;[8Q]&quot;wbuf&quot;[16Q]}'/>
+<struct name='CC_SHA512state_st' type='{CC_SHA512state_st=&quot;count&quot;[2Q]&quot;hash&quot;[8Q]&quot;wbuf&quot;[16Q]}'/>
+<struct name='mach_dead_name_notification_t' type='{_mach_dead_name_notification_t=&quot;not_header&quot;{?=&quot;msgh_bits&quot;I&quot;msgh_size&quot;I&quot;msgh_remote_port&quot;I&quot;msgh_local_port&quot;I&quot;msgh_voucher_port&quot;I&quot;msgh_id&quot;i}&quot;NDR&quot;{?=&quot;mig_vers&quot;C&quot;if_vers&quot;C&quot;reserved1&quot;C&quot;mig_encoding&quot;C&quot;int_rep&quot;C&quot;char_rep&quot;C&quot;float_rep&quot;C&quot;reserved2&quot;C}&quot;not_port&quot;I&quot;trailer&quot;{?=&quot;msgh_trailer_type&quot;I&quot;msgh_trailer_size&quot;I&quot;msgh_seqno&quot;I&quot;msgh_sender&quot;{?=&quot;val&quot;[2I]}}}'/>
+<struct name='mach_no_senders_notification_t' type='{_mach_no_senders_notification_t=&quot;not_header&quot;{?=&quot;msgh_bits&quot;I&quot;msgh_size&quot;I&quot;msgh_remote_port&quot;I&quot;msgh_local_port&quot;I&quot;msgh_voucher_port&quot;I&quot;msgh_id&quot;i}&quot;NDR&quot;{?=&quot;mig_vers&quot;C&quot;if_vers&quot;C&quot;reserved1&quot;C&quot;mig_encoding&quot;C&quot;int_rep&quot;C&quot;char_rep&quot;C&quot;float_rep&quot;C&quot;reserved2&quot;C}&quot;not_count&quot;I&quot;trailer&quot;{?=&quot;msgh_trailer_type&quot;I&quot;msgh_trailer_size&quot;I&quot;msgh_seqno&quot;I&quot;msgh_sender&quot;{?=&quot;val&quot;[2I]}}}'/>
+<struct name='mach_port_deleted_notification_t' type='{_mach_port_deleted_notification_t=&quot;not_header&quot;{?=&quot;msgh_bits&quot;I&quot;msgh_size&quot;I&quot;msgh_remote_port&quot;I&quot;msgh_local_port&quot;I&quot;msgh_voucher_port&quot;I&quot;msgh_id&quot;i}&quot;NDR&quot;{?=&quot;mig_vers&quot;C&quot;if_vers&quot;C&quot;reserved1&quot;C&quot;mig_encoding&quot;C&quot;int_rep&quot;C&quot;char_rep&quot;C&quot;float_rep&quot;C&quot;reserved2&quot;C}&quot;not_port&quot;I&quot;trailer&quot;{?=&quot;msgh_trailer_type&quot;I&quot;msgh_trailer_size&quot;I&quot;msgh_seqno&quot;I&quot;msgh_sender&quot;{?=&quot;val&quot;[2I]}}}'/>
+<struct name='mach_port_destroyed_notification_t' type='{_mach_port_destroyed_notification_t=&quot;not_header&quot;{?=&quot;msgh_bits&quot;I&quot;msgh_size&quot;I&quot;msgh_remote_port&quot;I&quot;msgh_local_port&quot;I&quot;msgh_voucher_port&quot;I&quot;msgh_id&quot;i}&quot;not_body&quot;{?=&quot;msgh_descriptor_count&quot;I}&quot;not_port&quot;{?=&quot;name&quot;I&quot;pad1&quot;I&quot;pad2&quot;b16&quot;disposition&quot;b8&quot;type&quot;b8}&quot;trailer&quot;{?=&quot;msgh_trailer_type&quot;I&quot;msgh_trailer_size&quot;I&quot;msgh_seqno&quot;I&quot;msgh_sender&quot;{?=&quot;val&quot;[2I]}}}'/>
+<struct name='mach_send_once_notification_t' type='{_mach_send_once_notification_t=&quot;not_header&quot;{?=&quot;msgh_bits&quot;I&quot;msgh_size&quot;I&quot;msgh_remote_port&quot;I&quot;msgh_local_port&quot;I&quot;msgh_voucher_port&quot;I&quot;msgh_id&quot;i}&quot;trailer&quot;{?=&quot;msgh_trailer_type&quot;I&quot;msgh_trailer_size&quot;I&quot;msgh_seqno&quot;I&quot;msgh_sender&quot;{?=&quot;val&quot;[2I]}}}'/>
+<struct name='mach_send_possible_notification_t' type='{_mach_send_possible_notification_t=&quot;not_header&quot;{?=&quot;msgh_bits&quot;I&quot;msgh_size&quot;I&quot;msgh_remote_port&quot;I&quot;msgh_local_port&quot;I&quot;msgh_voucher_port&quot;I&quot;msgh_id&quot;i}&quot;NDR&quot;{?=&quot;mig_vers&quot;C&quot;if_vers&quot;C&quot;reserved1&quot;C&quot;mig_encoding&quot;C&quot;int_rep&quot;C&quot;char_rep&quot;C&quot;float_rep&quot;C&quot;reserved2&quot;C}&quot;not_port&quot;I&quot;trailer&quot;{?=&quot;msgh_trailer_type&quot;I&quot;msgh_trailer_size&quot;I&quot;msgh_seqno&quot;I&quot;msgh_sender&quot;{?=&quot;val&quot;[2I]}}}'/>
+<opaque name='CCCryptorRef' type='^{_CCCryptor=}'/>
+<opaque name='asl_object_t' type='^{__asl_object_s=}'/>
+<opaque name='copyfile_state_t' type='^{_copyfile_state=}'/>
+<opaque name='launch_data_t' type='^{_launch_data=}'/>
+<constant name='CCrfc3394_iv' type='*'/>
+<constant name='CCrfc3394_ivLen' type='L' type64='Q'/>
+<constant name='kSBXProfileNoInternet' type='^c'/>
+<constant name='kSBXProfileNoNetwork' type='^c'/>
+<constant name='kSBXProfileNoWrite' type='^c'/>
+<constant name='kSBXProfileNoWriteExceptTemporary' type='^c'/>
+<constant name='kSBXProfilePureComputation' type='^c'/>
+<string_constant name='ASL_KEY_AUX_DATA' value='ASLAuxData'/>
+<string_constant name='ASL_KEY_AUX_TITLE' value='ASLAuxTitle'/>
+<string_constant name='ASL_KEY_AUX_URL' value='ASLAuxURL'/>
+<string_constant name='ASL_KEY_AUX_UTI' value='ASLAuxUTI'/>
+<string_constant name='ASL_KEY_EXPIRE_TIME' value='ASLExpireTime'/>
+<string_constant name='ASL_KEY_FACILITY' value='Facility'/>
+<string_constant name='ASL_KEY_FINAL_NOTIFICATION' value='ASLFinalNotification'/>
+<string_constant name='ASL_KEY_GID' value='GID'/>
+<string_constant name='ASL_KEY_HOST' value='Host'/>
+<string_constant name='ASL_KEY_LEVEL' value='Level'/>
+<string_constant name='ASL_KEY_MODULE' value='ASLModule'/>
+<string_constant name='ASL_KEY_MSG' value='Message'/>
+<string_constant name='ASL_KEY_MSG_ID' value='ASLMessageID'/>
+<string_constant name='ASL_KEY_OPTION' value='ASLOption'/>
+<string_constant name='ASL_KEY_OS_ACTIVITY_ID' value='OSActivityID'/>
+<string_constant name='ASL_KEY_PID' value='PID'/>
+<string_constant name='ASL_KEY_READ_GID' value='ReadGID'/>
+<string_constant name='ASL_KEY_READ_UID' value='ReadUID'/>
+<string_constant name='ASL_KEY_REF_PID' value='RefPID'/>
+<string_constant name='ASL_KEY_REF_PROC' value='RefProc'/>
+<string_constant name='ASL_KEY_SENDER' value='Sender'/>
+<string_constant name='ASL_KEY_SENDER_INSTANCE' value='SenderInstance'/>
+<string_constant name='ASL_KEY_SENDER_MACH_UUID' value='SenderMachUUID'/>
+<string_constant name='ASL_KEY_SESSION' value='Session'/>
+<string_constant name='ASL_KEY_TIME' value='Time'/>
+<string_constant name='ASL_KEY_TIME_NSEC' value='TimeNanoSec'/>
+<string_constant name='ASL_KEY_UID' value='UID'/>
+<string_constant name='ASL_MSG_FMT_BSD' value='bsd'/>
+<string_constant name='ASL_MSG_FMT_MSG' value='msg'/>
+<string_constant name='ASL_MSG_FMT_RAW' value='raw'/>
+<string_constant name='ASL_MSG_FMT_STD' value='std'/>
+<string_constant name='ASL_MSG_FMT_XML' value='xml'/>
+<string_constant name='ASL_STRING_ALERT' value='Alert'/>
+<string_constant name='ASL_STRING_CRIT' value='Critical'/>
+<string_constant name='ASL_STRING_DEBUG' value='Debug'/>
+<string_constant name='ASL_STRING_EMERG' value='Emergency'/>
+<string_constant name='ASL_STRING_ERR' value='Error'/>
+<string_constant name='ASL_STRING_INFO' value='Info'/>
+<string_constant name='ASL_STRING_NOTICE' value='Notice'/>
+<string_constant name='ASL_STRING_WARNING' value='Warning'/>
+<string_constant name='ASL_TIME_FMT_LCL' value='lcl'/>
+<string_constant name='ASL_TIME_FMT_SEC' value='sec'/>
+<string_constant name='ASL_TIME_FMT_UTC' value='utc'/>
+<string_constant name='CC_DIGEST_DEPRECATION_WARNING' value='This function is cryptographically broken and should not be used in security contexts. Clients should migrate to SHA256 (or stronger).'/>
+<string_constant name='COPYFILE_DISABLE_VAR' value='COPYFILE_DISABLE'/>
+<string_constant name='LAUNCH_JOBINETDCOMPATIBILITY_INSTANCES' value='Instances'/>
+<string_constant name='LAUNCH_JOBINETDCOMPATIBILITY_WAIT' value='Wait'/>
+<string_constant name='LAUNCH_JOBKEY_ABANDONPROCESSGROUP' value='AbandonProcessGroup'/>
+<string_constant name='LAUNCH_JOBKEY_ASSOCIATEDBUNDLEIDENTIFIERS' value='AssociatedBundleIdentifiers'/>
+<string_constant name='LAUNCH_JOBKEY_BONJOURFDS' value='BonjourFDs'/>
+<string_constant name='LAUNCH_JOBKEY_BUNDLEPROGRAM' value='BundleProgram'/>
+<string_constant name='LAUNCH_JOBKEY_CAL_DAY' value='Day'/>
+<string_constant name='LAUNCH_JOBKEY_CAL_HOUR' value='Hour'/>
+<string_constant name='LAUNCH_JOBKEY_CAL_MINUTE' value='Minute'/>
+<string_constant name='LAUNCH_JOBKEY_CAL_MONTH' value='Month'/>
+<string_constant name='LAUNCH_JOBKEY_CAL_WEEKDAY' value='Weekday'/>
+<string_constant name='LAUNCH_JOBKEY_DATASTORES' value='Datastores'/>
+<string_constant name='LAUNCH_JOBKEY_DATASTORES_SIZELIMIT' value='SizeLimit'/>
+<string_constant name='LAUNCH_JOBKEY_DEBUG' value='Debug'/>
+<string_constant name='LAUNCH_JOBKEY_DISABLED' value='Disabled'/>
+<string_constant name='LAUNCH_JOBKEY_DISABLED_MACHINETYPE' value='MachineType'/>
+<string_constant name='LAUNCH_JOBKEY_DISABLED_MODELNAME' value='ModelName'/>
+<string_constant name='LAUNCH_JOBKEY_DRAINMESSAGESONFAILEDINIT' value='DrainMessagesOnFailedInit'/>
+<string_constant name='LAUNCH_JOBKEY_ENABLEGLOBBING' value='EnableGlobbing'/>
+<string_constant name='LAUNCH_JOBKEY_ENABLEPRESSUREDEXIT' value='EnablePressuredExit'/>
+<string_constant name='LAUNCH_JOBKEY_ENABLETRANSACTIONS' value='EnableTransactions'/>
+<string_constant name='LAUNCH_JOBKEY_ENVIRONMENTVARIABLES' value='EnvironmentVariables'/>
+<string_constant name='LAUNCH_JOBKEY_EXITTIMEOUT' value='ExitTimeOut'/>
+<string_constant name='LAUNCH_JOBKEY_GROUPNAME' value='GroupName'/>
+<string_constant name='LAUNCH_JOBKEY_HARDRESOURCELIMITS' value='HardResourceLimits'/>
+<string_constant name='LAUNCH_JOBKEY_HOPEFULLYEXITSFIRST' value='HopefullyExitsFirst'/>
+<string_constant name='LAUNCH_JOBKEY_HOPEFULLYEXITSLAST' value='HopefullyExitsLast'/>
+<string_constant name='LAUNCH_JOBKEY_IGNOREPROCESSGROUPATSHUTDOWN' value='IgnoreProcessGroupAtShutdown'/>
+<string_constant name='LAUNCH_JOBKEY_INETDCOMPATIBILITY' value='inetdCompatibility'/>
+<string_constant name='LAUNCH_JOBKEY_INITGROUPS' value='InitGroups'/>
+<string_constant name='LAUNCH_JOBKEY_KEEPALIVE' value='KeepAlive'/>
+<string_constant name='LAUNCH_JOBKEY_KEEPALIVE_AFTERINITIALDEMAND' value='AfterInitialDemand'/>
+<string_constant name='LAUNCH_JOBKEY_KEEPALIVE_CRASHED' value='Crashed'/>
+<string_constant name='LAUNCH_JOBKEY_KEEPALIVE_NETWORKSTATE' value='NetworkState'/>
+<string_constant name='LAUNCH_JOBKEY_KEEPALIVE_OTHERJOBACTIVE' value='OtherJobActive'/>
+<string_constant name='LAUNCH_JOBKEY_KEEPALIVE_OTHERJOBENABLED' value='OtherJobEnabled'/>
+<string_constant name='LAUNCH_JOBKEY_KEEPALIVE_PATHSTATE' value='PathState'/>
+<string_constant name='LAUNCH_JOBKEY_KEEPALIVE_SUCCESSFULEXIT' value='SuccessfulExit'/>
+<string_constant name='LAUNCH_JOBKEY_LABEL' value='Label'/>
+<string_constant name='LAUNCH_JOBKEY_LASTEXITSTATUS' value='LastExitStatus'/>
+<string_constant name='LAUNCH_JOBKEY_LAUNCHEVENTS' value='LaunchEvents'/>
+<string_constant name='LAUNCH_JOBKEY_LAUNCHONLYONCE' value='LaunchOnlyOnce'/>
+<string_constant name='LAUNCH_JOBKEY_LEGACYTIMERS' value='LegacyTimers'/>
+<string_constant name='LAUNCH_JOBKEY_LIMITLOADFROMHARDWARE' value='LimitLoadFromHardware'/>
+<string_constant name='LAUNCH_JOBKEY_LIMITLOADFROMHOSTS' value='LimitLoadFromHosts'/>
+<string_constant name='LAUNCH_JOBKEY_LIMITLOADTOHARDWARE' value='LimitLoadToHardware'/>
+<string_constant name='LAUNCH_JOBKEY_LIMITLOADTOHOSTS' value='LimitLoadToHosts'/>
+<string_constant name='LAUNCH_JOBKEY_LIMITLOADTOSESSIONTYPE' value='LimitLoadToSessionType'/>
+<string_constant name='LAUNCH_JOBKEY_LOWPRIORITYBACKGROUNDIO' value='LowPriorityBackgroundIO'/>
+<string_constant name='LAUNCH_JOBKEY_LOWPRIORITYIO' value='LowPriorityIO'/>
+<string_constant name='LAUNCH_JOBKEY_MACHSERVICELOOKUPPOLICIES' value='MachServiceLookupPolicies'/>
+<string_constant name='LAUNCH_JOBKEY_MACHSERVICES' value='MachServices'/>
+<string_constant name='LAUNCH_JOBKEY_MACH_HIDEUNTILCHECKIN' value='HideUntilCheckIn'/>
+<string_constant name='LAUNCH_JOBKEY_MACH_RESETATCLOSE' value='ResetAtClose'/>
+<string_constant name='LAUNCH_JOBKEY_MATERIALIZEDATALESSFILES' value='MaterializeDatalessFiles'/>
+<string_constant name='LAUNCH_JOBKEY_NICE' value='Nice'/>
+<string_constant name='LAUNCH_JOBKEY_ONDEMAND' value='OnDemand'/>
+<string_constant name='LAUNCH_JOBKEY_PID' value='PID'/>
+<string_constant name='LAUNCH_JOBKEY_POLICIES' value='Policies'/>
+<string_constant name='LAUNCH_JOBKEY_PROCESSTYPE' value='ProcessType'/>
+<string_constant name='LAUNCH_JOBKEY_PROGRAM' value='Program'/>
+<string_constant name='LAUNCH_JOBKEY_PROGRAMARGUMENTS' value='ProgramArguments'/>
+<string_constant name='LAUNCH_JOBKEY_PUBLISHESEVENTS' value='PublishesEvents'/>
+<string_constant name='LAUNCH_JOBKEY_QUEUEDIRECTORIES' value='QueueDirectories'/>
+<string_constant name='LAUNCH_JOBKEY_RESOURCELIMIT_CORE' value='Core'/>
+<string_constant name='LAUNCH_JOBKEY_RESOURCELIMIT_CPU' value='CPU'/>
+<string_constant name='LAUNCH_JOBKEY_RESOURCELIMIT_DATA' value='Data'/>
+<string_constant name='LAUNCH_JOBKEY_RESOURCELIMIT_FSIZE' value='FileSize'/>
+<string_constant name='LAUNCH_JOBKEY_RESOURCELIMIT_MEMLOCK' value='MemoryLock'/>
+<string_constant name='LAUNCH_JOBKEY_RESOURCELIMIT_NOFILE' value='NumberOfFiles'/>
+<string_constant name='LAUNCH_JOBKEY_RESOURCELIMIT_NPROC' value='NumberOfProcesses'/>
+<string_constant name='LAUNCH_JOBKEY_RESOURCELIMIT_RSS' value='ResidentSetSize'/>
+<string_constant name='LAUNCH_JOBKEY_RESOURCELIMIT_STACK' value='Stack'/>
+<string_constant name='LAUNCH_JOBKEY_ROOTDIRECTORY' value='RootDirectory'/>
+<string_constant name='LAUNCH_JOBKEY_RUNATLOAD' value='RunAtLoad'/>
+<string_constant name='LAUNCH_JOBKEY_SESSIONCREATE' value='SessionCreate'/>
+<string_constant name='LAUNCH_JOBKEY_SOCKETS' value='Sockets'/>
+<string_constant name='LAUNCH_JOBKEY_SOFTRESOURCELIMITS' value='SoftResourceLimits'/>
+<string_constant name='LAUNCH_JOBKEY_SPAWNCONSTRAINT' value='SpawnConstraint'/>
+<string_constant name='LAUNCH_JOBKEY_STANDARDERRORPATH' value='StandardErrorPath'/>
+<string_constant name='LAUNCH_JOBKEY_STANDARDINPATH' value='StandardInPath'/>
+<string_constant name='LAUNCH_JOBKEY_STANDARDOUTPATH' value='StandardOutPath'/>
+<string_constant name='LAUNCH_JOBKEY_STARTCALENDARINTERVAL' value='StartCalendarInterval'/>
+<string_constant name='LAUNCH_JOBKEY_STARTINTERVAL' value='StartInterval'/>
+<string_constant name='LAUNCH_JOBKEY_STARTONMOUNT' value='StartOnMount'/>
+<string_constant name='LAUNCH_JOBKEY_THROTTLEINTERVAL' value='ThrottleInterval'/>
+<string_constant name='LAUNCH_JOBKEY_TIMEOUT' value='TimeOut'/>
+<string_constant name='LAUNCH_JOBKEY_UMASK' value='Umask'/>
+<string_constant name='LAUNCH_JOBKEY_USERENVIRONMENTVARIABLES' value='UserEnvironmentVariables'/>
+<string_constant name='LAUNCH_JOBKEY_USERNAME' value='UserName'/>
+<string_constant name='LAUNCH_JOBKEY_WAITFORDEBUGGER' value='WaitForDebugger'/>
+<string_constant name='LAUNCH_JOBKEY_WATCHPATHS' value='WatchPaths'/>
+<string_constant name='LAUNCH_JOBKEY_WORKINGDIRECTORY' value='WorkingDirectory'/>
+<string_constant name='LAUNCH_JOBPOLICY_DENYCREATINGOTHERJOBS' value='DenyCreatingOtherJobs'/>
+<string_constant name='LAUNCH_JOBSOCKETKEY_BONJOUR' value='Bonjour'/>
+<string_constant name='LAUNCH_JOBSOCKETKEY_FAMILY' value='SockFamily'/>
+<string_constant name='LAUNCH_JOBSOCKETKEY_MULTICASTGROUP' value='MulticastGroup'/>
+<string_constant name='LAUNCH_JOBSOCKETKEY_NODENAME' value='SockNodeName'/>
+<string_constant name='LAUNCH_JOBSOCKETKEY_PASSIVE' value='SockPassive'/>
+<string_constant name='LAUNCH_JOBSOCKETKEY_PATHGROUP' value='SockPathGroup'/>
+<string_constant name='LAUNCH_JOBSOCKETKEY_PATHMODE' value='SockPathMode'/>
+<string_constant name='LAUNCH_JOBSOCKETKEY_PATHNAME' value='SockPathName'/>
+<string_constant name='LAUNCH_JOBSOCKETKEY_PATHOWNER' value='SockPathOwner'/>
+<string_constant name='LAUNCH_JOBSOCKETKEY_PROTOCOL' value='SockProtocol'/>
+<string_constant name='LAUNCH_JOBSOCKETKEY_SECUREWITHKEY' value='SecureSocketWithKey'/>
+<string_constant name='LAUNCH_JOBSOCKETKEY_SERVICENAME' value='SockServiceName'/>
+<string_constant name='LAUNCH_JOBSOCKETKEY_TYPE' value='SockType'/>
+<string_constant name='LAUNCH_KEY_CHECKIN' value='CheckIn'/>
+<string_constant name='LAUNCH_KEY_GETJOB' value='GetJob'/>
+<string_constant name='LAUNCH_KEY_GETJOBS' value='GetJobs'/>
+<string_constant name='LAUNCH_KEY_PROCESSTYPE_ADAPTIVE' value='Adaptive'/>
+<string_constant name='LAUNCH_KEY_PROCESSTYPE_APP' value='App'/>
+<string_constant name='LAUNCH_KEY_PROCESSTYPE_BACKGROUND' value='Background'/>
+<string_constant name='LAUNCH_KEY_PROCESSTYPE_INTERACTIVE' value='Interactive'/>
+<string_constant name='LAUNCH_KEY_PROCESSTYPE_STANDARD' value='Standard'/>
+<string_constant name='LAUNCH_KEY_PUBLISHESEVENTS_DOMAININTERNAL' value='DomainInternal'/>
+<string_constant name='LAUNCH_KEY_REMOVEJOB' value='RemoveJob'/>
+<string_constant name='LAUNCH_KEY_STARTJOB' value='StartJob'/>
+<string_constant name='LAUNCH_KEY_STOPJOB' value='StopJob'/>
+<string_constant name='LAUNCH_KEY_SUBMITJOB' value='SubmitJob'/>
+<string_constant name='kNotifyASLDBUpdate' value='com.apple.system.logger.message'/>
+<string_constant name='kNotifyClockSet' value='com.apple.system.clock_set'/>
+<string_constant name='kNotifyDSCacheInvalidation' value='com.apple.system.DirectoryService.InvalidateCache'/>
+<string_constant name='kNotifyDSCacheInvalidationGroup' value='com.apple.system.DirectoryService.InvalidateCache.group'/>
+<string_constant name='kNotifyDSCacheInvalidationHost' value='com.apple.system.DirectoryService.InvalidateCache.host'/>
+<string_constant name='kNotifyDSCacheInvalidationService' value='com.apple.system.DirectoryService.InvalidateCache.service'/>
+<string_constant name='kNotifyDSCacheInvalidationUser' value='com.apple.system.DirectoryService.InvalidateCache.user'/>
+<string_constant name='kNotifySCHostNameChange' value='com.apple.system.hostname'/>
+<string_constant name='kNotifySCNetworkChange' value='com.apple.system.config.network_change'/>
+<string_constant name='kNotifyTimeZoneChange' value='com.apple.system.timezone'/>
+<string_constant name='kNotifyVFSLowDiskSpace' value='com.apple.system.lowdiskspace'/>
+<string_constant name='kNotifyVFSLowDiskSpaceOtherFS' value='com.apple.system.lowdiskspace.user'/>
+<string_constant name='kNotifyVFSLowDiskSpaceRootFS' value='com.apple.system.lowdiskspace.system'/>
+<string_constant name='kNotifyVFSMount' value='com.apple.system.kernel.mount'/>
+<string_constant name='kNotifyVFSUnmount' value='com.apple.system.kernel.unmount'/>
+<string_constant name='kNotifyVFSUpdate' value='com.apple.system.kernel.mountupdate'/>
+<enum name='ASL_API_VERSION' value='20150225'/>
+<enum name='ASL_ENCODE_ASL' value='2'/>
+<enum name='ASL_ENCODE_NONE' value='0'/>
+<enum name='ASL_ENCODE_SAFE' value='1'/>
+<enum name='ASL_ENCODE_XML' value='3'/>
+<enum name='ASL_FILTER_MASK_ALERT' value='2'/>
+<enum name='ASL_FILTER_MASK_CRIT' value='4'/>
+<enum name='ASL_FILTER_MASK_DEBUG' value='128'/>
+<enum name='ASL_FILTER_MASK_EMERG' value='1'/>
+<enum name='ASL_FILTER_MASK_ERR' value='8'/>
+<enum name='ASL_FILTER_MASK_INFO' value='64'/>
+<enum name='ASL_FILTER_MASK_NOTICE' value='32'/>
+<enum name='ASL_FILTER_MASK_WARNING' value='16'/>
+<enum name='ASL_LEVEL_ALERT' value='1'/>
+<enum name='ASL_LEVEL_CRIT' value='2'/>
+<enum name='ASL_LEVEL_DEBUG' value='7'/>
+<enum name='ASL_LEVEL_EMERG' value='0'/>
+<enum name='ASL_LEVEL_ERR' value='3'/>
+<enum name='ASL_LEVEL_INFO' value='6'/>
+<enum name='ASL_LEVEL_NOTICE' value='5'/>
+<enum name='ASL_LEVEL_WARNING' value='4'/>
+<enum name='ASL_LOG_DESCRIPTOR_READ' value='1'/>
+<enum name='ASL_LOG_DESCRIPTOR_WRITE' value='2'/>
+<enum name='ASL_MATCH_DIRECTION_FORWARD' value='1'/>
+<enum name='ASL_MATCH_DIRECTION_REVERSE' value='-1'/>
+<enum name='ASL_OPT_CREATE_STORE' value='2'/>
+<enum name='ASL_OPT_NO_DELAY' value='2'/>
+<enum name='ASL_OPT_NO_REMOTE' value='4'/>
+<enum name='ASL_OPT_OPEN_WRITE' value='1'/>
+<enum name='ASL_OPT_STDERR' value='1'/>
+<enum name='ASL_QUERY_OP_CASEFOLD' value='16'/>
+<enum name='ASL_QUERY_OP_EQUAL' value='1'/>
+<enum name='ASL_QUERY_OP_GREATER' value='2'/>
+<enum name='ASL_QUERY_OP_GREATER_EQUAL' value='3'/>
+<enum name='ASL_QUERY_OP_LESS' value='4'/>
+<enum name='ASL_QUERY_OP_LESS_EQUAL' value='5'/>
+<enum name='ASL_QUERY_OP_NOT_EQUAL' value='6'/>
+<enum name='ASL_QUERY_OP_NUMERIC' value='128'/>
+<enum name='ASL_QUERY_OP_PREFIX' value='32'/>
+<enum name='ASL_QUERY_OP_REGEX' value='256'/>
+<enum name='ASL_QUERY_OP_SUBSTRING' value='96'/>
+<enum name='ASL_QUERY_OP_SUFFIX' value='64'/>
+<enum name='ASL_QUERY_OP_TRUE' value='7'/>
+<enum name='ASL_TYPE_CLIENT' value='5'/>
+<enum name='ASL_TYPE_FILE' value='3'/>
+<enum name='ASL_TYPE_LIST' value='2'/>
+<enum name='ASL_TYPE_MSG' value='0'/>
+<enum name='ASL_TYPE_QUERY' value='1'/>
+<enum name='ASL_TYPE_STORE' value='4'/>
+<enum name='ASL_TYPE_UNDEF' value='4294967295'/>
+<enum name='CC_HMAC_CONTEXT_SIZE' value='96'/>
+<enum name='CC_MD2_BLOCK_BYTES' value='64'/>
+<enum name='CC_MD2_BLOCK_LONG' value='16'/>
+<enum name='CC_MD2_DIGEST_LENGTH' value='16'/>
+<enum name='CC_MD4_BLOCK_BYTES' value='64'/>
+<enum name='CC_MD4_BLOCK_LONG' value='16'/>
+<enum name='CC_MD4_DIGEST_LENGTH' value='16'/>
+<enum name='CC_MD5_BLOCK_BYTES' value='64'/>
+<enum name='CC_MD5_BLOCK_LONG' value='16'/>
+<enum name='CC_MD5_DIGEST_LENGTH' value='16'/>
+<enum name='CC_SHA1_BLOCK_BYTES' value='64'/>
+<enum name='CC_SHA1_BLOCK_LONG' value='16'/>
+<enum name='CC_SHA1_DIGEST_LENGTH' value='20'/>
+<enum name='CC_SHA224_BLOCK_BYTES' value='64'/>
+<enum name='CC_SHA224_DIGEST_LENGTH' value='28'/>
+<enum name='CC_SHA256_BLOCK_BYTES' value='64'/>
+<enum name='CC_SHA256_DIGEST_LENGTH' value='32'/>
+<enum name='CC_SHA384_BLOCK_BYTES' value='128'/>
+<enum name='CC_SHA384_DIGEST_LENGTH' value='48'/>
+<enum name='CC_SHA512_BLOCK_BYTES' value='128'/>
+<enum name='CC_SHA512_DIGEST_LENGTH' value='64'/>
+<enum name='COPYFILE_ACL' value='1'/>
+<enum name='COPYFILE_ALL' value='15'/>
+<enum name='COPYFILE_CHECK' value='65536'/>
+<enum name='COPYFILE_CLONE' value='16777216'/>
+<enum name='COPYFILE_CLONE_FORCE' value='33554432'/>
+<enum name='COPYFILE_CONTINUE' value='0'/>
+<enum name='COPYFILE_COPY_DATA' value='4'/>
+<enum name='COPYFILE_COPY_XATTR' value='5'/>
+<enum name='COPYFILE_DATA' value='8'/>
+<enum name='COPYFILE_DATA_SPARSE' value='134217728'/>
+<enum name='COPYFILE_ERR' value='3'/>
+<enum name='COPYFILE_EXCL' value='131072'/>
+<enum name='COPYFILE_FINISH' value='2'/>
+<enum name='COPYFILE_METADATA' value='7'/>
+<enum name='COPYFILE_MOVE' value='1048576'/>
+<enum name='COPYFILE_NOFOLLOW' value='786432'/>
+<enum name='COPYFILE_NOFOLLOW_DST' value='524288'/>
+<enum name='COPYFILE_NOFOLLOW_SRC' value='262144'/>
+<enum name='COPYFILE_PACK' value='4194304'/>
+<enum name='COPYFILE_PRESERVE_DST_TRACKED' value='268435456'/>
+<enum name='COPYFILE_PROGRESS' value='4'/>
+<enum name='COPYFILE_QUIT' value='2'/>
+<enum name='COPYFILE_RECURSE_DIR' value='2'/>
+<enum name='COPYFILE_RECURSE_DIR_CLEANUP' value='3'/>
+<enum name='COPYFILE_RECURSE_ERROR' value='0'/>
+<enum name='COPYFILE_RECURSE_FILE' value='1'/>
+<enum name='COPYFILE_RECURSIVE' value='32768'/>
+<enum name='COPYFILE_RUN_IN_PLACE' value='67108864'/>
+<enum name='COPYFILE_SECURITY' value='3'/>
+<enum name='COPYFILE_SKIP' value='1'/>
+<enum name='COPYFILE_START' value='1'/>
+<enum name='COPYFILE_STAT' value='2'/>
+<enum name='COPYFILE_STATE_BSIZE' value='13'/>
+<enum name='COPYFILE_STATE_COPIED' value='8'/>
+<enum name='COPYFILE_STATE_DST_BSIZE' value='12'/>
+<enum name='COPYFILE_STATE_DST_FD' value='3'/>
+<enum name='COPYFILE_STATE_DST_FILENAME' value='4'/>
+<enum name='COPYFILE_STATE_FORBID_CROSS_MOUNT' value='14'/>
+<enum name='COPYFILE_STATE_FORBID_DST_EXISTING_SYMLINKS' value='18'/>
+<enum name='COPYFILE_STATE_NOCPROTECT' value='15'/>
+<enum name='COPYFILE_STATE_PRESERVE_SUID' value='16'/>
+<enum name='COPYFILE_STATE_QUARANTINE' value='5'/>
+<enum name='COPYFILE_STATE_RECURSIVE_SRC_FTSENT' value='17'/>
+<enum name='COPYFILE_STATE_SRC_BSIZE' value='11'/>
+<enum name='COPYFILE_STATE_SRC_FD' value='1'/>
+<enum name='COPYFILE_STATE_SRC_FILENAME' value='2'/>
+<enum name='COPYFILE_STATE_STATUS_CB' value='6'/>
+<enum name='COPYFILE_STATE_STATUS_CTX' value='7'/>
+<enum name='COPYFILE_STATE_WAS_CLONED' value='10'/>
+<enum name='COPYFILE_STATE_XATTRNAME' value='9'/>
+<enum name='COPYFILE_UNLINK' value='2097152'/>
+<enum name='COPYFILE_UNPACK' value='8388608'/>
+<enum name='COPYFILE_VERBOSE' value='1073741824'/>
+<enum name='COPYFILE_XATTR' value='4'/>
+<enum name='LAUNCH_DATA_ARRAY' value='2'/>
+<enum name='LAUNCH_DATA_BOOL' value='6'/>
+<enum name='LAUNCH_DATA_DICTIONARY' value='1'/>
+<enum name='LAUNCH_DATA_ERRNO' value='9'/>
+<enum name='LAUNCH_DATA_FD' value='3'/>
+<enum name='LAUNCH_DATA_INTEGER' value='4'/>
+<enum name='LAUNCH_DATA_MACHPORT' value='10'/>
+<enum name='LAUNCH_DATA_OPAQUE' value='8'/>
+<enum name='LAUNCH_DATA_REAL' value='5'/>
+<enum name='LAUNCH_DATA_STRING' value='7'/>
+<enum name='MACH_NOTIFY_DEAD_NAME' value='72'/>
+<enum name='MACH_NOTIFY_FIRST' value='64'/>
+<enum name='MACH_NOTIFY_LAST' value='77'/>
+<enum name='MACH_NOTIFY_NO_SENDERS' value='70'/>
+<enum name='MACH_NOTIFY_PORT_DELETED' value='65'/>
+<enum name='MACH_NOTIFY_PORT_DESTROYED' value='69'/>
+<enum name='MACH_NOTIFY_SEND_ONCE' value='71'/>
+<enum name='MACH_NOTIFY_SEND_POSSIBLE' value='66'/>
+<enum name='NOTIFY_REUSE' value='1'/>
+<enum name='NOTIFY_STATUS_FAILED' value='1000000'/>
+<enum name='NOTIFY_STATUS_INVALID_FILE' value='4'/>
+<enum name='NOTIFY_STATUS_INVALID_NAME' value='1'/>
+<enum name='NOTIFY_STATUS_INVALID_PORT' value='3'/>
+<enum name='NOTIFY_STATUS_INVALID_REQUEST' value='6'/>
+<enum name='NOTIFY_STATUS_INVALID_SIGNAL' value='5'/>
+<enum name='NOTIFY_STATUS_INVALID_TOKEN' value='2'/>
+<enum name='NOTIFY_STATUS_NOT_AUTHORIZED' value='7'/>
+<enum name='NOTIFY_STATUS_NULL_INPUT' value='10'/>
+<enum name='NOTIFY_STATUS_OK' value='0'/>
+<enum name='NOTIFY_STATUS_OPT_DISABLE' value='8'/>
+<enum name='NOTIFY_STATUS_SERVER_NOT_FOUND' value='9'/>
+<enum name='NOTIFY_TOKEN_INVALID' value='-1'/>
+<enum name='SANDBOX_NAMED' value='1'/>
+<enum name='ccNoPadding' value='0'/>
+<enum name='ccPKCS7Padding' value='1'/>
+<enum name='kCCAlgorithm3DES' value='2'/>
+<enum name='kCCAlgorithmAES' value='0'/>
+<enum name='kCCAlgorithmAES128' value='0'/>
+<enum name='kCCAlgorithmBlowfish' value='6'/>
+<enum name='kCCAlgorithmCAST' value='3'/>
+<enum name='kCCAlgorithmDES' value='1'/>
+<enum name='kCCAlgorithmRC2' value='5'/>
+<enum name='kCCAlgorithmRC4' value='4'/>
+<enum name='kCCAlignmentError' value='-4303'/>
+<enum name='kCCBlockSize3DES' value='8'/>
+<enum name='kCCBlockSizeAES128' value='16'/>
+<enum name='kCCBlockSizeBlowfish' value='8'/>
+<enum name='kCCBlockSizeCAST' value='8'/>
+<enum name='kCCBlockSizeDES' value='8'/>
+<enum name='kCCBlockSizeRC2' value='8'/>
+<enum name='kCCBufferTooSmall' value='-4301'/>
+<enum name='kCCCallSequenceError' value='-4309'/>
+<enum name='kCCContextSize3DES' value='496'/>
+<enum name='kCCContextSizeAES128' value='404'/>
+<enum name='kCCContextSizeCAST' value='240'/>
+<enum name='kCCContextSizeDES' value='240'/>
+<enum name='kCCContextSizeRC4' value='1072'/>
+<enum name='kCCDecodeError' value='-4304'/>
+<enum name='kCCDecrypt' value='1'/>
+<enum name='kCCEncrypt' value='0'/>
+<enum name='kCCHmacAlgMD5' value='1'/>
+<enum name='kCCHmacAlgSHA1' value='0'/>
+<enum name='kCCHmacAlgSHA224' value='5'/>
+<enum name='kCCHmacAlgSHA256' value='2'/>
+<enum name='kCCHmacAlgSHA384' value='3'/>
+<enum name='kCCHmacAlgSHA512' value='4'/>
+<enum name='kCCInvalidKey' value='-4311'/>
+<enum name='kCCKeySize3DES' value='24'/>
+<enum name='kCCKeySizeAES128' value='16'/>
+<enum name='kCCKeySizeAES192' value='24'/>
+<enum name='kCCKeySizeAES256' value='32'/>
+<enum name='kCCKeySizeDES' value='8'/>
+<enum name='kCCKeySizeError' value='-4310'/>
+<enum name='kCCKeySizeMaxBlowfish' value='56'/>
+<enum name='kCCKeySizeMaxCAST' value='16'/>
+<enum name='kCCKeySizeMaxRC2' value='128'/>
+<enum name='kCCKeySizeMaxRC4' value='512'/>
+<enum name='kCCKeySizeMinBlowfish' value='8'/>
+<enum name='kCCKeySizeMinCAST' value='5'/>
+<enum name='kCCKeySizeMinRC2' value='1'/>
+<enum name='kCCKeySizeMinRC4' value='1'/>
+<enum name='kCCMemoryFailure' value='-4302'/>
+<enum name='kCCModeCBC' value='2'/>
+<enum name='kCCModeCFB' value='3'/>
+<enum name='kCCModeCFB8' value='10'/>
+<enum name='kCCModeCTR' value='4'/>
+<enum name='kCCModeECB' value='1'/>
+<enum name='kCCModeOFB' value='7'/>
+<enum name='kCCModeOptionCTR_BE' value='2'/>
+<enum name='kCCModeRC4' value='9'/>
+<enum name='kCCOptionECBMode' value='2'/>
+<enum name='kCCOptionPKCS7Padding' value='1'/>
+<enum name='kCCOverflow' value='-4306'/>
+<enum name='kCCPBKDF2' value='2'/>
+<enum name='kCCPRFHmacAlgSHA1' value='1'/>
+<enum name='kCCPRFHmacAlgSHA224' value='2'/>
+<enum name='kCCPRFHmacAlgSHA256' value='3'/>
+<enum name='kCCPRFHmacAlgSHA384' value='4'/>
+<enum name='kCCPRFHmacAlgSHA512' value='5'/>
+<enum name='kCCParamError' value='-4300'/>
+<enum name='kCCRNGFailure' value='-4307'/>
+<enum name='kCCSuccess' value='0'/>
+<enum name='kCCUnimplemented' value='-4305'/>
+<enum name='kCCUnspecifiedError' value='-4308'/>
+<enum name='kCCWRAPAES' value='1'/>
+<function name='CCCalibratePBKDF'>
+<arg type='I'/>
+<arg type='L' type64='Q'/>
+<arg type='L' type64='Q'/>
+<arg type='I'/>
+<arg type='L' type64='Q'/>
+<arg type='I'/>
+<retval type='I'/>
+</function>
+<function name='CCCrypt'>
+<arg type='I'/>
+<arg type='I'/>
+<arg type='I'/>
+<arg c_array_length_in_arg='4' type='^v' type_modifier='n'/>
+<arg type='L' type64='Q'/>
+<arg c_array_of_variable_length='true' type='^v' type_modifier='n'/>
+<arg c_array_length_in_arg='7' type='^v' type_modifier='n'/>
+<arg type='L' type64='Q'/>
+<arg c_array_length_in_arg='9' type='^v' type_modifier='o'/>
+<arg type='L' type64='Q'/>
+<arg type='^I' type64='^Q' type_modifier='o'/>
+<retval type='i'/>
+</function>
+<function name='CCCryptorCreate'>
+<arg type='I'/>
+<arg type='I'/>
+<arg type='I'/>
+<arg c_array_length_in_arg='4' type='^v' type_modifier='n'/>
+<arg type='L' type64='Q'/>
+<arg c_array_of_variable_length='true' type='^v' type_modifier='n'/>
+<arg type='^^{_CCCryptor}' type_modifier='o'/>
+<retval type='i'/>
+</function>
+<function name='CCCryptorCreateFromData'>
+<arg type='I'/>
+<arg type='I'/>
+<arg type='I'/>
+<arg c_array_length_in_arg='4' type='^v' type_modifier='n'/>
+<arg type='L' type64='Q'/>
+<arg c_array_of_variable_length='true' type='^v' type_modifier='n'/>
+<arg c_array_length_in_arg='7' type='^v' type_modifier='n'/>
+<arg type='L' type64='Q'/>
+<arg type='^^{_CCCryptor}' type_modifier='o'/>
+<arg type='^I' type64='^Q' type_modifier='o'/>
+<retval type='i'/>
+</function>
+<function name='CCCryptorCreateWithMode'>
+<arg type='I'/>
+<arg type='I'/>
+<arg type='I'/>
+<arg type='I'/>
+<arg type='^v'/>
+<arg type='^v'/>
+<arg type='L' type64='Q'/>
+<arg type='^v'/>
+<arg type='L' type64='Q'/>
+<arg type='i'/>
+<arg type='I'/>
+<arg type='^^{_CCCryptor}'/>
+<retval type='i'/>
+</function>
+<function name='CCCryptorFinal'>
+<arg type='^{_CCCryptor=}' type_modifier='N'/>
+<arg c_array_length_in_arg='2' type='^v' type_modifier='o'/>
+<arg type='L' type64='Q'/>
+<arg type='^I' type64='^Q' type_modifier='o'/>
+<retval type='i'/>
+</function>
+<function name='CCCryptorGetOutputLength'>
+<arg type='^{_CCCryptor=}' type_modifier='n'/>
+<arg type='L' type64='Q'/>
+<arg type='B'/>
+<retval type='L' type64='Q'/>
+</function>
+<function name='CCCryptorRelease'>
+<arg type='^{_CCCryptor=}' type_modifier='n'/>
+<retval type='i'/>
+</function>
+<function name='CCCryptorReset'>
+<arg type='^{_CCCryptor=}' type_modifier='N'/>
+<arg c_array_of_variable_length='true' type='^v' type_modifier='n'/>
+<retval type='i'/>
+</function>
+<function name='CCCryptorUpdate'>
+<arg type='^{_CCCryptor=}' type_modifier='N'/>
+<arg c_array_length_in_arg='2' type='^v' type_modifier='n'/>
+<arg type='L' type64='Q'/>
+<arg c_array_length_in_arg='4' type='^v' type_modifier='o'/>
+<arg type='L' type64='Q'/>
+<arg type='^I' type64='^Q' type_modifier='o'/>
+<retval type='i'/>
+</function>
+<function name='CCHmac'>
+<arg type='I'/>
+<arg c_array_length_in_arg='2' type='^v' type_modifier='n'/>
+<arg type='L' type64='Q'/>
+<arg c_array_length_in_arg='4' type='^v' type_modifier='n'/>
+<arg type='L' type64='Q'/>
+<arg c_array_of_variable_length='true' type='^v' type_modifier='o'/>
+</function>
+<function name='CCHmacFinal'>
+<arg type='^{_CCHmacContext=[96I]}' type_modifier='n'/>
+<arg c_array_of_variable_length='true' type='^v' type_modifier='o'/>
+</function>
+<function name='CCHmacInit'>
+<arg type='^{_CCHmacContext=[96I]}' type_modifier='o'/>
+<arg type='I'/>
+<arg c_array_length_in_arg='3' type='^v' type_modifier='n'/>
+<arg type='L' type64='Q'/>
+</function>
+<function name='CCHmacUpdate'>
+<arg type='^{_CCHmacContext=[96I]}' type_modifier='N'/>
+<arg c_array_length_in_arg='2' type='^v' type_modifier='n'/>
+<arg type='L' type64='Q'/>
+</function>
+<function name='CCKeyDerivationPBKDF'>
+<arg type='I'/>
+<arg c_array_length_in_arg='2' type='*' type_modifier='n'/>
+<arg type='L' type64='Q'/>
+<arg c_array_length_in_arg='4' type='*' type_modifier='n'/>
+<arg type='L' type64='Q'/>
+<arg type='I'/>
+<arg type='I'/>
+<arg c_array_length_in_arg='8' type='*' type_modifier='o'/>
+<arg type='L' type64='Q'/>
+<retval type='i'/>
+</function>
+<function name='CCRandomGenerateBytes'>
+<arg type='^v'/>
+<arg type='L' type64='Q'/>
+<retval type='i'/>
+</function>
+<function name='CCSymmetricKeyUnwrap'>
+<arg type='I'/>
+<arg c_array_length_in_arg='2' type='*' type_modifier='n'/>
+<arg type='L' type64='Q'/>
+<arg c_array_length_in_arg='4' type='*' type_modifier='n'/>
+<arg type='L' type64='Q'/>
+<arg c_array_length_in_arg='6' type='*' type_modifier='n'/>
+<arg type='L' type64='Q'/>
+<arg c_array_length_in_arg='8' type='*' type_modifier='o'/>
+<arg type='^I' type64='^Q' type_modifier='N'/>
+<retval type='i'/>
+</function>
+<function name='CCSymmetricKeyWrap'>
+<arg type='I'/>
+<arg c_array_length_in_arg='2' type='*' type_modifier='n'/>
+<arg type='L' type64='Q'/>
+<arg c_array_length_in_arg='4' type='*' type_modifier='n'/>
+<arg type='L' type64='Q'/>
+<arg c_array_length_in_arg='6' type='*' type_modifier='n'/>
+<arg type='L' type64='Q'/>
+<arg c_array_length_in_arg='8' type='*' type_modifier='o'/>
+<arg type='^I' type64='^Q' type_modifier='N'/>
+<retval type='i'/>
+</function>
+<function name='CCSymmetricUnwrappedSize'>
+<arg type='I'/>
+<arg type='L' type64='Q'/>
+<retval type='L' type64='Q'/>
+</function>
+<function name='CCSymmetricWrappedSize'>
+<arg type='I'/>
+<arg type='L' type64='Q'/>
+<retval type='L' type64='Q'/>
+</function>
+<function name='CC_MD2'>
+<arg c_array_length_in_arg='1' type='^v' type_modifier='n'/>
+<arg type='I'/>
+<arg c_array_of_fixed_length='16' type='*' type_modifier='o'/>
+<retval type='*'/>
+</function>
+<function name='CC_MD2_Final'>
+<arg c_array_of_fixed_length='16' type='*' type_modifier='o'/>
+<arg type='^{CC_MD2state_st=i[16C][16I][16I]}' type_modifier='n'/>
+<retval type='i'/>
+</function>
+<function name='CC_MD2_Init'>
+<arg type='^{CC_MD2state_st=i[16C][16I][16I]}' type_modifier='o'/>
+<retval type='i'/>
+</function>
+<function name='CC_MD2_Update'>
+<arg type='^{CC_MD2state_st=i[16C][16I][16I]}' type_modifier='N'/>
+<arg c_array_length_in_arg='2' type='^v' type_modifier='n'/>
+<arg type='I'/>
+<retval type='i'/>
+</function>
+<function name='CC_MD4'>
+<arg c_array_length_in_arg='1' type='^v' type_modifier='n'/>
+<arg type='I'/>
+<arg c_array_of_fixed_length='16' type='*' type_modifier='o'/>
+<retval type='*'/>
+</function>
+<function name='CC_MD4_Final'>
+<arg c_array_of_fixed_length='16' type='*' type_modifier='o'/>
+<arg type='^{CC_MD4state_st=IIIIII[16I]I}' type_modifier='n'/>
+<retval type='i'/>
+</function>
+<function name='CC_MD4_Init'>
+<arg type='^{CC_MD4state_st=IIIIII[16I]I}' type_modifier='o'/>
+<retval type='i'/>
+</function>
+<function name='CC_MD4_Update'>
+<arg type='^{CC_MD4state_st=IIIIII[16I]I}' type_modifier='N'/>
+<arg c_array_length_in_arg='2' type='^v' type_modifier='n'/>
+<arg type='I'/>
+<retval type='i'/>
+</function>
+<function name='CC_MD5'>
+<arg c_array_length_in_arg='1' type='^v' type_modifier='n'/>
+<arg type='I'/>
+<arg c_array_of_fixed_length='16' type='*' type_modifier='o'/>
+<retval type='*'/>
+</function>
+<function name='CC_MD5_Final'>
+<arg c_array_of_fixed_length='16' type='*' type_modifier='o'/>
+<arg type='^{CC_MD5state_st=IIIIII[16I]i}' type_modifier='n'/>
+<retval type='i'/>
+</function>
+<function name='CC_MD5_Init'>
+<arg type='^{CC_MD5state_st=IIIIII[16I]i}' type_modifier='o'/>
+<retval type='i'/>
+</function>
+<function name='CC_MD5_Update'>
+<arg type='^{CC_MD5state_st=IIIIII[16I]i}' type_modifier='N'/>
+<arg c_array_length_in_arg='2' type='^v' type_modifier='n'/>
+<arg type='I'/>
+<retval type='i'/>
+</function>
+<function name='CC_SHA1'>
+<arg c_array_length_in_arg='1' type='^v' type_modifier='n'/>
+<arg type='I'/>
+<arg c_array_of_fixed_length='20' type='*' type_modifier='o'/>
+<retval type='*'/>
+</function>
+<function name='CC_SHA1_Final'>
+<arg c_array_of_fixed_length='20' type='*' type_modifier='o'/>
+<arg type='^{CC_SHA1state_st=IIIIIII[16I]i}' type_modifier='n'/>
+<retval type='i'/>
+</function>
+<function name='CC_SHA1_Init'>
+<arg type='^{CC_SHA1state_st=IIIIIII[16I]i}' type_modifier='o'/>
+<retval type='i'/>
+</function>
+<function name='CC_SHA1_Update'>
+<arg type='^{CC_SHA1state_st=IIIIIII[16I]i}' type_modifier='N'/>
+<arg c_array_length_in_arg='2' type='^v' type_modifier='n'/>
+<arg type='I'/>
+<retval type='i'/>
+</function>
+<function name='CC_SHA224'>
+<arg c_array_length_in_arg='1' type='^v' type_modifier='n'/>
+<arg type='I'/>
+<arg c_array_of_fixed_length='28' type='*' type_modifier='o'/>
+<retval type='*'/>
+</function>
+<function name='CC_SHA224_Final'>
+<arg c_array_of_fixed_length='28' type='*' type_modifier='o'/>
+<arg type='^{CC_SHA256state_st=[2I][8I][16I]}' type_modifier='n'/>
+<retval type='i'/>
+</function>
+<function name='CC_SHA224_Init'>
+<arg type='^{CC_SHA256state_st=[2I][8I][16I]}' type_modifier='o'/>
+<retval type='i'/>
+</function>
+<function name='CC_SHA224_Update'>
+<arg type='^{CC_SHA256state_st=[2I][8I][16I]}' type_modifier='N'/>
+<arg c_array_length_in_arg='2' type='^v' type_modifier='n'/>
+<arg type='I'/>
+<retval type='i'/>
+</function>
+<function name='CC_SHA256'>
+<arg c_array_length_in_arg='1' type='^v' type_modifier='n'/>
+<arg type='I'/>
+<arg c_array_of_fixed_length='32' type='*' type_modifier='o'/>
+<retval type='*'/>
+</function>
+<function name='CC_SHA256_Final'>
+<arg c_array_of_fixed_length='32' type='*' type_modifier='o'/>
+<arg type='^{CC_SHA256state_st=[2I][8I][16I]}' type_modifier='n'/>
+<retval type='i'/>
+</function>
+<function name='CC_SHA256_Init'>
+<arg type='^{CC_SHA256state_st=[2I][8I][16I]}' type_modifier='o'/>
+<retval type='i'/>
+</function>
+<function name='CC_SHA256_Update'>
+<arg type='^{CC_SHA256state_st=[2I][8I][16I]}' type_modifier='N'/>
+<arg c_array_length_in_arg='2' type='^v' type_modifier='n'/>
+<arg type='I'/>
+<retval type='i'/>
+</function>
+<function name='CC_SHA384'>
+<arg c_array_length_in_arg='1' type='^v' type_modifier='n'/>
+<arg type='I'/>
+<arg c_array_of_fixed_length='48' type='*' type_modifier='o'/>
+<retval type='*'/>
+</function>
+<function name='CC_SHA384_Final'>
+<arg c_array_of_fixed_length='48' type='*' type_modifier='o'/>
+<arg type='^{CC_SHA512state_st=[2Q][8Q][16Q]}' type_modifier='n'/>
+<retval type='i'/>
+</function>
+<function name='CC_SHA384_Init'>
+<arg type='^{CC_SHA512state_st=[2Q][8Q][16Q]}' type_modifier='o'/>
+<retval type='i'/>
+</function>
+<function name='CC_SHA384_Update'>
+<arg type='^{CC_SHA512state_st=[2Q][8Q][16Q]}' type_modifier='N'/>
+<arg c_array_length_in_arg='2' type='^v' type_modifier='n'/>
+<arg type='I'/>
+<retval type='i'/>
+</function>
+<function name='CC_SHA512'>
+<arg c_array_length_in_arg='1' type='^v' type_modifier='n'/>
+<arg type='I'/>
+<arg c_array_of_fixed_length='64' type='*' type_modifier='o'/>
+<retval type='*'/>
+</function>
+<function name='CC_SHA512_Final'>
+<arg c_array_of_fixed_length='64' type='*' type_modifier='o'/>
+<arg type='^{CC_SHA512state_st=[2Q][8Q][16Q]}' type_modifier='n'/>
+<retval type='i'/>
+</function>
+<function name='CC_SHA512_Init'>
+<arg type='^{CC_SHA512state_st=[2Q][8Q][16Q]}' type_modifier='o'/>
+<retval type='i'/>
+</function>
+<function name='CC_SHA512_Update'>
+<arg type='^{CC_SHA512state_st=[2Q][8Q][16Q]}' type_modifier='N'/>
+<arg c_array_length_in_arg='2' type='^v' type_modifier='n'/>
+<arg type='I'/>
+<retval type='i'/>
+</function>
+<function name='asl_add_log_file'>
+<arg type='^{__asl_object_s=}' type_modifier='n'/>
+<arg type='i'/>
+<retval type='i'/>
+</function>
+<function name='asl_add_output_file'>
+<arg type='^{__asl_object_s=}'/>
+<arg type='i'/>
+<arg type='*'/>
+<arg type='*'/>
+<arg type='i'/>
+<arg type='i'/>
+<retval type='i'/>
+</function>
+<function name='asl_append'>
+<arg type='^{__asl_object_s=}'/>
+<arg type='^{__asl_object_s=}'/>
+</function>
+<function name='asl_close'>
+<arg type='^{__asl_object_s=}' type_modifier='n'/>
+</function>
+<function name='asl_close_auxiliary_file'>
+<arg type='i'/>
+<retval type='i'/>
+</function>
+<function name='asl_count'>
+<arg type='^{__asl_object_s=}'/>
+<retval type='L' type64='Q'/>
+</function>
+<function name='asl_create_auxiliary_file'>
+<arg type='^{__asl_object_s=}'/>
+<arg type='*'/>
+<arg type='*'/>
+<arg type='^i'/>
+<retval type='i'/>
+</function>
+<function name='asl_decode_buffer'>
+<arg type='*'/>
+<arg type='^*'/>
+<arg type='^I' type64='^Q'/>
+<retval type='i'/>
+</function>
+<function name='asl_encode_buffer'>
+<arg type='*'/>
+<arg type='L' type64='Q'/>
+<retval type='*'/>
+</function>
+<function name='asl_fetch_key_val_op'>
+<arg type='^{__asl_object_s=}'/>
+<arg type='I'/>
+<arg type='^*'/>
+<arg type='^*'/>
+<arg type='^I'/>
+<retval type='i'/>
+</function>
+<function name='asl_format'>
+<arg type='^{__asl_object_s=}'/>
+<arg type='*'/>
+<arg type='*'/>
+<arg type='I'/>
+<retval type='*'/>
+</function>
+<function name='asl_free'>
+<arg type='^{__asl_object_s=}' type_modifier='n'/>
+</function>
+<function name='asl_get'>
+<arg type='^{__asl_object_s=}' type_modifier='n'/>
+<arg type='*'/>
+<retval type='*'/>
+</function>
+<function name='asl_get_index'>
+<arg type='^{__asl_object_s=}'/>
+<arg type='L' type64='Q'/>
+<retval type='^{__asl_object_s=}'/>
+</function>
+<function name='asl_get_type'>
+<arg type='^{__asl_object_s=}'/>
+<retval type='I'/>
+</function>
+<function name='asl_key'>
+<arg type='^{__asl_object_s=}' type_modifier='n'/>
+<arg type='I'/>
+<retval type='*'/>
+</function>
+<function name='asl_log' variadic='true'>
+<arg type='^{__asl_object_s=}' type_modifier='n'/>
+<arg type='^{__asl_object_s=}' type_modifier='n'/>
+<arg type='i'/>
+<arg printf_format='true' type='*'/>
+<retval type='i'/>
+</function>
+<function name='asl_log_auxiliary_location'>
+<arg type='^{__asl_object_s=}'/>
+<arg type='*'/>
+<arg type='*'/>
+<arg type='*'/>
+<retval type='i'/>
+</function>
+<function name='asl_log_descriptor'>
+<arg type='^{__asl_object_s=}'/>
+<arg type='^{__asl_object_s=}'/>
+<arg type='i'/>
+<arg type='i'/>
+<arg type='I'/>
+<retval type='i'/>
+</function>
+<function name='asl_log_message' variadic='true'>
+<arg type='i'/>
+<arg printf_format='true' type='*'/>
+<retval type='i'/>
+</function>
+<function name='asl_match'>
+<arg type='^{__asl_object_s=}'/>
+<arg type='^{__asl_object_s=}'/>
+<arg type='^I' type64='^Q'/>
+<arg type='L' type64='Q'/>
+<arg type='L' type64='Q'/>
+<arg type='I'/>
+<arg type='i'/>
+<retval type='^{__asl_object_s=}'/>
+</function>
+<function name='asl_new'>
+<arg type='I'/>
+<retval type='^{__asl_object_s=}'/>
+</function>
+<function name='asl_next'>
+<arg type='^{__asl_object_s=}'/>
+<retval type='^{__asl_object_s=}'/>
+</function>
+<function name='asl_open'>
+<arg type='*'/>
+<arg type='*'/>
+<arg type='I'/>
+<retval type='^{__asl_object_s=}'/>
+</function>
+<function name='asl_open_from_file'>
+<arg type='i'/>
+<arg type='*'/>
+<arg type='*'/>
+<retval type='^{__asl_object_s=}'/>
+</function>
+<function name='asl_open_path'>
+<arg type='*'/>
+<arg type='I'/>
+<retval type='^{__asl_object_s=}'/>
+</function>
+<function name='asl_prepend'>
+<arg type='^{__asl_object_s=}'/>
+<arg type='^{__asl_object_s=}'/>
+</function>
+<function name='asl_prev'>
+<arg type='^{__asl_object_s=}'/>
+<retval type='^{__asl_object_s=}'/>
+</function>
+<function name='asl_release'>
+<arg type='^{__asl_object_s=}'/>
+</function>
+<function name='asl_remove_index'>
+<arg type='^{__asl_object_s=}'/>
+<arg type='L' type64='Q'/>
+</function>
+<function name='asl_remove_log_file'>
+<arg type='^{__asl_object_s=}' type_modifier='n'/>
+<arg type='i'/>
+<retval type='i'/>
+</function>
+<function name='asl_reset_iteration'>
+<arg type='^{__asl_object_s=}'/>
+<arg type='L' type64='Q'/>
+</function>
+<function name='asl_retain'>
+<arg type='^{__asl_object_s=}'/>
+<retval type='^{__asl_object_s=}'/>
+</function>
+<function name='asl_search'>
+<arg type='^{__asl_object_s=}' type_modifier='n'/>
+<arg type='^{__asl_object_s=}' type_modifier='n'/>
+<retval type='^{__asl_object_s=}'/>
+</function>
+<function name='asl_send'>
+<arg type='^{__asl_object_s=}' type_modifier='n'/>
+<arg type='^{__asl_object_s=}' type_modifier='n'/>
+<retval type='i'/>
+</function>
+<function name='asl_set'>
+<arg type='^{__asl_object_s=}' type_modifier='n'/>
+<arg type='*'/>
+<arg type='*'/>
+<retval type='i'/>
+</function>
+<function name='asl_set_filter'>
+<arg type='^{__asl_object_s=}' type_modifier='n'/>
+<arg type='i'/>
+<retval type='i'/>
+</function>
+<function name='asl_set_output_file_filter'>
+<arg type='^{__asl_object_s=}'/>
+<arg type='i'/>
+<arg type='i'/>
+<retval type='i'/>
+</function>
+<function name='asl_set_query'>
+<arg type='^{__asl_object_s=}' type_modifier='n'/>
+<arg type='*'/>
+<arg type='*'/>
+<arg type='I'/>
+<retval type='i'/>
+</function>
+<function name='asl_unset'>
+<arg type='^{__asl_object_s=}' type_modifier='n'/>
+<arg type='*'/>
+<retval type='i'/>
+</function>
+<function name='asl_vlog'>
+<arg type='^{__asl_object_s=}'/>
+<arg type='^{__asl_object_s=}'/>
+<arg type='i'/>
+<arg printf_format='true' type='*'/>
+<arg type='*' type64='^{__va_list_tag=II^v^v}'/>
+<retval type='i'/>
+</function>
+<function name='aslresponse_free'>
+<arg type='^{__asl_object_s=}' type_modifier='n'/>
+</function>
+<function name='aslresponse_next'>
+<arg type='^{__asl_object_s=}' type_modifier='n'/>
+<retval type='^{__asl_object_s=}'/>
+</function>
+<function name='copyfile'>
+<arg type='*'/>
+<arg type='*'/>
+<arg type='^{_copyfile_state=}' type_modifier='o'/>
+<arg type='I'/>
+<retval type='i'/>
+</function>
+<function name='copyfile_state_alloc'>
+<retval type='^{_copyfile_state=}'/>
+</function>
+<function name='copyfile_state_free'>
+<arg type='^{_copyfile_state=}' type_modifier='n'/>
+<retval type='i'/>
+</function>
+<function name='copyfile_state_get'>
+<arg type='^{_copyfile_state=}' type_modifier='n'/>
+<arg type='I'/>
+<arg type='^v' type_modifier='o'/>
+<retval type='i'/>
+</function>
+<function name='copyfile_state_set'>
+<arg type='^{_copyfile_state=}' type_modifier='n'/>
+<arg type='I'/>
+<arg type='^v' type_modifier='n'/>
+<retval type='i'/>
+</function>
+<function name='fcopyfile'>
+<arg type='i'/>
+<arg type='i'/>
+<arg type='^{_copyfile_state=}' type_modifier='o'/>
+<arg type='I'/>
+<retval type='i'/>
+</function>
+<function name='launch_activate_socket'>
+<arg null_accepted='false' type='*'/>
+<arg type='^^i'/>
+<arg type='^I' type64='^Q'/>
+<retval type='i'/>
+</function>
+<function name='launch_data_alloc'>
+<arg type='i'/>
+<retval type='^{_launch_data=}'/>
+</function>
+<function name='launch_data_array_get_count'>
+<arg null_accepted='false' type='^{_launch_data=}' type_modifier='n'/>
+<retval type='L' type64='Q'/>
+</function>
+<function name='launch_data_array_get_index'>
+<arg null_accepted='false' type='^{_launch_data=}' type_modifier='n'/>
+<arg type='L' type64='Q'/>
+<retval type='^{_launch_data=}'/>
+</function>
+<function name='launch_data_array_set_index'>
+<arg null_accepted='false' type='^{_launch_data=}' type_modifier='n'/>
+<arg type='^{_launch_data=}' type_modifier='n'/>
+<arg type='L' type64='Q'/>
+<retval type='B'/>
+</function>
+<function name='launch_data_copy'>
+<arg null_accepted='false' type='^{_launch_data=}' type_modifier='n'/>
+<retval type='^{_launch_data=}'/>
+</function>
+<function name='launch_data_dict_get_count'>
+<arg null_accepted='false' type='^{_launch_data=}' type_modifier='n'/>
+<retval type='L' type64='Q'/>
+</function>
+<function name='launch_data_dict_insert'>
+<arg null_accepted='false' type='^{_launch_data=}' type_modifier='n'/>
+<arg type='^{_launch_data=}' type_modifier='n'/>
+<arg type='*'/>
+<retval type='B'/>
+</function>
+<function name='launch_data_dict_iterate'>
+<arg null_accepted='false' type='^{_launch_data=}'/>
+<arg function_pointer='true' type='^?'>
+<arg type='^{_launch_data=}'/>
+<arg type='*'/>
+<arg type='^v'/>
+<retval type='v'/>
+</arg>
+<arg type='^v'/>
+</function>
+<function name='launch_data_dict_lookup'>
+<arg null_accepted='false' type='^{_launch_data=}' type_modifier='n'/>
+<arg type='*'/>
+<retval type='^{_launch_data=}'/>
+</function>
+<function name='launch_data_dict_remove'>
+<arg null_accepted='false' type='^{_launch_data=}' type_modifier='n'/>
+<arg type='*'/>
+<retval type='B'/>
+</function>
+<function name='launch_data_free'>
+<arg null_accepted='false' type='^{_launch_data=}' type_modifier='n'/>
+</function>
+<function name='launch_data_get_bool'>
+<arg null_accepted='false' type='^{_launch_data=}' type_modifier='n'/>
+<retval type='B'/>
+</function>
+<function name='launch_data_get_errno'>
+<arg null_accepted='false' type='^{_launch_data=}' type_modifier='n'/>
+<retval type='i'/>
+</function>
+<function name='launch_data_get_fd'>
+<arg null_accepted='false' type='^{_launch_data=}' type_modifier='n'/>
+<retval type='i'/>
+</function>
+<function name='launch_data_get_integer'>
+<arg null_accepted='false' type='^{_launch_data=}' type_modifier='n'/>
+<retval type='q'/>
+</function>
+<function name='launch_data_get_machport'>
+<arg null_accepted='false' type='^{_launch_data=}' type_modifier='n'/>
+<retval type='I'/>
+</function>
+<function name='launch_data_get_opaque'>
+<arg null_accepted='false' type='^{_launch_data=}' type_modifier='n'/>
+<retval type='^v'/>
+</function>
+<function name='launch_data_get_opaque_size'>
+<arg null_accepted='false' type='^{_launch_data=}' type_modifier='n'/>
+<retval type='L' type64='Q'/>
+</function>
+<function name='launch_data_get_real'>
+<arg null_accepted='false' type='^{_launch_data=}' type_modifier='n'/>
+<retval type='d'/>
+</function>
+<function name='launch_data_get_string'>
+<arg null_accepted='false' type='^{_launch_data=}' type_modifier='n'/>
+<retval type='*'/>
+</function>
+<function name='launch_data_get_type'>
+<arg null_accepted='false' type='^{_launch_data=}' type_modifier='n'/>
+<retval type='i'/>
+</function>
+<function name='launch_data_new_bool'>
+<arg type='B'/>
+<retval type='^{_launch_data=}'/>
+</function>
+<function name='launch_data_new_fd'>
+<arg type='i'/>
+<retval type='^{_launch_data=}'/>
+</function>
+<function name='launch_data_new_integer'>
+<arg type='q'/>
+<retval type='^{_launch_data=}'/>
+</function>
+<function name='launch_data_new_machport'>
+<arg type='I'/>
+<retval type='^{_launch_data=}'/>
+</function>
+<function name='launch_data_new_opaque'>
+<arg type='^v' type_modifier='n'/>
+<arg type='L' type64='Q'/>
+<retval type='^{_launch_data=}'/>
+</function>
+<function name='launch_data_new_real'>
+<arg type='d'/>
+<retval type='^{_launch_data=}'/>
+</function>
+<function name='launch_data_new_string'>
+<arg type='*'/>
+<retval type='^{_launch_data=}'/>
+</function>
+<function name='launch_data_set_bool'>
+<arg null_accepted='false' type='^{_launch_data=}' type_modifier='n'/>
+<arg type='B'/>
+<retval type='B'/>
+</function>
+<function name='launch_data_set_fd'>
+<arg null_accepted='false' type='^{_launch_data=}' type_modifier='n'/>
+<arg type='i'/>
+<retval type='B'/>
+</function>
+<function name='launch_data_set_integer'>
+<arg null_accepted='false' type='^{_launch_data=}' type_modifier='n'/>
+<arg type='q'/>
+<retval type='B'/>
+</function>
+<function name='launch_data_set_machport'>
+<arg null_accepted='false' type='^{_launch_data=}' type_modifier='n'/>
+<arg type='I'/>
+<retval type='B'/>
+</function>
+<function name='launch_data_set_opaque'>
+<arg null_accepted='false' type='^{_launch_data=}' type_modifier='n'/>
+<arg type='^v' type_modifier='n'/>
+<arg type='L' type64='Q'/>
+<retval type='B'/>
+</function>
+<function name='launch_data_set_real'>
+<arg null_accepted='false' type='^{_launch_data=}' type_modifier='n'/>
+<arg type='d'/>
+<retval type='B'/>
+</function>
+<function name='launch_data_set_string'>
+<arg null_accepted='false' type='^{_launch_data=}' type_modifier='n'/>
+<arg type='*'/>
+<retval type='B'/>
+</function>
+<function name='launch_get_fd'>
+<retval type='i'/>
+</function>
+<function name='launch_msg'>
+<arg null_accepted='false' type='^{_launch_data=}' type_modifier='n'/>
+<retval type='^{_launch_data=}'/>
+</function>
+<function name='notify_cancel'>
+<arg type='i'/>
+<retval type='I'/>
+</function>
+<function name='notify_check'>
+<arg type='i'/>
+<arg type='^i' type_modifier='o'/>
+<retval type='I'/>
+</function>
+<function name='notify_get_state'>
+<arg type='i'/>
+<arg type='^Q' type_modifier='o'/>
+<retval type='I'/>
+</function>
+<function name='notify_is_valid_token'>
+<arg type='i'/>
+<retval type='B'/>
+</function>
+<function name='notify_post'>
+<arg type='*'/>
+<retval type='I'/>
+</function>
+<function name='notify_register_check'>
+<arg type='*'/>
+<arg type='^i' type_modifier='o'/>
+<retval type='I'/>
+</function>
+<function name='notify_register_dispatch'>
+<arg type='*'/>
+<arg type='^i'/>
+<arg type='^{dispatch_queue_s=}'/>
+<arg function_pointer='true' type='@?'>
+<arg type='i'/>
+<retval type='v'/>
+</arg>
+<retval type='I'/>
+</function>
+<function name='notify_register_file_descriptor'>
+<arg type='*'/>
+<arg type='^i' type_modifier='o'/>
+<arg type='i'/>
+<arg type='^i' type_modifier='N'/>
+<retval type='I'/>
+</function>
+<function name='notify_register_mach_port'>
+<arg type='*'/>
+<arg type='^I' type_modifier='N'/>
+<arg type='i'/>
+<arg type='^i' type_modifier='o'/>
+<retval type='I'/>
+</function>
+<function name='notify_register_signal'>
+<arg type='*'/>
+<arg type='i'/>
+<arg type='^i' type_modifier='o'/>
+<retval type='I'/>
+</function>
+<function name='notify_resume'>
+<arg type='i'/>
+<retval type='I'/>
+</function>
+<function name='notify_set_state'>
+<arg type='i'/>
+<arg type='Q'/>
+<retval type='I'/>
+</function>
+<function name='notify_suspend'>
+<arg type='i'/>
+<retval type='I'/>
+</function>
+<function name='sandbox_free_error'>
+<arg type='*'/>
+</function>
+<function name='sandbox_init'>
+<arg type='*'/>
+<arg type='Q'/>
+<arg type='^*' type_modifier='o'/>
+<retval type='i'/>
+</function>
+</signatures>
