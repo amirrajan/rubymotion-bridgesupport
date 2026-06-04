@@ -5,9 +5,9 @@ SHELL = /bin/sh
 #### Start of system configuration section. ####
 
 usrlib  = /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/System/Library/Frameworks/Ruby.framework/Versions/2.6/usr/include
-topdir  = /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/System/Library/Frameworks/Ruby.framework/Versions/2.6/usr/lib/ruby/2.6.0/universal-darwin22
+topdir  = /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/System/Library/Frameworks/Ruby.framework/Versions/2.6/usr/lib/ruby/2.6.0/universal-darwin25
 hdrdir  = /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/System/Library/Frameworks/Ruby.framework/Versions/2.6/usr/include/ruby-2.6.0
-confdir = /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/System/Library/Frameworks/Ruby.framework/Versions/2.6/usr/include/ruby-2.6.0/universal-darwin22
+confdir = /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/System/Library/Frameworks/Ruby.framework/Versions/2.6/usr/include/ruby-2.6.0/universal-darwin25
 
 srcdir = .
 VPATH = $(srcdir):$(topdir):$(hdrdir)
@@ -56,7 +56,26 @@ INCFLAGS = -I$(usrlib) -I. -I$(topdir) -I$(hdrdir) -I$(confdir) -I$(srcdir)
 DEFS     =
 CPPFLAGS =  $(shell $(LLVM-CONFIG) -arch x86_64 -arch arm64 --cppflags | sed 's/ *-arch [^ ]*//g')
 
-CXXFLAGS = $(CFLAGS) -arch x86_64 -arch arm64 -Wno-switch -Wno-reserved-user-defined-literal
+CXXFLAGS = $(CFLAGS) -arch x86_64 -arch arm64 -Wno-switch -Wno-reserved-user-defined-literal \
+           -Wno-deprecated-declarations \
+           -Wno-bitwise-instead-of-logical \
+           -Wno-unused-but-set-variable \
+           -Wno-cast-function-type-mismatch \
+           -Wno-unused-private-field \
+           -Wno-unused-lambda-capture \
+           -Wno-expansion-to-defined \
+           -Wno-deprecated-copy-with-user-provided-copy \
+           -Wno-strict-prototypes \
+           -Wno-enum-compare-switch \
+           -Wno-user-defined-warnings \
+           -Wno-range-loop-construct \
+           -Wno-cast-qual \
+           -Wno-unused-result \
+           -Wno-unused-but-set-parameter \
+           -Wno-unqualified-std-cast-call \
+           -Wno-unguarded-availability-new \
+           -Wno-string-concatenation \
+           -Wno-unused-command-line-argument
 ldflags  = $(RC_CFLAGS) -arch x86_64 -arch arm64 -mmacosx-version-min=10.9 $(shell $(LLVM-CONFIG) --ldflags | sed 's/ *-arch [^ ]*//g')
 
 dldflags =
@@ -68,10 +87,10 @@ EXEEXT =
 
 RUBY_INSTALL_NAME = ruby
 RUBY_SO_NAME = ruby
-arch = $(shell $(RUBY) -e 'puts RUBY_PLATFORM')
+arch = universal-darwin25
 sitearch = $(arch)
 
-ruby = /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/System/Library/Frameworks/Ruby.framework/Versions/2.6/usr/include/ruby-2.6.0/universal-darwin22/ruby
+ruby = /usr/bin/ruby
 RUBY = $(ruby)
 RM = rm -f
 MAKEDIRS = mkdir -p

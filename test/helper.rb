@@ -42,6 +42,6 @@ def gen_bridge_metadata(header_file_name, options = {})
   command = generate_command header_list_file_name, bridgesupport_file_name, options
   File.write repro_script_file_name, command
   $test_id += 1
-  system "#{ command }"
+  IO.popen("(#{command.strip}) 2>&1") { |io| io.each_line { |line| $stderr.puts line } }
   hash = XmlSimple.xml_in(open(bridgesupport_file_name))
 end

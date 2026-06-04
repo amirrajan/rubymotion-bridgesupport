@@ -21,12 +21,12 @@ S
   end
 end
 
-desc "To run all tests `rake`. To run only a single test file, `rake -- -files=./path_to_test.rb,./path_to_another_test.rb`."
+desc "To run all tests `rake`. To run only a single test file, `rake -- --files=./path_to_test.rb,./path_to_another_test.rb`."
 task :default => [:test]
 
 Rake::TestTask.new do |test|
   if ARGV.join(" ").include?("--")
-    files = (ARGV.join(" ").split("--").last || "").split("-files=").last.strip
+    files = (ARGV.join(" ").split("--").last || "").split("--files=").last.strip
   else
     files = nil
   end

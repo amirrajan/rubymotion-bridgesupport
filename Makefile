@@ -96,9 +96,9 @@ SWIG_DIR = $(OBJROOT)/swig
 CLANG_DIR_MADE = $(CLANG_DIR)/$(MADEFILE)
 $(CLANG_DIR_MADE): $(OBJROOT_MADE)
 	mkdir -p $(OBJROOT)
-	cd $(OBJROOT) && git clone https://github.com/llvm-mirror/llvm.git $(CLANG_VERS) && cd $(CLANG_DIR) && git checkout -b $(CLANG_BRANCH) origin/$(CLANG_BRANCH)
-	cd $(CLANG_DIR)/tools && git clone https://github.com/llvm-mirror/clang.git && cd $(CLANG_DIR)/tools/clang && git checkout -b $(CLANG_BRANCH) origin/$(CLANG_BRANCH)
-	cd $(CLANG_DIR)/projects && git clone https://github.com/llvm-mirror/compiler-rt.git && cd $(CLANG_DIR)/projects/compiler-rt && git checkout -b $(CLANG_BRANCH) origin/$(CLANG_BRANCH)
+	cd $(OBJROOT) && git clone --depth 1 --branch $(CLANG_BRANCH) https://github.com/llvm-mirror/llvm.git $(CLANG_VERS)
+	cd $(CLANG_DIR)/tools && git clone --depth 1 --branch $(CLANG_BRANCH) https://github.com/llvm-mirror/clang.git
+	cd $(CLANG_DIR)/projects && git clone --depth 1 --branch $(CLANG_BRANCH) https://github.com/llvm-mirror/compiler-rt.git
 	cd $(CLANG_DIR)/tools/clang && patch -p0 < $(SRCROOT)/clang.patch
 	cd $(SRCROOT)
 	$(TOUCH) $@
@@ -118,8 +118,20 @@ COPY_DIRS = bin include
 endif
 CLANGROOT_MADE = $(CLANGROOT)/$(MADEFILE)
 CLANG_PREFIX = /usr
+CMAKE_VERSION = 3.27.9
+CMAKE_DIR = $(PWD)/build-tools/cmake-$(CMAKE_VERSION)-macos-universal
+CMAKE = $(CMAKE_DIR)/CMake.app/Contents/bin/cmake
+CMAKE_URL = https://github.com/Kitware/CMake/releases/download/v$(CMAKE_VERSION)/cmake-$(CMAKE_VERSION)-macos-universal.tar.gz
 
-$(CLANGROOT_MADE): $(CLANG_DIR_MADE)
+$(CMAKE):
+	@echo "*** Downloading CMake $(CMAKE_VERSION)..."
+	mkdir -p $(PWD)/build-tools
+	curl -L -o /tmp/cmake-$(CMAKE_VERSION)-macos-universal.tar.gz $(CMAKE_URL)
+	cd $(PWD)/build-tools && tar -xzf /tmp/cmake-$(CMAKE_VERSION)-macos-universal.tar.gz
+	rm -f /tmp/cmake-$(CMAKE_VERSION)-macos-universal.tar.gz
+	@echo "*** CMake $(CMAKE_VERSION) ready."
+
+$(CLANGROOT_MADE): $(CLANG_DIR_MADE) $(CMAKE)
 	@/bin/echo -n '*** Started Building $(CLANG_VERS): ' && date
 	@set -x && \
 	for arch in $(RC_ARCHS); do \
@@ -127,7 +139,7 @@ $(CLANGROOT_MADE): $(CLANG_DIR_MADE)
 	    $(MKDIR) $(CLANG_DIR)/darwin-$$arch && \
 	    (cd $(CLANG_DIR)/darwin-$$arch && \
 	    $(MKDIR) ROOT && \
-	    env MACOSX_DEPLOYMENT_TARGET=10.9 CC="$(CC) -arch $$arch -arch arm64" CXX="$(CXX) -arch $$arch -arch arm64" cmake ../ -G "Unix Makefiles" -DCMAKE_BUILD_TYPE=Release -DLLVM_ENABLE_LIBCXX=YES -DLLVM_BUILD_EXTERNAL_COMPILER_RT=YES -DLLVM_TARGETS_TO_BUILD="X86;ARM;AArch64" && \
+	    env MACOSX_DEPLOYMENT_TARGET=10.9 CC="$(CC) -arch $$arch -arch arm64" CXX="$(CXX) -arch $$arch -arch arm64" $(CMAKE) ../ -G "Unix Makefiles" -DOCAMLFIND=FALSE -DCMAKE_BUILD_TYPE=Release -DLLVM_ENABLE_LIBCXX=YES -DLLVM_BUILD_EXTERNAL_COMPILER_RT=YES -DLLVM_TARGETS_TO_BUILD="X86;ARM;AArch64" && \
 	    env MACOSX_DEPLOYMENT_TARGET=10.9 CC="$(CC) -arch $$arch -arch arm64" CXX="$(CXX) -arch $$arch -arch arm64" make -j$(shell sysctl -n hw.ncpu) && \
 	    $(MKDIR) $(CLANG_DIR)/darwin-$$arch/ROOT && \
 	    make install DESTDIR=$(CLANG_DIR)/darwin-$$arch/ROOT) || exit 1; \

@@ -24,15 +24,15 @@ enhancements:
   compiled against system Ruby.
 
 # How to Build
-- Assumses you are on MacOS 13.4.1
-- Install Xcode 14.3.1
+- Install Xcode 16.3
 - Install [brew](http://brew.sh) and run the following commands:
 ```
+brew install mise
 brew install gcc
 brew install make
 brew install cmake
 ```
-- Install Xcode 10.3, it is strongly recommended that you do not
+- Install Xcode 26.2, it is strongly recommended that you do not
   install Xcode from the App Store and instead use the archived
   images provided in [Apple's Developer Portal Download Archive].
 - Install Xcode at `/Applications/Xcode.app` (if you have another
@@ -48,7 +48,7 @@ sudo xcode-select --reset
 ```
 
 NOTE: The version that is used within the repo _must_ be `system`
-Ruby. Do not change the `.ruby-version` file.
+Ruby. Do not change the `mise.toml` file.
 
 - Download the Starter License for [RubyMotion] (if you want to test an update).
 
