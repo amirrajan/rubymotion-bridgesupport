@@ -790,13 +790,14 @@ class BridgeSupportGenerator
 	prepare(sysroot == '/' ? '' : sysroot, enable_32, enable_64)
 	@incdirs << encode_includes("#{$slb}/include", 'A', false, true)
 	@incdirs << encode_includes('/System/Library/Frameworks/CoreServices.framework/Frameworks', 'S', false, true)
+	@incdirs << encode_includes("#{sysroot}/System/Library/SubFrameworks", 'A', true, true)
 	@imports.unshift('AvailabilityMacros.h')
 	@imports.unshift('_BS_bool.h')
 
 	args = OpenStruct.new
 	args.darwinvers = darwinvers.nil? ? _darwinvers : darwinvers
 	args.imports = includes + @imports
-	args.defines = defines + %w{__APPLE_CPP__=1} + %w{__BLOCKS__=1}
+	args.defines = defines + %w{__APPLE_CPP__=1} + %w{__BLOCKS__=1} + %w{USE_UIKIT_PUBLIC_HEADERS=1}
 	args.incdirs = incdirs + @incdirs
 	args.defaultincs = defaultincs
 	args.sysroot = sysroot
@@ -807,7 +808,7 @@ class BridgeSupportGenerator
 		darwinvers, defines, incdirs, includes, sysroot = parse_cc_args(compiler_flags_64)
 		args.darwinvers = darwinvers.nil? ? _darwinvers : darwinvers
 		args.imports = includes + @imports
-		args.defines = defines + %w{__APPLE_CPP__=1} + %w{__BLOCKS__=1}
+		args.defines = defines + %w{__APPLE_CPP__=1} + %w{__BLOCKS__=1} + %w{USE_UIKIT_PUBLIC_HEADERS=1}
 		args.incdirs = incdirs + @incdirs
 		args.defaultincs = defaultincs
 		args.sysroot = sysroot
