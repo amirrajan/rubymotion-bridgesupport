@@ -48,7 +48,7 @@ end
 
 def getcc(sdkroot = '/')
     return $_cc if $_cc
-    if File.exists?('/usr/bin/xcrun')
+    if File.exist?('/usr/bin/xcrun')
 	out = `/usr/bin/xcrun -sdk #{sdkroot} -find cc`.chomp
 	return $_cc = out unless out.empty?
     end
@@ -590,7 +590,7 @@ class BridgeSupportGenerator
 #    end
 
     def add_header(path)
-	h = (Pathname.new(path).absolute? || File.exists?(path)) ? File.basename(path) : path
+	h = (Pathname.new(path).absolute? || File.exist?(path)) ? File.basename(path) : path
 	@headers << path
 	@imports << h
 	@import_directive ||= ''
